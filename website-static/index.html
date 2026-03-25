@@ -3,496 +3,3514 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Attent — De attentheidsapp</title>
-<meta name="description" content="Attent helpt je om er te zijn op de momenten die ertoe doen. Download gratis.">
+<title>Attent - Mis nooit meer een moment dat ertoe doet.</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💜</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/tokens.css">
-<link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/animations.css">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES — ATTENT BRAND
+   ============================================ */
+:root {
+  --cream: #FFF8EE;
+  --ink: #0C0C22;
+  --purple: #6D2EFF;
+  --pink: #FFA2FF;
+  --yellow: #E8FF3C;
+  --cyan: #7DFFFF;
+  --green: #00FF80;
+  --magenta: #FF69FF;
+  --teal: #2D9B9B;
+
+  --surface: #FFF4E2;
+  --raised: #FFFFFF;
+  --page-bg: #FFF8EE;
+
+  --text-primary: #0C0C22;
+  --text-body: #5A5468;
+  --text-muted: #9A9198;
+
+  --nav-bg: rgba(255, 244, 226, 0.88);
+  --nav-active: rgba(12, 12, 34, 0.06);
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-smooth: cubic-bezier(0.44, 0, 0.56, 1);
+
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 28px;
+  --radius-xl: 40px;
+  --radius-full: 999px;
+
+  --shadow-card: 0 8px 18px rgba(12,12,34,0.08);
+  --shadow-pill: 0 8px 20px rgba(12,12,34,0.05);
+  --shadow-button: 0 4px 10px rgba(12,12,34,0.3), 0 10px 35px rgba(12,12,34,0.3);
+  --shadow-float: 0 12px 40px -8px rgba(12,12,34,0.12), 0 4px 12px -2px rgba(12,12,34,0.06);
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-body);
+  background: var(--page-bg);
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Sora', sans-serif;
+  color: var(--text-primary);
+  line-height: 1.15;
+}
+
+a { color: var(--purple); text-decoration: none; }
+img, svg { display: block; max-width: 100%; }
+
+/* ============================================
+   SCROLL REVEAL
+   ============================================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* ============================================
+   NAVIGATION
+   ============================================ */
+.nav {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 16px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(12, 12, 34, 0.06);
+  max-width: calc(100vw - 32px);
+  transition: background 0.4s var(--ease-smooth), border-color 0.4s var(--ease-smooth);
+}
+
+.nav.scrolled {
+  background: rgba(255, 248, 238, 0.95);
+  border-color: rgba(12, 12, 34, 0.1);
+  box-shadow: 0 4px 20px rgba(12,12,34,0.06);
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.nav-logo-svg { display: block; }
+
+.nav-links {
+  display: flex;
+  gap: 2px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  transition: color 0.3s var(--ease-smooth), background-color 0.3s var(--ease-smooth);
+  position: relative;
+}
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: var(--purple);
+  border-radius: 1px;
+  transition: width 0.3s var(--ease-out);
+}
+.nav-links a:hover::after {
+  width: 60%;
+}
+.nav-links a:hover {
+  color: var(--purple);
+  background: rgba(109, 46, 255, 0.06);
+}
+
+.nav-links a.active { color: var(--text-primary); background: rgba(12,12,34,0.06); }
+
+.nav-cta {
+  margin-left: 8px;
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.nav-cta-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s var(--ease-out);
+  cursor: pointer;
+}
+.nav-cta-btn:hover { transform: scale(1.05); }
+.nav-cta-btn svg { width: 16px; height: 16px; fill: var(--cream); }
+
+/* ============================================
+   HERO
+   ============================================ */
+.hero {
+  background: var(--page-bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 160px 30px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: linear-gradient(to top, var(--page-bg) 0%, transparent 100%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.hero-gradient-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.hero-bg-image {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url('input/Attent Pics/248777c5c404051722dd831a52821412.jpg');
+  background-size: cover;
+  background-position: center top;
+  opacity: 0.12;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 20%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 20%, transparent 70%);
+}
+
+.hero-content {
+  max-width: 980px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 18px 6px 6px;
+  background: rgba(12, 12, 34, 0.05);
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(12, 12, 34, 0.08);
+  opacity: 0;
+  animation: fadeUp 0.8s var(--ease-out) 0.2s forwards;
+}
+
+.hero-badge-new {
+  padding: 4px 12px;
+  background: var(--purple);
+  border-radius: var(--radius-full);
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  letter-spacing: 0.04em;
+}
+
+.hero-badge-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--text-body);
+}
+
+.hero-title {
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(44px, 7vw, 90px);
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  max-width: 800px;
+  margin: 8px 0 4px;
+  opacity: 0;
+  animation: fadeUp 0.8s var(--ease-out) 0.35s forwards;
+}
+
+.hero-title-line {
+  display: block;
+  text-align: center;
+}
+
+.hero-desc {
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(16px, 1.4vw, 18px);
+  color: var(--text-body);
+  max-width: 480px;
+  line-height: 1.5;
+  opacity: 0;
+  animation: fadeUp 0.8s var(--ease-out) 0.5s forwards;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 8px;
+  opacity: 0;
+  animation: fadeUp 0.8s var(--ease-out) 0.65s forwards;
+}
+
+/* Button with text-flip hover */
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 32px;
+  border-radius: var(--radius-full);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.3s var(--ease-out), box-shadow 0.45s var(--ease-smooth);
+  text-decoration: none;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: scale(0.98); }
+
+.btn-primary {
+  background: var(--ink);
+  color: var(--cream);
+}
+.btn-primary:hover { box-shadow: 0 8px 30px rgba(12,12,34,0.2); }
+
+.btn-dark {
+  background: var(--ink);
+  color: var(--cream);
+  box-shadow: var(--shadow-button);
+}
+.btn-dark:hover { box-shadow: 0 6px 16px rgba(12,12,34,0.4), 0 14px 40px rgba(12,12,34,0.35); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-body);
+  border: 1px solid rgba(12, 12, 34, 0.12);
+}
+.btn-ghost:hover { color: var(--text-primary); border-color: rgba(12,12,34,0.25); }
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text-primary);
+}
+.btn-secondary:hover { background: #EDE5D5; }
+
+.btn-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Hero phone mockups */
+.hero-phones {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 900px;
+  height: 500px;
+  margin-top: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  opacity: 0;
+  animation: fadeUp 1s var(--ease-out) 0.8s forwards;
+}
+
+.phone-mockup {
+  max-width: 260px;
+  width: 100%;
+  height: 520px;
+  background: var(--raised);
+  border-radius: 36px;
+  box-shadow: 0 20px 60px rgba(12,12,34,0.15), 0 0 0 1px rgba(12,12,34,0.06);
+  overflow: hidden;
+  position: absolute;
+  transition: transform 0.6s var(--ease-out);
+}
+
+.phone-mockup-center {
+  z-index: 3;
+  bottom: 0;
+}
+
+.phone-mockup-left {
+  z-index: 2;
+  transform: translateX(-200px) rotate(-6deg) scale(0.92);
+  bottom: -20px;
+}
+
+.phone-mockup-right {
+  z-index: 2;
+  transform: translateX(200px) rotate(6deg) scale(0.92);
+  bottom: -20px;
+}
+
+.phone-screen {
+  width: 100%;
+  height: 100%;
+  background: var(--ink);
+  padding: 48px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.phone-status {
+  font-family: 'Sora', sans-serif;
+  font-size: 11px;
+  color: rgba(255,248,238,0.4);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.phone-notif {
+  background: rgba(255, 248, 238, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 248, 238, 0.1);
+  border-radius: 16px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.phone-notif-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.phone-notif-icon {
+  width: 28px;
+  height: 28px;
+  background: var(--purple);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.phone-notif-icon svg { width: 14px; height: 14px; fill: white; }
+
+.phone-notif-app {
+  font-family: 'Sora', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,248,238,0.5);
+  letter-spacing: 0.04em;
+}
+
+.phone-notif-time {
+  font-size: 11px;
+  color: rgba(255,248,238,0.3);
+  margin-left: auto;
+}
+
+.phone-notif-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255,248,238,0.9);
+}
+
+.phone-notif-body {
+  font-size: 13px;
+  color: rgba(255,248,238,0.5);
+  line-height: 1.4;
+}
+
+.phone-notif-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.phone-notif-action {
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+}
+
+.phone-notif-action-primary {
+  background: var(--purple);
+  color: white;
+}
+
+.phone-notif-action-secondary {
+  background: rgba(255,248,238,0.08);
+  color: rgba(255,248,238,0.6);
+}
+
+/* Hero image overlay — removed, replaced by gradient */
+.hero-image-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.hero-image-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.25;
+  filter: saturate(0.6);
+}
+
+/* ============================================
+   SECTION CONTAINERS
+   ============================================ */
+.section {
+  padding: 160px 30px;
+  position: relative;
+}
+
+.section-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 20px;
+  background: var(--raised);
+  border-radius: var(--radius-full);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-body);
+  box-shadow: var(--shadow-pill);
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+  max-width: 600px;
+}
+
+.section-desc {
+  font-size: 16px;
+  color: var(--text-body);
+  max-width: 500px;
+  line-height: 1.6;
+}
+
+/* ============================================
+   FLOWING TEXT + MARQUEE SECTION
+   ============================================ */
+/* ============================================
+   STATEMENT — Flowing text
+   ============================================ */
+.statement-section {
+  padding: 80px 30px;
+}
+
+.statement-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.statement-text {
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(26px, 3.5vw, 44px);
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 8px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.stword {
+  display: inline;
+  color: var(--text-muted);
+  transition: color 0.6s var(--ease-out);
+}
+.stword.filled {
+  color: var(--text-primary);
+}
+
+.statement-img {
+  display: inline-block;
+  width: clamp(90px, 12vw, 140px);
+  height: 1.3em;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  vertical-align: middle;
+  position: relative;
+}
+
+.statement-img img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.2s ease-in-out;
+}
+
+.statement-img img.statement-img-active {
+  opacity: 1;
+}
+
+/* ============================================
+   PHONE SHOWCASE — Scrolling cards
+   ============================================ */
+.phone-showcase {
+  padding: 40px 0 80px;
+  overflow: hidden;
+}
+
+.phone-showcase-inner {
+  position: relative;
+  max-width: 100%;
+  height: 560px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.showcase-scroll-area {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  z-index: 1;
+}
+
+.showcase-row {
+  display: flex;
+  gap: 16px;
+  width: max-content;
+  animation: showcaseScroll 30s linear infinite;
+}
+
+.showcase-row-2 {
+  animation-direction: reverse;
+}
+
+@keyframes showcaseScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes streakCarousel {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.showcase-card {
+  width: 160px;
+  height: 200px;
+  border-radius: 20px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--raised);
+  box-shadow: 0 4px 20px rgba(12,12,34,0.06);
+}
+
+.showcase-card-img {
+  padding: 0;
+}
+
+.showcase-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.showcase-card-achievement {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px;
+  text-align: center;
+}
+
+.showcase-card-achievement span {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+/* Phone overlay on top */
+.showcase-phone {
+  position: relative;
+  z-index: 3;
+}
+
+.showcase-phone-frame {
+  width: 300px;
+  background: var(--raised);
+  border-radius: 40px;
+  box-shadow: 0 24px 80px rgba(12,12,34,0.18), 0 0 0 1px rgba(12,12,34,0.06);
+  overflow: hidden;
+}
+
+/* Fade edges of scroll area */
+.showcase-scroll-area::before,
+.showcase-scroll-area::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 200px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.showcase-scroll-area::before {
+  left: 0;
+  background: linear-gradient(to right, var(--page-bg), transparent);
+}
+
+.showcase-scroll-area::after {
+  right: 0;
+  background: linear-gradient(to left, var(--page-bg), transparent);
+}
+
+/* Marquee */
+.marquee-wrapper {
+  overflow: hidden;
+  padding: 8px 0;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  width: 100vw;
+}
+
+.marquee-track {
+  display: flex;
+  gap: 16px;
+  width: max-content;
+  animation: marqueeScroll 25s linear infinite;
+}
+
+.marquee-track-reverse {
+  animation-direction: reverse;
+}
+
+.marquee-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  background: var(--raised);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-pill);
+  white-space: nowrap;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+  flex-shrink: 0;
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out), background 0.3s var(--ease-out);
+  cursor: default;
+}
+.marquee-item:hover {
+  transform: translateY(-2px);
+  background: var(--ink);
+  color: var(--cream);
+}
+
+.marquee-item-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+@keyframes marqueeScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Rating + Download */
+.download-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 48px;
+}
+
+.rating-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--raised);
+  border-radius: var(--radius-full);
+  font-size: 14px;
+  color: var(--text-body);
+  box-shadow: var(--shadow-pill);
+}
+
+.rating-stars { color: var(--purple); font-size: 14px; letter-spacing: 2px; }
+
+/* Flowing section bottom text */
+.flowing-bottom-text {
+  font-size: 16px;
+  color: var(--text-body);
+  max-width: 640px;
+  text-align: center;
+  margin: 48px auto 32px;
+  line-height: 1.6;
+}
+
+/* ============================================
+   FEATURES GRID
+   ============================================ */
+.features-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.feature-card {
+  background: var(--raised);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 480px;
+}
+
+.download-section {
+  padding: 60px 30px;
+  text-align: center;
+}
+
+.reminder-notification {
+  background: rgba(255, 248, 238, 0.06);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 248, 238, 0.1);
+  border-radius: 20px;
+  padding: 24px;
+}
+
+.feature-card-dark {
+  background: var(--ink);
+  color: rgba(255,248,238,0.9);
+}
+
+.feature-card-dark h3 { color: rgba(255,248,238,0.9); }
+.feature-card-dark p { color: rgba(255,248,238,0.5); }
+
+.feature-card-content {
+  padding: 36px;
+  flex-shrink: 0;
+}
+
+.feature-card h3 {
+  font-family: 'Sora', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+
+.feature-card p {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-body);
+}
+
+.feature-card-full {
+  grid-column: 1 / -1;
+}
+
+/* Feature ticker (vertical) */
+.feature-ticker-container {
+  overflow: hidden;
+  height: auto;
+  min-height: 260px;
+  flex: 1;
+  position: relative;
+  padding: 0 36px;
+}
+
+.feature-ticker-container::before,
+.feature-ticker-container::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 40px;
+  z-index: 2;
+  pointer-events: none;
+}
+.feature-ticker-container::before { top: 0; background: linear-gradient(to bottom, var(--raised), transparent); }
+.feature-ticker-container::after { bottom: 0; background: linear-gradient(to top, var(--raised), transparent); }
+
+.feature-ticker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: tickerVertical 15s linear infinite;
+}
+
+@keyframes tickerVertical {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+.feature-ticker-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  background: var(--raised);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-pill);
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.feature-ticker-item-check {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--purple);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.feature-ticker-item-check svg { width: 10px; height: 10px; fill: white; }
+
+/* Feature planner mockup */
+.planner-mockup {
+  padding: 20px 36px 36px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.planner-card {
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  flex: 1;
+}
+
+.planner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.planner-greeting {
+  font-family: 'Sora', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.planner-date {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.planner-progress {
+  height: 4px;
+  background: rgba(12,12,34,0.06);
+  border-radius: 2px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.planner-progress-bar {
+  height: 100%;
+  background: var(--purple);
+  border-radius: 2px;
+  width: 35%;
+}
+
+.planner-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(12,12,34,0.04);
+}
+
+.planner-item:last-child { border-bottom: none; }
+
+.planner-item-check {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(12,12,34,0.15);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.planner-item-check.done {
+  background: var(--purple);
+  border-color: var(--purple);
+}
+
+.planner-item-text {
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.planner-item-time {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Feature full-width reminders */
+.reminders-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 0 36px 36px;
+}
+
+.reminder-col {
+  overflow: hidden;
+  height: 280px;
+  position: relative;
+}
+
+.reminder-col::before,
+.reminder-col::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50px;
+  z-index: 2;
+  pointer-events: none;
+}
+.feature-card-reminders .reminder-col::before { top: 0; background: linear-gradient(to bottom, #151030, transparent); }
+.feature-card-reminders .reminder-col::after { bottom: 0; background: linear-gradient(to top, #151030, transparent); }
+.feature-card-full:not(.feature-card-reminders) .reminder-col::before { top: 0; background: linear-gradient(to bottom, var(--raised), transparent); }
+.feature-card-full:not(.feature-card-reminders) .reminder-col::after { bottom: 0; background: linear-gradient(to top, var(--raised), transparent); }
+
+.reminder-ticker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reminder-ticker-1 { animation: tickerVertical 20s linear infinite; }
+.reminder-ticker-2 { animation: tickerVertical 25s linear infinite reverse; }
+.reminder-ticker-3 { animation: tickerVertical 22s linear infinite; }
+
+.reminder-item {
+  background: rgba(255, 248, 238, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 248, 238, 0.08);
+  border-radius: 16px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reminder-item-time {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.reminder-item-text {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.reminder-item-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* Reminders card frosted glass style */
+.feature-card-reminders {
+  background: linear-gradient(135deg, #0C0C22 0%, #1a1040 30%, #2a1060 60%, #1a1040 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card-reminders::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 50%, rgba(109,46,255,0.15), transparent 60%),
+    radial-gradient(ellipse at 70% 30%, rgba(255,162,255,0.1), transparent 50%);
+  pointer-events: none;
+}
+
+.feature-card-reminders h3 { color: rgba(255,248,238,0.9); }
+.feature-card-reminders p { color: rgba(255,248,238,0.5); }
+.feature-card-reminders .reminder-item { background: rgba(255, 248, 238, 0.06); border-color: rgba(255, 248, 238, 0.1); }
+.feature-card-reminders .reminder-item-time { color: rgba(255,248,238,0.4); }
+.feature-card-reminders .reminder-item-text { color: rgba(255,248,238,0.9); }
+.feature-card-reminders .reminder-item-desc { color: rgba(255,248,238,0.5); }
+
+.reminder-card {
+  background: rgba(255, 248, 238, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 248, 238, 0.1);
+  border-radius: 16px;
+}
+
+/* Feature card image area */
+.feature-card-image {
+  height: 240px;
+  overflow: hidden;
+  position: relative;
+}
+
+.feature-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Stats mockup */
+.stats-mockup {
+  padding: 20px 36px 36px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.stat-item {
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  text-align: center;
+}
+
+.stat-item-number {
+  font-family: 'Sora', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--purple);
+}
+
+.stat-item-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ============================================
+   USE CASES
+   ============================================ */
+/* Use Cases — Boxed layout */
+.usecase-box {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  padding: 48px 40px;
+  border: 1px solid rgba(12,12,34,0.04);
+}
+
+.usecase-header {
+  text-align: center;
+}
+
+.use-cases-tabs {
+  display: inline-flex;
+  gap: 6px;
+  margin: 0 auto 32px;
+  padding: 6px;
+  background: var(--raised);
+  border-radius: var(--radius-full);
+  border: 1.5px solid rgba(12,12,34,0.06);
+}
+
+.use-tab {
+  padding: 10px 22px;
+  background: transparent;
+  border-radius: var(--radius-full);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-body);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-smooth);
+}
+
+.use-tab:hover { background: rgba(12,12,34,0.04); }
+.use-tab.active { background: var(--ink); color: var(--cream); box-shadow: 0 2px 8px rgba(12,12,34,0.15); }
+
+.use-case-content {
+  display: none;
+}
+.use-case-content.active { display: block; }
+
+.usecase-image-box {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  height: 480px;
+}
+
+.usecase-image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.usecase-glass {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  max-width: 400px;
+  background: rgba(12, 12, 34, 0.65);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 248, 238, 0.1);
+  border-radius: var(--radius-md);
+  padding: 24px;
+}
+
+.usecase-glass p {
+  font-size: 15px;
+  line-height: 1.5;
+  color: rgba(255, 248, 238, 0.85);
+  margin-bottom: 16px;
+}
+
+.usecase-glass-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.usecase-glass-number {
+  font-family: 'Sora', sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: white;
+}
+
+.usecase-glass-label {
+  font-size: 14px;
+  color: rgba(255, 248, 238, 0.5);
+}
+
+/* ============================================
+   SOCIAL PROOF
+   ============================================ */
+.proof-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 48px;
+}
+
+.proof-trust {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.proof-avatars {
+  display: flex;
+}
+
+.proof-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--cream);
+  margin-left: -10px;
+  overflow: hidden;
+}
+
+.proof-avatar:first-child { margin-left: 0; }
+.proof-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.proof-avatar-more {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--purple);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -10px;
+  border: 2px solid var(--cream);
+}
+
+.proof-trust-text {
+  font-size: 14px;
+  color: var(--text-body);
+}
+
+.proof-trust-stars { color: var(--purple); }
+
+.proof-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.proof-card {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  position: relative;
+  height: 380px;
+  cursor: pointer;
+  transition: transform 0.4s var(--ease-out);
+}
+
+.proof-card:hover { transform: translateY(-4px); }
+
+.proof-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.proof-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(12,12,34,0.8) 0%, transparent 50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 24px;
+}
+
+.proof-card-name {
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+}
+
+.proof-card-role {
+  font-size: 13px;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 8px;
+}
+
+.proof-card-achievement {
+  font-size: 15px;
+  color: rgba(255,255,255,0.9);
+  line-height: 1.4;
+}
+
+.proof-card-stat {
+  font-family: 'Sora', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 4px;
+}
+
+/* ============================================
+   COUNTER / STATS
+   ============================================ */
+.counter-section {
+  text-align: center;
+  padding: 200px 30px 160px;
+}
+
+.counter-number {
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(64px, 10vw, 120px);
+  font-weight: 700;
+  color: var(--purple);
+  line-height: 1;
+  margin: 24px 0 8px;
+}
+
+.counter-label {
+  font-size: 18px;
+  color: var(--text-body);
+  margin-bottom: 80px;
+}
+
+.counter-stats {
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+  flex-wrap: wrap;
+}
+
+.counter-stat {
+  text-align: center;
+}
+
+.counter-stat-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin: 0 auto 12px;
+  font-family: 'Sora', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+}
+.counter-stat-circle-purple { background: var(--purple); box-shadow: 0 10px 15px rgba(109,46,255,0.5); }
+.counter-stat-circle-pink { background: var(--pink); box-shadow: 0 10px 15px rgba(255,162,255,0.5); }
+.counter-stat-circle-teal { background: var(--teal); box-shadow: 0 10px 15px rgba(45,155,155,0.5); }
+
+.counter-stat-label {
+  font-size: 14px;
+  color: var(--text-muted);
+  max-width: 120px;
+}
+
+/* ============================================
+   AI SUGGESTIONS
+   ============================================ */
+.ai-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-top: 48px;
+}
+
+.ai-card {
+  background: var(--raised);
+  border-radius: var(--radius-md);
+  padding: 28px;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.3s var(--ease-out);
+  position: relative;
+}
+
+.ai-card:hover { transform: translateY(-4px); }
+
+.ai-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.ai-card h3 {
+  font-family: 'Sora', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+
+.ai-card p {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-body);
+}
+
+/* ============================================
+   TESTIMONIALS
+   ============================================ */
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 48px;
+}
+
+.testimonial-card {
+  background: var(--raised);
+  border-radius: var(--radius-md);
+  padding: 28px;
+  box-shadow: var(--shadow-card);
+}
+
+.testimonial-text {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-body);
+  margin-bottom: 20px;
+  font-style: italic;
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.testimonial-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.testimonial-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.testimonial-avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--purple);
+  color: white;
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.testimonial-name {
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.testimonial-role {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ============================================
+   FAQ
+   ============================================ */
+.faq-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  margin-top: 48px;
+}
+
+.faq-cta-card {
+  background: var(--raised);
+  border-radius: var(--radius-md);
+  padding: 36px;
+  box-shadow: var(--shadow-card);
+  height: fit-content;
+  position: sticky;
+  top: 100px;
+}
+
+.faq-cta-card h3 {
+  font-family: 'Sora', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.faq-cta-card p {
+  font-size: 15px;
+  color: var(--text-body);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.faq-item {
+  background: var(--raised);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(12,12,34,0.03);
+}
+
+.faq-question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+  transition: color 0.3s;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+
+.faq-question:hover { color: var(--purple); }
+
+.faq-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s var(--ease-out);
+  flex-shrink: 0;
+}
+
+.faq-item.open .faq-icon { transform: rotate(45deg); }
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s var(--ease-out), padding 0.4s var(--ease-out);
+}
+
+.faq-item.open .faq-answer {
+  max-height: 1000px;
+}
+
+.faq-answer-inner {
+  padding: 0 24px 20px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-body);
+}
+
+/* ============================================
+   FINAL CTA
+   ============================================ */
+.final-cta {
+  text-align: center;
+  padding: 160px 30px 120px;
+  position: relative;
+}
+
+.final-cta-title {
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  margin-bottom: 16px;
+}
+
+.final-cta-desc {
+  font-size: 18px;
+  color: var(--text-body);
+  max-width: 460px;
+  margin: 0 auto 40px;
+  line-height: 1.5;
+}
+
+.final-cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+.footer {
+  background: var(--ink);
+  padding: 80px 30px 40px;
+  color: rgba(255,248,238,0.6);
+}
+
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-top {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 48px;
+  padding-bottom: 60px;
+  border-bottom: 1px solid rgba(255,248,238,0.08);
+}
+
+.footer-brand svg { height: 28px; width: 28px; margin-bottom: 20px; }
+
+.footer-brand p {
+  font-size: 14px;
+  color: rgba(255,248,238,0.4);
+  max-width: 260px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.footer-newsletter {
+  display: flex;
+  gap: 8px;
+}
+
+.footer-newsletter input {
+  flex: 1;
+  padding: 10px 16px;
+  background: rgba(255,248,238,0.08);
+  border: 1.5px solid rgba(255,248,238,0.2);
+  border-radius: var(--radius-full);
+  color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s, background 0.3s;
+}
+
+.footer-newsletter input:focus {
+  border-color: var(--purple);
+  background: rgba(255,248,238,0.12);
+}
+
+.footer-newsletter input::placeholder { color: rgba(255,248,238,0.3); }
+
+.footer-newsletter button {
+  padding: 10px 20px;
+  background: var(--purple);
+  color: white;
+  border: none;
+  border-radius: var(--radius-full);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.footer-newsletter button:hover { background: #5B20E0; }
+
+.footer-col h4 {
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,248,238,0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 20px;
+}
+
+.footer-col a {
+  display: block;
+  font-size: 14px;
+  color: rgba(255,248,238,0.6);
+  padding: 4px 0;
+  transition: color 0.3s;
+}
+
+.footer-col a:hover { color: var(--cream); }
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 32px;
+  font-size: 13px;
+  color: rgba(255,248,238,0.3);
+}
+
+.footer-social {
+  display: flex;
+  gap: 16px;
+}
+
+.footer-social a {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255,248,238,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+}
+
+.footer-social a:hover { background: rgba(255,248,238,0.12); }
+.footer-social svg { width: 16px; height: 16px; fill: rgba(255,248,238,0.5); }
+
+/* ============================================
+   FLOATING CTA
+   ============================================ */
+.floating-cta {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999;
+  padding: 10px 18px;
+  background: var(--raised);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 20px rgba(12,12,34,0.12);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.floating-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(12,12,34,0.16);
+}
+
+.floating-cta-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .features-grid { grid-template-columns: 1fr; }
+  .feature-card-full { flex-direction: column !important; }
+  .ai-grid { grid-template-columns: repeat(2, 1fr); }
+  .proof-cards { grid-template-columns: repeat(2, 1fr); }
+  .testimonials-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .usecase-box { padding: 32px 24px; }
+  .usecase-image-box { height: 360px; }
+  .faq-layout { grid-template-columns: 1fr; gap: 32px; }
+  .reminders-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .hero { padding-top: 100px; }
+  .hero-title { font-size: 40px; }
+  .hero-buttons { flex-direction: column; width: 100%; max-width: 300px; }
+  .hero-buttons .btn { width: 100%; justify-content: center; }
+  .hero-phones { height: 300px; }
+  .phone-mockup { width: 180px; height: 360px; border-radius: 24px; }
+  .phone-mockup-left { transform: translateX(-120px) rotate(-6deg) scale(0.88); }
+  .phone-mockup-right { transform: translateX(120px) rotate(6deg) scale(0.88); }
+  .section { padding: 100px 20px; }
+  .statement-section { padding: 60px 20px; }
+  .statement-text { font-size: 24px; }
+  .proof-cards { grid-template-columns: 1fr; }
+  .ai-grid { grid-template-columns: 1fr; }
+  .testimonials-grid { grid-template-columns: 1fr; }
+  .footer-top { grid-template-columns: 1fr; }
+  .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+  .download-row { justify-content: center; }
+  .reminders-grid { grid-template-columns: 1fr; }
+  .proof-header { flex-direction: column; gap: 20px; }
+}
+
+@media (max-width: 480px) {
+  .hero-phones { display: none; }
+  .phone-mockup-left, .phone-mockup-right { display: none; }
+}
+
+/* ============================================
+   TEXT CYCLE ANIMATION
+   ============================================ */
+.text-cycle {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  height: 1.1em;
+  vertical-align: baseline;
+  min-width: 4ch;
+  transition: width 500ms var(--ease-out);
+}
+.text-cycle-word {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  white-space: nowrap;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: 0;
+  transform: translateY(0.3em);
+  filter: blur(6px);
+  transition: opacity 350ms var(--ease-out), transform 350ms var(--ease-out), filter 350ms var(--ease-out);
+  pointer-events: none;
+}
+.text-cycle-word.active {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0px);
+  pointer-events: auto;
+}
+.text-cycle-word.exit {
+  opacity: 0 !important;
+  transform: translateY(-0.4em);
+  filter: blur(6px);
+  visibility: hidden;
+  transition: opacity 250ms var(--ease-out), transform 250ms var(--ease-out), filter 250ms var(--ease-out), visibility 0ms 250ms;
+}
+
+/* ============================================
+   PROOF CAROUSEL (Early Adopters)
+   ============================================ */
+.proof-carousel {
+  display: flex;
+  gap: 24px;
+  width: max-content;
+  animation: carouselScroll 60s linear infinite;
+}
+.proof-carousel:hover {
+  animation-play-state: paused;
+}
+@keyframes carouselScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.proof-card-img {
+  width: 320px;
+  height: 440px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+.proof-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.proof-card-img .proof-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24px;
+  background: linear-gradient(to top, rgba(12,12,34,0.85) 0%, transparent 100%);
+  color: white;
+}
+
+/* ============================================
+   USE CASES CENTERED
+   ============================================ */
+#usecases .section-inner {
+  text-align: center;
+}
+#usecases .section-title {
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+#usecases .section-badge {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ============================================
+   RESPONSIVE ADDITIONS
+   ============================================ */
+@media (max-width: 1024px) {
+  #ai [style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+  #ai [style*="grid-template-columns: repeat(4"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+@media (max-width: 768px) {
+  #features [style*="display: flex; justify-content: space-between"] {
+    flex-direction: column !important;
+    gap: 24px !important;
+  }
+  #ai [style*="grid-template-columns: repeat(4"] {
+    grid-template-columns: 1fr !important;
+  }
+  #ai [style*="min-height: 500px"] {
+    min-height: 400px !important;
+  }
+  .proof-card-img {
+    width: 260px;
+    height: 360px;
+  }
+}
+
+/* ============================================
+   FIX #3: AI floating cards responsive
+   ============================================ */
+.ai-float-card { position: absolute; background: var(--raised); border-radius: 16px; padding: 16px 20px; box-shadow: var(--shadow-float); max-width: 260px; }
+@media (max-width: 768px) {
+  .ai-float-card { display: none !important; }
+}
+
+/* ============================================
+   FIX #7: Testimonial avatar colors
+   ============================================ */
+.testimonial-card:nth-child(6n+1) .testimonial-avatar-placeholder { background: var(--purple); }
+.testimonial-card:nth-child(6n+2) .testimonial-avatar-placeholder { background: var(--pink); color: var(--ink); }
+.testimonial-card:nth-child(6n+3) .testimonial-avatar-placeholder { background: var(--teal); }
+.testimonial-card:nth-child(6n+4) .testimonial-avatar-placeholder { background: var(--cyan); color: var(--ink); }
+.testimonial-card:nth-child(6n+5) .testimonial-avatar-placeholder { background: var(--green); color: var(--ink); }
+.testimonial-card:nth-child(6n+6) .testimonial-avatar-placeholder { background: var(--purple); }
+
+/* ============================================
+   FIX #8: AI section classes
+   ============================================ */
+.ai-section-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; margin-bottom: 80px; }
+.ai-phone { width: 280px; max-width: 100%; height: 540px; background: var(--ink); border-radius: 36px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); overflow: hidden; margin-left: auto; position: relative; }
+.ai-phone-screen { padding: 48px 20px 20px; display: flex; flex-direction: column; gap: 12px; }
+.ai-feature-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.ai-feature-card { background: var(--raised); border-radius: var(--radius-md); padding: 32px; box-shadow: var(--shadow-card); position: relative; overflow: hidden; transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out); }
+.ai-feature-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 80px; font-size: 24px; }
+@media (max-width: 1024px) { .ai-section-grid { grid-template-columns: 1fr; } .ai-feature-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .ai-feature-grid { grid-template-columns: 1fr; } }
+
+/* ============================================
+   FIX #11: Feature card hover states
+   ============================================ */
+.feature-card {
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
+}
+.feature-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(109,46,255,0.04), rgba(255,162,255,0.03), rgba(125,255,255,0.02));
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-out);
+  pointer-events: none;
+  z-index: 0;
+}
+@media (hover: hover) {
+  .feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(12,12,34,0.1);
+  }
+  .feature-card:hover::before { opacity: 1; }
+}
+
+/* ============================================
+   FIX #13: Globe SVG container
+   ============================================ */
+.globe-container {
+  max-width: 600px;
+  margin: 40px auto;
+  aspect-ratio: 2 / 1;
+  position: relative;
+  overflow: hidden;
+}
+.globe-container svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ============================================
+   FIX #16: Marquee pause on hover
+   ============================================ */
+.marquee-wrapper:hover .marquee-track { animation-play-state: paused; }
+
+/* ============================================
+   FIX #17: Feature ticker pause on hover
+   ============================================ */
+.feature-ticker-container:hover .feature-ticker { animation-play-state: paused; }
+
+/* ============================================
+   FIX #25: Section dividers
+   ============================================ */
+.section-divider {
+  height: 1px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: linear-gradient(90deg, transparent, rgba(109,46,255,0.12), rgba(255,162,255,0.08), transparent);
+}
+
+/* ============================================
+   FIX #29: Reduced motion for globe
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .globe-container svg animate { display: none; }
+}
+
+/* ============================================
+   FIX #30: Footer link hover
+   ============================================ */
+.footer-col a:hover { color: var(--purple); transition: color 0.2s; }
+</style>
 </head>
 <body>
 
-<!-- ====== NAV ====== -->
-<nav class="nav" id="nav">
-  <div class="nav-inner">
-    <a href="#" class="nav-brand" aria-label="Attent home">
-      <svg class="nav-logo" viewBox="0 0 394.9 135.11" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <g fill="var(--ink)">
-          <path d="M9.38,94.14c0-10.94,9.83-25.34,39.46-25.34h.97c7.61-18.69,19.38-45.55,36.97-45.55,5.4,0,9.14.83,13.57,1.94l-6.23,43.61h13.15l-1.52,11.21h-13.15l-.83,5.4c-1.52,10.11,1.52,15.09,8.31,15.09,8.44,0,14.81-6.78,20.63-17.86l9.14,4.43c-6.51,13.15-17.31,24.78-32.4,24.64-12.74,0-22.01-8.45-19.11-26.31l.83-5.4h-20.21l-.28.55c-8.86,21.32-18.14,31.29-31.7,31.29-8.44,0-17.58-5.81-17.58-17.72ZM27.93,100.78c6.51,0,11.35-7.75,17.17-20.63-14.95.83-23.54,7.2-23.54,14.26,0,4.15,2.77,6.37,6.37,6.37ZM80.95,68.8l5.26-33.64h-.69c-6.92,0-15.09,17.17-22.01,33.64h17.44Z"/>
-          <path d="M119.85,87.08l3.46-21.18h-9.55l1.66-11.35h9.69l3.05-18.97h13.01l-3.05,18.97h17.03l-1.52,11.35h-17.44l-3.32,20.77c-1.66,9.41,1.66,13.84,9.55,13.84,7.2,0,15.78-6.37,21.32-17.86l9.14,4.43c-7.48,15.78-19.24,24.64-33.37,24.64-9,0-22.98-4.15-19.66-24.64Z"/>
-          <path d="M162.91,87.08l3.46-21.18h-9.55l1.66-11.35h9.69l3.05-18.97h13.01l-3.05,18.97h17.03l-1.52,11.35h-17.44l-3.32,20.77c-1.66,9.41,1.66,13.84,9.55,13.84,7.2,0,15.78-6.37,21.32-17.86l9.14,4.43c-7.48,15.78-19.24,24.64-33.37,24.64-9,0-22.98-4.15-19.66-24.64Z"/>
-          <path d="M234.07,53.16c11.91,0,18,7.48,18.14,15.23,0,9.83-9.55,20.49-32.12,23.54,2.91,5.81,9.28,9.14,17.86,9.14,9.97,0,20.08-5.12,26.58-18.41l9.14,4.43c-7.89,16.34-20.77,24.78-37.24,24.78-18.97,0-31.15-10.11-31.01-27.14,0-15.51,10.24-31.57,28.66-31.57ZM239.88,69.08c0-3.05-2.22-5.26-5.95-5.4-8.58,0-15.23,9.14-15.64,19.24,14.68-1.11,21.6-8.17,21.6-13.84Z"/>
-          <path d="M268.26,54.54h12.46l-1.8,12.74c5.4-7.2,14.12-13.98,24.23-14.12,10.52,0,16.61,6.78,16.75,16.34,0,8.03-4.02,17.44-4.02,23.95,0,4.71,2.91,7.06,7.2,7.06,5.81,0,12.18-5.95,18.28-17.86l9.14,4.43c-6.78,13.71-17.58,24.64-30.32,24.64-8.86,0-16.61-5.12-16.61-15.92,0-7.89,3.18-15.64,3.32-22.98,0-4.98-2.63-8.86-8.03-9-11.49,0-20.77,18-23.81,33.09l-.42,3.05-1.38,10.52h-13.01l8.03-55.93Z"/>
-          <path d="M340.53,87.08l3.32-21.18h-9.41l1.52-11.21h9.69l3.05-18.97h13.15l-3.05,18.97h17.03l-1.52,11.21h-17.44l-3.32,20.77c-1.52,9.14,1.66,14.4,8.31,14.4,5.81,0,10.94-5.12,15.78-12.04l7.89,6.09c-5.81,8.31-14.68,16.75-25.75,16.75-8.58,0-22.57-4.29-19.24-24.78Z"/>
-        </g>
-      </svg>
-    </a>
-
-    <ul class="nav-links" id="navLinks">
-      <li><a href="#stories" data-i18n="nav.features">Features</a></li>
-      <li><a href="#how" data-i18n="nav.how">Hoe het werkt</a></li>
-      <li class="nav-lang">
-        <button class="lang-btn active" data-lang="nl">NL</button>
-        <span class="lang-sep">|</span>
-        <button class="lang-btn" data-lang="en">EN</button>
-      </li>
-    </ul>
-
-    <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
+<!-- ==========================================
+     NAVIGATION
+     ========================================== -->
+<nav class="nav" id="mainNav">
+  <div class="nav-logo">
+    <svg class="nav-logo-svg" viewBox="0 0 394.9 135.11" xmlns="http://www.w3.org/2000/svg" style="height:24px;width:auto;">
+      <g fill="var(--ink)">
+        <path d="M9.38,94.14c0-10.94,9.83-25.34,39.46-25.34h.97c7.61-18.69,19.38-45.55,36.97-45.55,5.4,0,9.14.83,13.57,1.94l-6.23,43.61h13.15l-1.52,11.21h-13.15l-.83,5.4c-1.52,10.11,1.52,15.09,8.31,15.09,8.44,0,14.81-6.78,20.63-17.86l9.14,4.43c-6.51,13.15-17.31,24.78-32.4,24.64-12.74,0-22.01-8.45-19.11-26.31l.83-5.4h-20.21l-.28.55c-8.86,21.32-18.14,31.29-31.7,31.29-8.44,0-17.58-5.81-17.58-17.72ZM27.93,100.78c6.51,0,11.35-7.75,17.17-20.63-14.95.83-23.54,7.2-23.54,14.26,0,4.15,2.77,6.37,6.37,6.37ZM80.95,68.8l5.26-33.64h-.69c-6.92,0-15.09,17.17-22.01,33.64h17.44Z"/>
+        <path d="M119.85,87.08l3.46-21.18h-9.55l1.66-11.35h9.69l3.05-18.97h13.01l-3.05,18.97h17.03l-1.52,11.35h-17.44l-3.32,20.77c-1.66,9.41,1.66,13.84,9.55,13.84,7.2,0,15.78-6.37,21.32-17.86l9.14,4.43c-7.48,15.78-19.24,24.64-33.37,24.64-9,0-22.98-4.15-19.66-24.64Z"/>
+        <path d="M162.91,87.08l3.46-21.18h-9.55l1.66-11.35h9.69l3.05-18.97h13.01l-3.05,18.97h17.03l-1.52,11.35h-17.44l-3.32,20.77c-1.66,9.41,1.66,13.84,9.55,13.84,7.2,0,15.78-6.37,21.32-17.86l9.14,4.43c-7.48,15.78-19.24,24.64-33.37,24.64-9,0-22.98-4.15-19.66-24.64Z"/>
+        <path d="M234.07,53.16c11.91,0,18,7.48,18.14,15.23,0,9.83-9.55,20.49-32.12,23.54,2.91,5.81,9.28,9.14,17.86,9.14,9.97,0,20.08-5.12,26.58-18.41l9.14,4.43c-7.89,16.34-20.77,24.78-37.24,24.78-18.97,0-31.15-10.11-31.01-27.14,0-15.51,10.24-31.57,28.66-31.57ZM239.88,69.08c0-3.05-2.22-5.26-5.95-5.4-8.58,0-15.23,9.14-15.64,19.24,14.68-1.11,21.6-8.17,21.6-13.84Z"/>
+        <path d="M268.26,54.54h12.46l-1.8,12.74c5.4-7.2,14.12-13.98,24.23-14.12,10.52,0,16.61,6.78,16.75,16.34,0,8.03-4.02,17.44-4.02,23.95,0,4.71,2.91,7.06,7.2,7.06,5.81,0,12.18-5.95,18.28-17.86l9.14,4.43c-6.78,13.71-17.58,24.64-30.32,24.64-8.86,0-16.61-5.12-16.61-15.92,0-7.89,3.18-15.64,3.32-22.98,0-4.98-2.63-8.86-8.03-9-11.49,0-20.77,18-23.81,33.09l-.42,3.05-1.38,10.52h-13.01l8.03-55.93Z"/>
+        <path d="M340.53,87.08l3.32-21.18h-9.41l1.52-11.21h9.69l3.05-18.97h13.15l-3.05,18.97h17.03l-1.52,11.21h-17.44l-3.32,20.77c-1.52,9.14,1.66,14.4,8.31,14.4,5.81,0,10.94-5.12,15.78-12.04l7.89,6.09c-5.81,8.31-14.68,16.75-25.75,16.75-8.58,0-22.57-4.29-19.24-24.78Z"/>
+      </g>
+    </svg>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#features" class="active">Wat zit erin</a></li>
+    <li><a href="#usecases">Voor wie</a></li>
+    <li><a href="#metrics">Hoe het werkt</a></li>
+    <li><a href="#ai">Slimme herinneringen</a></li>
+  </ul>
+  <div class="nav-cta">
+    <div class="nav-cta-btn" title="Download voor iOS">
+      <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+    </div>
+    <div class="nav-cta-btn" title="Download voor Android">
+      <svg viewBox="0 0 24 24"><path d="M17.6 11.8l1.7-2.9c.1-.2 0-.4-.2-.5-.2-.1-.4 0-.5.2l-1.7 3c-1.3-.6-2.7-.9-4.2-.9s-2.9.3-4.2.9L6.8 8.6c-.1-.2-.3-.3-.5-.2-.2.1-.3.3-.2.5l1.7 2.9C4.5 13.6 2.5 17 2.5 21h18.5c0-4-2-7.4-5.2-9.2zM7.5 18c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm8.5 0c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1z"/></svg>
+    </div>
   </div>
 </nav>
 
-<!-- ====== HERO ====== -->
-<section class="hero" id="hero">
-  <!-- Animated gradient background -->
-  <div class="hero-gradient" id="heroGradient"></div>
-
-  <div class="container hero-grid">
-    <div class="hero-text rv">
-      <h1>
-        <span data-i18n="hero.line1">Mis nooit meer een</span>
-        <span class="text-cycle" id="textCycle">
-          <span class="text-cycle-word active">verjaardag</span>
-          <span class="text-cycle-word">jubileum</span>
-          <span class="text-cycle-word">moment</span>
-          <span class="text-cycle-word">mijlpaal</span>
-          <span class="text-cycle-word">kans</span>
-        </span>
-      </h1>
-      <p class="hero-sub" data-i18n="hero.sub">Attent helpt je om er te zijn op de momenten die ertoe doen.</p>
-      <div class="hero-actions">
-        <a href="#cta" class="btn btn-neon" data-i18n="hero.cta1">Download gratis</a>
-        <a href="#how" class="btn-text" data-i18n="hero.cta2">Bekijk hoe het werkt <span class="arrow">&rarr;</span></a>
-      </div>
+<!-- ==========================================
+     HERO
+     ========================================== -->
+<section class="hero">
+  <div class="hero-bg-image"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="hero-badge-new">Nieuw</span>
+      <span class="hero-badge-text">Je brutale accountability partner</span>
     </div>
-    <div class="hero-photo rv" style="--delay: 0.15s">
-      <img src="assets/images/hero-couple.jpg" alt="Stel dat samen naar een telefoon kijkt" width="560" height="640" loading="eager">
-    </div>
-  </div>
-</section>
-
-<!-- ====== PHOTO STRIP ====== -->
-<section class="photo-strip" aria-hidden="true">
-  <div class="marquee-row marquee-right">
-    <div class="marquee-track">
-      <img src="assets/images/selfie-woman.jpg" alt="" width="140" height="180">
-      <img src="assets/images/phone-lying.jpg" alt="" width="140" height="180">
-      <img src="assets/images/friends-piggyback.jpg" alt="" width="140" height="180">
-      <img src="assets/images/van-woman.jpg" alt="" width="140" height="180">
-      <img src="assets/images/headphones-smile.jpg" alt="" width="140" height="180">
-      <!-- dupe 2 -->
-      <img src="assets/images/selfie-woman.jpg" alt="" width="140" height="180">
-      <img src="assets/images/phone-lying.jpg" alt="" width="140" height="180">
-      <img src="assets/images/friends-piggyback.jpg" alt="" width="140" height="180">
-      <img src="assets/images/van-woman.jpg" alt="" width="140" height="180">
-      <img src="assets/images/headphones-smile.jpg" alt="" width="140" height="180">
-      <!-- dupe 3 -->
-      <img src="assets/images/selfie-woman.jpg" alt="" width="140" height="180">
-      <img src="assets/images/phone-lying.jpg" alt="" width="140" height="180">
-      <img src="assets/images/friends-piggyback.jpg" alt="" width="140" height="180">
-      <img src="assets/images/van-woman.jpg" alt="" width="140" height="180">
-      <img src="assets/images/headphones-smile.jpg" alt="" width="140" height="180">
-    </div>
-  </div>
-  <div class="marquee-row marquee-left">
-    <div class="marquee-track">
-      <img src="assets/images/heart-hands.jpg" alt="" width="140" height="180">
-      <img src="assets/images/beach-laugh.jpg" alt="" width="140" height="180">
-      <img src="assets/images/spinning-joy.jpg" alt="" width="140" height="180">
-      <img src="assets/images/friends-phones.jpg" alt="" width="140" height="180">
-      <img src="assets/images/hero-couple.jpg" alt="" width="140" height="180">
-      <!-- dupe 2 -->
-      <img src="assets/images/heart-hands.jpg" alt="" width="140" height="180">
-      <img src="assets/images/beach-laugh.jpg" alt="" width="140" height="180">
-      <img src="assets/images/spinning-joy.jpg" alt="" width="140" height="180">
-      <img src="assets/images/friends-phones.jpg" alt="" width="140" height="180">
-      <img src="assets/images/hero-couple.jpg" alt="" width="140" height="180">
-      <!-- dupe 3 -->
-      <img src="assets/images/heart-hands.jpg" alt="" width="140" height="180">
-      <img src="assets/images/beach-laugh.jpg" alt="" width="140" height="180">
-      <img src="assets/images/spinning-joy.jpg" alt="" width="140" height="180">
-      <img src="assets/images/friends-phones.jpg" alt="" width="140" height="180">
-      <img src="assets/images/hero-couple.jpg" alt="" width="140" height="180">
-    </div>
-  </div>
-</section>
-
-<!-- ====== PROBLEM ====== -->
-<section class="problem" id="problem">
-  <div class="container">
-    <span class="badge rv" data-i18n="problem.label">DE HARDE WAARHEID</span>
-    <h2 class="section-title rv" data-i18n="problem.title">Iedereen wil attent zijn.<br>Bijna niemand is het.</h2>
-
-    <div class="problem-grid">
-      <div class="problem-card problem-card--photo rv">
-        <img src="assets/images/heart-hands.jpg" alt="Hartgebaar vanuit autoraam" width="400" height="240" loading="lazy">
-        <p data-i18n="problem.card1">92% wil attenter zijn voor hun dierbaren. Het willen is niet het probleem.</p>
-      </div>
-      <div class="problem-card rv" style="--delay: 0.1s">
-        <p data-i18n="problem.card2">Je weet dat mama jarig is. Maar je weet niet precies wanneer. Of wat haar ringmaat is. Of waar je dat cadeautje naartoe moet sturen.</p>
-      </div>
-      <div class="problem-card problem-card--wide rv" style="--delay: 0.2s">
-        <div class="problem-card-inner">
-          <p data-i18n="problem.card3">Een herinnering op de dag zelf is een herinnering om je schuldig te voelen.</p>
-          <div class="problem-stat">
-            <span class="stat-number">0</span>
-            <span class="stat-label" data-i18n="problem.stat">dagen van tevoren</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ====== PIVOT ====== -->
-<section class="pivot" id="pivot">
-  <div class="container pivot-grid">
-    <div class="pivot-photo rv">
-      <img src="assets/images/spinning-joy.jpg" alt="Vrouw die draait van vreugde" width="520" height="620" loading="lazy">
-    </div>
-    <div class="pivot-text rv" style="--delay: 0.15s">
-      <h2 class="shimmer-text" data-i18n="pivot.text">Stel je voor dat je nooit meer een moment mist.</h2>
-    </div>
-  </div>
-</section>
-
-<!-- ====== HOW IT WORKS ====== -->
-<section class="how" id="how">
-  <div class="container">
-    <span class="badge rv" data-i18n="how.label">HOE HET WERKT</span>
-    <h2 class="section-title rv" data-i18n="how.title">Drie stappen om nooit meer te vergeten</h2>
-
-    <div class="how-grid">
-      <div class="how-steps">
-        <button class="step active rv" data-step="1" aria-expanded="true">
-          <span class="step-num">01</span>
-          <div class="step-content">
-            <h3 data-i18n="how.step1.title">Voeg je mensen toe</h3>
-            <p data-i18n="how.step1.desc">Importeer contacten of voeg ze handmatig toe. Stel verjaardagen, jubilea en alles wat ertoe doet in.</p>
-          </div>
-        </button>
-        <button class="step rv" data-step="2" style="--delay:0.08s" aria-expanded="false">
-          <span class="step-num">02</span>
-          <div class="step-content">
-            <h3 data-i18n="how.step2.title">Krijg slimme herinneringen</h3>
-            <p data-i18n="how.step2.desc">Attent vertelt het je vroeg genoeg om iets te doen. Niet op de dag zelf als je alleen nog een paniektekstje kunt sturen.</p>
-          </div>
-        </button>
-        <button class="step rv" data-step="3" style="--delay:0.16s" aria-expanded="false">
-          <span class="step-num">03</span>
-          <div class="step-content">
-            <h3 data-i18n="how.step3.title">Laat zien dat je er bent</h3>
-            <p data-i18n="how.step3.desc">Stuur een cadeautje, schrijf een berichtje, of check gewoon even in. Elke actie bouwt aan je streak.</p>
-          </div>
-        </button>
-      </div>
-
-      <div class="phone-mockup rv" style="--delay:0.2s">
-        <div class="phone-frame">
-          <div class="phone-notch"></div>
-          <div class="phone-screens">
-            <!-- Screen 1: Contacts -->
-            <div class="phone-screen active" data-screen="1">
-              <div class="screen-header">
-                <span class="screen-title" data-i18n="phone.contacts">Mijn mensen</span>
-                <span class="screen-count">12</span>
-              </div>
-              <div class="contact-item">
-                <div class="avatar" style="background: var(--pink);">S</div>
-                <div class="contact-info">
-                  <span class="contact-name">Sarah de Vries</span>
-                  <span class="contact-detail" data-i18n="phone.birthday">Verjaardag: 14 april</span>
-                </div>
-              </div>
-              <div class="contact-item">
-                <div class="avatar" style="background: var(--purple); color: #fff;">M</div>
-                <div class="contact-info">
-                  <span class="contact-name">Mama</span>
-                  <span class="contact-detail" data-i18n="phone.birthday2">Verjaardag: 8 juni</span>
-                </div>
-              </div>
-              <div class="contact-item">
-                <div class="avatar" style="background: var(--cyan);">T</div>
-                <div class="contact-info">
-                  <span class="contact-name">Thomas</span>
-                  <span class="contact-detail" data-i18n="phone.anniv">Jubileum: 22 mei</span>
-                </div>
-              </div>
-              <div class="contact-item">
-                <div class="avatar" style="background: var(--yellow); color: var(--ink);">L</div>
-                <div class="contact-info">
-                  <span class="contact-name">Lisa</span>
-                  <span class="contact-detail" data-i18n="phone.birthday3">Verjaardag: 3 dec</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Screen 2: Reminders -->
-            <div class="phone-screen" data-screen="2">
-              <div class="screen-header">
-                <span class="screen-title" data-i18n="phone.reminders">Herinneringen</span>
-              </div>
-              <div class="reminder-card reminder-urgent">
-                <div class="reminder-time" data-i18n="phone.in3weeks">Over 3 weken</div>
-                <div class="reminder-title" data-i18n="phone.sarah30">Sarah wordt 30!</div>
-                <div class="reminder-hint" data-i18n="phone.sarahHint">Tijd om een cadeau te regelen</div>
-              </div>
-              <div class="reminder-card">
-                <div class="reminder-time" data-i18n="phone.in6weeks">Over 6 weken</div>
-                <div class="reminder-title" data-i18n="phone.mama">Mama&rsquo;s verjaardag</div>
-                <div class="reminder-hint" data-i18n="phone.mamaHint">Ze wilde dat boek van Kluun</div>
-              </div>
-              <div class="reminder-card">
-                <div class="reminder-time" data-i18n="phone.in2months">Over 2 maanden</div>
-                <div class="reminder-title" data-i18n="phone.thomas">Jubileum Thomas &amp; Eva</div>
-                <div class="reminder-hint" data-i18n="phone.thomasHint">Dinertje boeken?</div>
-              </div>
-            </div>
-
-            <!-- Screen 3: Streaks -->
-            <div class="phone-screen" data-screen="3">
-              <div class="screen-header">
-                <span class="screen-title" data-i18n="phone.activity">Activiteit</span>
-              </div>
-              <div class="streak-display">
-                <div class="streak-flame">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--pink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 3 2.5 3.5 3.5 4.5A5 5 0 0 1 17 10c0 3.5-2 5-5 7.5C9 15 7 13.5 7 10a5 5 0 0 1 1.5-3.5C9.5 5.5 11 5 12 2z"/></svg>
-                </div>
-                <span class="streak-count">7</span>
-                <span class="streak-label" data-i18n="phone.streak">dagen op rij</span>
-              </div>
-              <div class="activity-item done">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span data-i18n="phone.sent">Cadeau verstuurd naar Sarah</span>
-              </div>
-              <div class="activity-item done">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span data-i18n="phone.checked">Ingecheckt bij Thomas</span>
-              </div>
-              <div class="activity-item done">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span data-i18n="phone.wrote">Berichtje gestuurd naar Lisa</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ====== STORY CARDS ====== -->
-<section class="stories" id="stories">
-  <div class="container">
-    <div class="story-card rv">
-      <div class="story-photo">
-        <img src="assets/images/friends-phones.jpg" alt="Twee vriendinnen lachend met telefoons" width="480" height="360" loading="lazy">
-      </div>
-      <div class="story-text">
-        <p data-i18n="stories.card1">Sarah wordt 30 over 3 weken. Attent vertelde het je op tijd. Je hebt een cadeau geregeld. Je bent de held.</p>
-        <span class="story-tag" data-i18n="stories.card1.tag">Slimme herinneringen</span>
-      </div>
-    </div>
-
-    <div class="story-card story-card--reverse rv">
-      <div class="story-photo">
-        <img src="assets/images/headphones-smile.jpg" alt="Vrouw met koptelefoon lacht" width="480" height="360" loading="lazy">
-      </div>
-      <div class="story-text">
-        <p data-i18n="stories.card2">Je weet nog dat je klant van sushi houdt. Dat je collega vorige maand vader is geworden. Kleine details, groot verschil.</p>
-        <span class="story-tag" data-i18n="stories.card2.tag">Alles op één plek</span>
-      </div>
-    </div>
-
-    <div class="story-card rv">
-      <div class="story-photo">
-        <img src="assets/images/beach-laugh.jpg" alt="Vrouw op strand lacht met telefoon" width="480" height="360" loading="lazy">
-      </div>
-      <div class="story-text">
-        <p data-i18n="stories.card3">7 dagen op rij attent geweest. Je streak groeit. Je wordt er een beetje competitief van.</p>
-        <span class="story-tag" data-i18n="stories.card3.tag">Streaks die het leuk maken</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ====== SOCIAL PROOF ====== -->
-<section class="proof" id="proof">
-  <div class="container">
-    <h2 class="section-title rv" data-i18n="proof.title">Een probleem dat universeel werd herkend.</h2>
-
-    <div class="proof-grid">
-      <div class="proof-card proof-card--pink rv">
-        <blockquote>
-          <p data-i18n="proof.quote1">&ldquo;Een oplossing die voelt alsof het er altijd al had moeten zijn.&rdquo;</p>
-          <footer data-i18n="proof.attr1">Founder, pitchsessie</footer>
-        </blockquote>
-      </div>
-      <div class="proof-card proof-card--purple rv" style="--delay:0.1s">
-        <blockquote>
-          <p data-i18n="proof.quote2">&ldquo;Ik was vorige maand letterlijk de verjaardag van mijn beste vriend vergeten. Take my money.&rdquo;</p>
-          <footer data-i18n="proof.attr2">Developer, pitchsessie</footer>
-        </blockquote>
-      </div>
-      <div class="proof-card proof-card--cyan rv" style="--delay:0.2s">
-        <blockquote>
-          <p data-i18n="proof.quote3">&ldquo;Het streak-ding is geniaal. Ik zou met mijn broers en zussen strijden over wie attenter is.&rdquo;</p>
-          <footer data-i18n="proof.attr3">Creative, pitchsessie</footer>
-        </blockquote>
-      </div>
-    </div>
-
-    <div class="proof-rating rv">
-      <div class="stars">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--yellow)" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--yellow)" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--yellow)" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--yellow)" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--yellow)" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      </div>
-      <span data-i18n="proof.rating">4.9 uit pitchsessies</span>
-    </div>
-  </div>
-</section>
-
-<!-- ====== REMINDER CARDS STACK ====== -->
-<section class="card-stack-section" id="reminders">
-  <div class="container" style="text-align:center">
-    <div class="section-label rv" data-i18n="cards.label">WAT JE ONTVANGT</div>
-    <h2 class="section-title rv" data-i18n="cards.title">Herinneringen die er echt toe doen</h2>
-    <p class="section-sub rv" data-i18n="cards.sub">Geen saaie notificaties. Persoonlijke, tijdige nudges die je helpen er te zijn.</p>
-  </div>
-  <div class="card-stack" id="cardStack">
-    <div class="stack-card active" data-card="0">
-      <div class="stack-card-inner">
-        <div class="stack-card-emoji">🎂</div>
-        <div class="stack-card-content">
-          <strong>Mama's verjaardag</strong>
-          <span>Over 19 dagen — 12 april</span>
-          <small>Tip: ze wilde een nieuwe Sancerre proberen</small>
-        </div>
-        <div class="stack-card-action" style="background:rgba(109,46,255,0.08);color:var(--purple)">Plan cadeau</div>
-      </div>
-    </div>
-    <div class="stack-card" data-card="1">
-      <div class="stack-card-inner">
-        <div class="stack-card-emoji">💍</div>
-        <div class="stack-card-content">
-          <strong>Trouwdag met Emma</strong>
-          <span>Over 45 dagen — 8 mei</span>
-          <small>Vorig jaar: diner bij Jules. Overtref jezelf.</small>
-        </div>
-        <div class="stack-card-action" style="background:rgba(255,162,255,0.08);color:var(--pink)">Verras haar</div>
-      </div>
-    </div>
-    <div class="stack-card" data-card="2">
-      <div class="stack-card-inner">
-        <div class="stack-card-emoji">🎉</div>
-        <div class="stack-card-content">
-          <strong>Jaap's nieuwe baan</strong>
-          <span>Vandaag</span>
-          <small>Een felicitatiebericht doet wonderen.</small>
-        </div>
-        <div class="stack-card-action" style="background:rgba(0,255,128,0.08);color:#00994d">Stuur bericht</div>
-      </div>
-    </div>
-    <div class="stack-card" data-card="3">
-      <div class="stack-card-inner">
-        <div class="stack-card-emoji">👶</div>
-        <div class="stack-card-content">
-          <strong>David werd vader</strong>
-          <span>Vorige week</span>
-          <small>Een kaartje sturen? Of een klein cadeautje?</small>
-        </div>
-        <div class="stack-card-action" style="background:rgba(125,255,255,0.08);color:var(--teal)">Kies cadeau</div>
-      </div>
-    </div>
-    <div class="stack-card" data-card="4">
-      <div class="stack-card-inner">
-        <div class="stack-card-emoji">🏆</div>
-        <div class="stack-card-content">
-          <strong>7-dag streak bereikt</strong>
-          <span>Je bent on fire</span>
-          <small>Nog 3 dagen tot Blaze-status.</small>
-        </div>
-        <div class="stack-card-action" style="background:rgba(232,255,60,0.08);color:#7a8500">Ga zo door</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ====== FINAL CTA ====== -->
-<section class="cta" id="cta">
-  <canvas id="confetti" aria-hidden="true"></canvas>
-  <div class="container">
-    <div class="cta-photo rv">
-      <img src="assets/images/friends-phones.jpg" alt="Vrienden lachen samen" width="1100" height="500" loading="lazy">
-    </div>
-    <h2 class="rv" data-i18n="cta.title">Je mensen verdienen iemand die het onthoudt.</h2>
-    <p class="cta-sub rv" data-i18n="cta.sub">Wees diegene.</p>
-    <a href="#" class="btn btn-gradient rv" id="ctaBtn" data-i18n="cta.btn">Download Attent gratis</a>
-    <div class="store-badges rv">
-      <a href="#" class="store-badge" aria-label="Download on the App Store">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--cream)"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-        <div><small>Download on the</small><strong>App Store</strong></div>
+    <h1 class="hero-title"><span class="hero-title-line">Mis nooit meer</span><span class="hero-title-line">een <span class="text-cycle" id="heroCycle"><span class="text-cycle-word active">verjaardag</span><span class="text-cycle-word">jubileum</span><span class="text-cycle-word">moment</span><span class="text-cycle-word">mijlpaal</span><span class="text-cycle-word">kans</span></span></span></h1>
+    <p class="hero-desc">Attent herinnert je aan elk moment dat telt voor je dierbaren. En maakt het belachelijk makkelijk om er te zijn.</p>
+    <div class="hero-buttons">
+      <a href="#" class="btn btn-primary">Start gratis</a>
+      <a href="#" class="btn btn-ghost">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+        Bekijk hoe het werkt
       </a>
-      <a href="#" class="store-badge" aria-label="Get it on Google Play">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--cream)"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.302 1.31a1.004 1.004 0 0 1 0 1.764l-2.302 1.31-2.536-2.536 2.536-2.536zM5.864 2.658L16.8 8.99l-2.302 2.302-8.635-8.635z"/></svg>
-        <div><small>Get it on</small><strong>Google Play</strong></div>
+    </div>
+  </div>
+
+  <div class="hero-phones">
+    <div class="phone-mockup phone-mockup-left">
+      <div class="phone-screen">
+        <div class="phone-status">dinsdag, 25 maart</div>
+        <div class="phone-notif">
+          <div class="phone-notif-header">
+            <div class="phone-notif-icon"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>
+            <span class="phone-notif-app">Attent</span>
+            <span class="phone-notif-time">nu</span>
+          </div>
+          <div class="phone-notif-title">Psssst. Jake is over 3 dagen jarig.</div>
+          <div class="phone-notif-body">Niet vergeten. Wil je iets sturen?</div>
+          <div class="phone-notif-actions">
+            <button class="phone-notif-action phone-notif-action-primary">Stuur een cadeau</button>
+            <button class="phone-notif-action phone-notif-action-secondary">Herinner me later</button>
+          </div>
+        </div>
+        <div class="phone-notif" style="opacity: 0.6">
+          <div class="phone-notif-header">
+            <div class="phone-notif-icon" style="background: var(--pink)"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>
+            <span class="phone-notif-app">Attent</span>
+            <span class="phone-notif-time">2u geleden</span>
+          </div>
+          <div class="phone-notif-title">Date night deze vrijdag.</div>
+          <div class="phone-notif-body">Je ouders zijn donderdag jarig getrouwd. Wat sturen we?</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone-mockup phone-mockup-center">
+      <div class="phone-screen" style="background: var(--cream); padding-top: 52px;">
+        <div style="text-align: center; margin-bottom: 16px;">
+          <div style="font-family: Sora; font-size: 18px; font-weight: 600; color: var(--ink);">Aankomende momenten</div>
+          <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">maart 2026</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="background: rgba(109,46,255,0.08); border-radius: 12px; padding: 14px; display: flex; align-items: center; gap: 10px;">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--purple); color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0;">J</div>
+            <div>
+              <div style="font-size: 14px; font-weight: 600; color: var(--ink);">Jake's verjaardag</div>
+              <div style="font-size: 12px; color: var(--text-muted);">over 3 dagen &middot; cadeau klaar</div>
+            </div>
+            <div style="margin-left: auto; width: 8px; height: 8px; border-radius: 50%; background: var(--purple);"></div>
+          </div>
+          <div style="background: rgba(255,162,255,0.1); border-radius: 12px; padding: 14px; display: flex; align-items: center; gap: 10px;">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--pink); color: var(--ink); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0;">M</div>
+            <div>
+              <div style="font-size: 14px; font-weight: 600; color: var(--ink);">Trouwdag papa &amp; mama</div>
+              <div style="font-size: 12px; color: var(--text-muted);">donderdag &middot; actie nodig</div>
+            </div>
+          </div>
+          <div style="background: rgba(0,255,128,0.08); border-radius: 12px; padding: 14px; display: flex; align-items: center; gap: 10px;">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--green); color: var(--ink); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0;">S</div>
+            <div>
+              <div style="font-size: 14px; font-weight: 600; color: var(--ink);">Sarah's promotie</div>
+              <div style="font-size: 12px; color: var(--text-muted);">volgende week &middot; feliciteer haar</div>
+            </div>
+          </div>
+          <div style="background: rgba(12,12,34,0.03); border-radius: 12px; padding: 14px; display: flex; align-items: center; gap: 10px;">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--cyan); color: var(--ink); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0;">L</div>
+            <div>
+              <div style="font-size: 14px; font-weight: 600; color: var(--ink);">Lisa's afstuderen</div>
+              <div style="font-size: 12px; color: var(--text-muted);">2 apr &middot; nog 8 dagen</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 16px; text-align: center; padding: 10px; background: rgba(109,46,255,0.06); border-radius: 12px;">
+          <div style="font-family: Sora; font-size: 12px; font-weight: 600; color: var(--purple);">14 dagen streak</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Je bent lekker bezig. Blijf er zijn.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone-mockup phone-mockup-right">
+      <div class="phone-screen">
+        <div class="phone-status">Cadeaucatalogus</div>
+        <div style="display: flex; flex-direction: column; gap: 10px; padding-top: 8px;">
+          <div style="background: rgba(255,248,238,0.06); border-radius: 14px; overflow: hidden;">
+            <div style="height: 120px; background: linear-gradient(135deg, var(--purple), var(--pink)); display: flex; align-items: center; justify-content: center;">
+              <span style="font-size: 40px;">🎁</span>
+            </div>
+            <div style="padding: 12px;">
+              <div style="font-size: 13px; font-weight: 600; color: rgba(255,248,238,0.9);">Persoonlijk fotoboek</div>
+              <div style="font-size: 12px; color: rgba(255,248,238,0.4);">vanaf €24,99</div>
+            </div>
+          </div>
+          <div style="background: rgba(255,248,238,0.06); border-radius: 14px; overflow: hidden;">
+            <div style="height: 80px; background: linear-gradient(135deg, var(--cyan), var(--green)); display: flex; align-items: center; justify-content: center;">
+              <span style="font-size: 32px;">💐</span>
+            </div>
+            <div style="padding: 12px;">
+              <div style="font-size: 13px; font-weight: 600; color: rgba(255,248,238,0.9);">Verse bloemen bezorgd</div>
+              <div style="font-size: 12px; color: rgba(255,248,238,0.4);">vanaf €34,99</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Scroll indicator -->
+<div style="display: flex; justify-content: center; padding: 40px 0;">
+  <div style="width: 1px; height: 48px; background: linear-gradient(to bottom, var(--text-muted), transparent); opacity: 0.3;"></div>
+</div>
+
+<!-- ==========================================
+     STATEMENT — Flowing text with cycling images
+     ========================================== -->
+<section class="statement-section">
+  <div class="statement-inner">
+    <div class="statement-text reveal">
+      <span class="stword">Er</span>
+      <span class="stword">zijn</span>
+      <span class="stword">voor</span>
+      <span class="stword">de</span>
+      <span class="stword">mensen</span>
+      <span class="stword">die</span>
+      <span class="stword">ertoe</span>
+      <span class="stword">doen</span>
+      <div class="statement-img" data-cycle="0">
+        <img src="input/Attent Pics/248777c5c404051722dd831a52821412.jpg" alt="" loading="lazy" class="statement-img-active">
+        <img src="input/Attent Pics/67fa9e9ddaa33405f186fae1107ab8b9.jpg" alt="" loading="lazy">
+        <img src="input/Attent Pics/4a9ceee3172674a92409e3b920a9d6e1.jpg" alt="" loading="lazy">
+      </div>
+      <span class="stword">met</span>
+      <span class="stword">slimme</span>
+      <span class="stword">herinneringen,</span>
+      <span class="stword">een</span>
+      <span class="stword">cadeaucatalogus</span>
+      <span class="stword">die</span>
+      <span class="stword">echt</span>
+      <span class="stword">goed</span>
+      <span class="stword">is,</span>
+      <div class="statement-img" data-cycle="1">
+        <img src="input/Attent Pics/b7a860aeef1802877d260bc335c31bb9.jpg" alt="" loading="lazy" class="statement-img-active">
+        <img src="input/Attent Pics/90fa8e09482c7ff359193c2fbf425ab5.jpg" alt="" loading="lazy">
+        <img src="input/Attent Pics/ebea52536f2a43b9705e6832cc234ab7.jpg" alt="" loading="lazy">
+      </div>
+      <span class="stword">en</span>
+      <span class="stword">streaks</span>
+      <span class="stword">die</span>
+      <span class="stword">je</span>
+      <span class="stword">op</span>
+      <span class="stword">gang</span>
+      <span class="stword">houden.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     PHONE SHOWCASE — Scrolling cards behind phone
+     ========================================== -->
+<section class="phone-showcase">
+  <div class="phone-showcase-inner">
+    <!-- Scrolling rows behind the phone -->
+    <div class="showcase-scroll-area">
+      <div class="showcase-row showcase-row-1">
+        <div class="showcase-card showcase-card-img"><img src="input/Attent Pics/248777c5c404051722dd831a52821412.jpg" alt="" loading="lazy"></div>
+        <div class="showcase-card showcase-card-achievement">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--purple)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          <span>Eerste herinnering verstuurd</span>
+        </div>
+        <div class="showcase-card showcase-card-img"><img src="input/Attent Pics/67fa9e9ddaa33405f186fae1107ab8b9.jpg" alt="" loading="lazy"></div>
+        <div class="showcase-card showcase-card-achievement" style="--accent: var(--pink);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--pink)"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <span>7 dagen streak</span>
+        </div>
+        <div class="showcase-card showcase-card-img"><img src="input/Attent Pics/4a9ceee3172674a92409e3b920a9d6e1.jpg" alt="" loading="lazy"></div>
+        <div class="showcase-card showcase-card-achievement" style="--accent: var(--green);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--green)"><path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 00-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 12 7.4l3.38 4.6L17 10.83 14.92 8H20v6z"/></svg>
+          <span>Eerste cadeau verstuurd</span>
+        </div>
+        <!-- Duplicate for loop -->
+        <div class="showcase-card showcase-card-img"><img src="input/Attent Pics/248777c5c404051722dd831a52821412.jpg" alt="" loading="lazy"></div>
+        <div class="showcase-card showcase-card-achievement">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--purple)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          <span>Eerste herinnering verstuurd</span>
+        </div>
+        <div class="showcase-card showcase-card-img"><img src="input/Attent Pics/67fa9e9ddaa33405f186fae1107ab8b9.jpg" alt="" loading="lazy"></div>
+        <div class="showcase-card showcase-card-achievement" style="--accent: var(--pink);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--pink)"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <span>7 dagen streak</span>
+        </div>
+        <div class="showcase-card showcase-card-img"><img src="input/Attent Pics/4a9ceee3172674a92409e3b920a9d6e1.jpg" alt="" loading="lazy"></div>
+        <div class="showcase-card showcase-card-achievement" style="--accent: var(--green);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--green)"><path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 00-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 12 7.4l3.38 4.6L17 10.83 14.92 8H20v6z"/></svg>
+          <span>Eerste cadeau verstuurd</span>
+        </div>
+      </div>
+      <div class="showcase-row showcase-row-2">
+        <div class="showcase-card showcase-card-achievement" style="--accent: var(--cyan);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--cyan)"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+          <span>10 mensen toegevoegd</span>
+        </div>
+        <div class="showcase-card showcase-card-img"><img src="input/Attent Pics/b7a860aeef1802877d260bc335c31bb9.jpg" alt="" loading="lazy"></div>
+        <div class="showcase-card showcase-card-achievement">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--purple)"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+          <span>Maandoverzicht ontgrendeld</span>
+        </div>
+        <div class="showcase-card showcase-card-img"><img src="input/Attent Pics/90fa8e09482c7ff359193c2fbf425ab5.jpg" alt="" loading="lazy"></div>
+        <div class="showcase-card showcase-card-achievement" style="--accent: var(--yellow);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--yellow)"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          <span>30 dagen streak</span>
+        </div>
+        <div class="showcase-card showcase-card-img"><img src="input/Attent Pics/ebea52536f2a43b9705e6832cc234ab7.jpg" alt="" loading="lazy"></div>
+        <!-- Duplicate -->
+        <div class="showcase-card showcase-card-achievement" style="--accent: var(--cyan);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--cyan)"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+          <span>10 mensen toegevoegd</span>
+        </div>
+        <div class="showcase-card showcase-card-img"><img src="input/Attent Pics/b7a860aeef1802877d260bc335c31bb9.jpg" alt="" loading="lazy"></div>
+        <div class="showcase-card showcase-card-achievement">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--purple)"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+          <span>Maandoverzicht ontgrendeld</span>
+        </div>
+        <div class="showcase-card showcase-card-img"><img src="input/Attent Pics/90fa8e09482c7ff359193c2fbf425ab5.jpg" alt="" loading="lazy"></div>
+        <div class="showcase-card showcase-card-achievement" style="--accent: var(--yellow);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--yellow)"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          <span>30 dagen streak</span>
+        </div>
+        <div class="showcase-card showcase-card-img"><img src="input/Attent Pics/ebea52536f2a43b9705e6832cc234ab7.jpg" alt="" loading="lazy"></div>
+      </div>
+    </div>
+
+    <!-- Phone overlay -->
+    <div class="showcase-phone">
+      <div class="showcase-phone-frame">
+        <div style="padding: 48px 18px 18px;">
+          <div style="text-align: center; margin-bottom: 16px;">
+            <div style="font-family: Sora; font-size: 15px; font-weight: 600; color: var(--ink);">Wekelijks overzicht</div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Je voortgang deze week</div>
+          </div>
+          <!-- Mini chart area -->
+          <div style="background: rgba(12,12,34,0.03); border-radius: 14px; padding: 14px; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <span style="font-size: 12px; font-weight: 600; color: var(--purple);">86% deze week</span>
+              <span style="font-size: 10px; color: var(--text-muted);">Vorige week</span>
+            </div>
+            <div style="display: flex; align-items: flex-end; gap: 4px; height: 60px;">
+              <div style="flex: 1; background: var(--purple); border-radius: 4px 4px 0 0; height: 70%; opacity: 0.7;"></div>
+              <div style="flex: 1; background: var(--purple); border-radius: 4px 4px 0 0; height: 90%;"></div>
+              <div style="flex: 1; background: var(--purple); border-radius: 4px 4px 0 0; height: 60%; opacity: 0.7;"></div>
+              <div style="flex: 1; background: var(--purple); border-radius: 4px 4px 0 0; height: 100%;"></div>
+              <div style="flex: 1; background: var(--purple); border-radius: 4px 4px 0 0; height: 80%;"></div>
+              <div style="flex: 1; background: rgba(12,12,34,0.08); border-radius: 4px 4px 0 0; height: 30%;"></div>
+              <div style="flex: 1; background: rgba(12,12,34,0.08); border-radius: 4px 4px 0 0; height: 20%;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 6px;">
+              <span style="font-size: 9px; color: var(--text-muted);">Ma</span>
+              <span style="font-size: 9px; color: var(--text-muted);">Di</span>
+              <span style="font-size: 9px; color: var(--text-muted);">Wo</span>
+              <span style="font-size: 9px; color: var(--text-muted);">Do</span>
+              <span style="font-size: 9px; color: var(--text-muted);">Vr</span>
+              <span style="font-size: 9px; color: var(--text-muted);">Za</span>
+              <span style="font-size: 9px; color: var(--text-muted);">Zo</span>
+            </div>
+          </div>
+          <!-- Stats row -->
+          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <div style="flex: 1; background: rgba(12,12,34,0.03); border-radius: 12px; padding: 10px; text-align: center;">
+              <div style="font-family: Sora; font-size: 18px; font-weight: 700; color: var(--text-primary);">12</div>
+              <div style="font-size: 9px; color: var(--text-muted);">Streaks</div>
+            </div>
+            <div style="flex: 1; background: rgba(12,12,34,0.03); border-radius: 12px; padding: 10px; text-align: center;">
+              <div style="font-family: Sora; font-size: 18px; font-weight: 700; color: var(--text-primary);">07</div>
+              <div style="font-size: 9px; color: var(--text-muted);">Momenten</div>
+            </div>
+          </div>
+          <!-- AI suggestion -->
+          <div style="background: rgba(109,46,255,0.06); border-radius: 12px; padding: 10px 12px; display: flex; align-items: center; gap: 8px;">
+            <div style="width: 24px; height: 24px; border-radius: 50%; background: rgba(109,46,255,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--purple)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            </div>
+            <div>
+              <div style="font-size: 11px; font-weight: 600; color: var(--text-primary);">Beter Timing</div>
+              <div style="font-size: 10px; color: var(--text-muted);">Beste tijd: 8:20 ochtends</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rating + CTA below -->
+  <div style="text-align: center; padding-top: 48px;">
+    <div class="rating-badge reveal" style="display: inline-flex; margin-bottom: 20px;">
+      <span class="rating-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+      <span>4.9 beoordeling</span>
+    </div>
+    <p style="font-size: 16px; color: var(--text-body); max-width: 540px; margin: 0 auto 28px; line-height: 1.6;" class="reveal">Blijf consistent met een systeem dat past in het echte leven. Slimme herinneringen, uitgelezen cadeaus en zachte duwtjes helpen je om er te zijn.</p>
+    <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;" class="reveal">
+      <a href="#" class="btn btn-dark">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        Download voor iPhone
+      </a>
+      <a href="#" class="btn btn-secondary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 11.8l1.7-2.9c.1-.2 0-.4-.2-.5-.2-.1-.4 0-.5.2l-1.7 3c-1.3-.6-2.7-.9-4.2-.9s-2.9.3-4.2.9L6.8 8.6c-.1-.2-.3-.3-.5-.2-.2.1-.3.3-.2.5l1.7 2.9C4.5 13.6 2.5 17 2.5 21h18.5c0-4-2-7.4-5.2-9.2zM7.5 18c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm8.5 0c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1z"/></svg>
+        Download voor Android
       </a>
     </div>
   </div>
 </section>
 
-<!-- ====== FOOTER ====== -->
-<footer class="footer" id="footer">
-  <div class="container footer-grid">
-    <div class="footer-brand">
-      <svg class="footer-logo" viewBox="0 0 394.9 135.11" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <g fill="var(--ink)">
-          <path d="M9.38,94.14c0-10.94,9.83-25.34,39.46-25.34h.97c7.61-18.69,19.38-45.55,36.97-45.55,5.4,0,9.14.83,13.57,1.94l-6.23,43.61h13.15l-1.52,11.21h-13.15l-.83,5.4c-1.52,10.11,1.52,15.09,8.31,15.09,8.44,0,14.81-6.78,20.63-17.86l9.14,4.43c-6.51,13.15-17.31,24.78-32.4,24.64-12.74,0-22.01-8.45-19.11-26.31l.83-5.4h-20.21l-.28.55c-8.86,21.32-18.14,31.29-31.7,31.29-8.44,0-17.58-5.81-17.58-17.72ZM27.93,100.78c6.51,0,11.35-7.75,17.17-20.63-14.95.83-23.54,7.2-23.54,14.26,0,4.15,2.77,6.37,6.37,6.37ZM80.95,68.8l5.26-33.64h-.69c-6.92,0-15.09,17.17-22.01,33.64h17.44Z"/>
-          <path d="M119.85,87.08l3.46-21.18h-9.55l1.66-11.35h9.69l3.05-18.97h13.01l-3.05,18.97h17.03l-1.52,11.35h-17.44l-3.32,20.77c-1.66,9.41,1.66,13.84,9.55,13.84,7.2,0,15.78-6.37,21.32-17.86l9.14,4.43c-7.48,15.78-19.24,24.64-33.37,24.64-9,0-22.98-4.15-19.66-24.64Z"/>
-          <path d="M162.91,87.08l3.46-21.18h-9.55l1.66-11.35h9.69l3.05-18.97h13.01l-3.05,18.97h17.03l-1.52,11.35h-17.44l-3.32,20.77c-1.66,9.41,1.66,13.84,9.55,13.84,7.2,0,15.78-6.37,21.32-17.86l9.14,4.43c-7.48,15.78-19.24,24.64-33.37,24.64-9,0-22.98-4.15-19.66-24.64Z"/>
-          <path d="M234.07,53.16c11.91,0,18,7.48,18.14,15.23,0,9.83-9.55,20.49-32.12,23.54,2.91,5.81,9.28,9.14,17.86,9.14,9.97,0,20.08-5.12,26.58-18.41l9.14,4.43c-7.89,16.34-20.77,24.78-37.24,24.78-18.97,0-31.15-10.11-31.01-27.14,0-15.51,10.24-31.57,28.66-31.57ZM239.88,69.08c0-3.05-2.22-5.26-5.95-5.4-8.58,0-15.23,9.14-15.64,19.24,14.68-1.11,21.6-8.17,21.6-13.84Z"/>
-          <path d="M268.26,54.54h12.46l-1.8,12.74c5.4-7.2,14.12-13.98,24.23-14.12,10.52,0,16.61,6.78,16.75,16.34,0,8.03-4.02,17.44-4.02,23.95,0,4.71,2.91,7.06,7.2,7.06,5.81,0,12.18-5.95,18.28-17.86l9.14,4.43c-6.78,13.71-17.58,24.64-30.32,24.64-8.86,0-16.61-5.12-16.61-15.92,0-7.89,3.18-15.64,3.32-22.98,0-4.98-2.63-8.86-8.03-9-11.49,0-20.77,18-23.81,33.09l-.42,3.05-1.38,10.52h-13.01l8.03-55.93Z"/>
-          <path d="M340.53,87.08l3.32-21.18h-9.41l1.52-11.21h9.69l3.05-18.97h13.15l-3.05,18.97h17.03l-1.52,11.21h-17.44l-3.32,20.77c-1.52,9.14,1.66,14.4,8.31,14.4,5.81,0,10.94-5.12,15.78-12.04l7.89,6.09c-5.81,8.31-14.68,16.75-25.75,16.75-8.58,0-22.57-4.29-19.24-24.78Z"/>
-        </g>
-      </svg>
-      <p class="footer-tagline" data-i18n="footer.tagline">De attentheidsapp.</p>
+<div class="section-divider"></div>
+
+<!-- ==========================================
+     FEATURES
+     ========================================== -->
+<section class="section" id="features">
+  <div class="section-inner">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 60px; margin-bottom: 20px;">
+      <div>
+        <div class="section-badge reveal">Hoe het werkt</div>
+        <h2 class="section-title reveal" style="max-width: 500px;">Alles wat je nodig hebt om de meest attente persoon te zijn.</h2>
+      </div>
+      <p class="section-desc reveal" style="margin-top: 40px;">Attent brengt helderheid in je relaties met slimme herinneringen, realistische planning en begeleiding die zich aanpast aan jouw dag.</p>
     </div>
-    <div class="footer-col">
-      <h4 data-i18n="footer.product">Product</h4>
-      <ul>
-        <li><a href="#stories" data-i18n="footer.link.features">Features</a></li>
-        <li><a href="#how" data-i18n="footer.link.how">Hoe het werkt</a></li>
-        <li><a href="#cta" data-i18n="footer.link.download">Download</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4 data-i18n="footer.company">Bedrijf</h4>
-      <ul>
-        <li><a href="#" data-i18n="footer.link.about">Over ons</a></li>
-        <li><a href="#" data-i18n="footer.link.blog">Blog</a></li>
-        <li><a href="#" data-i18n="footer.link.contact">Contact</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4 data-i18n="footer.legal">Juridisch</h4>
-      <ul>
-        <li><a href="#" data-i18n="footer.link.privacy">Privacy</a></li>
-        <li><a href="#" data-i18n="footer.link.terms">Voorwaarden</a></li>
-      </ul>
+
+    <div class="features-grid">
+
+      <!-- Card 1: Slimme tijdlijn + Streaks -->
+      <div class="feature-card reveal" style="background: var(--surface);">
+        <div class="feature-card-content">
+          <h3>Slimme tijdlijn</h3>
+          <p>Bouw eerlijke streaks die echte betrokkenheid weerspiegelen. Mis een dag? Geen stress.</p>
+        </div>
+        <div style="padding: 0 28px; flex: 1; display: flex; flex-direction: column; gap: 12px;">
+          <!-- Streak display -->
+          <div style="background: var(--raised); border-radius: 20px; padding: 24px; text-align: center; box-shadow: 0 4px 20px rgba(12,12,34,0.06);">
+            <div style="font-size: 48px; margin-bottom: 8px; line-height: 1;">&#128293;</div>
+            <div style="font-family: Sora; font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">28 dagen streak</div>
+            <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Bouw streaks die echte betrokkenheid laten zien</div>
+            <!-- Day circles -->
+            <div style="display: flex; justify-content: center; gap: 6px; overflow: hidden;">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; opacity: 0.4;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(12,12,34,0.08); display: flex; align-items: center; justify-content: center; font-family: Sora; font-size: 12px; font-weight: 600; color: var(--text-muted);">22</div>
+                <span style="font-size: 9px; color: var(--text-muted);">Za</span>
+              </div>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: #FF6B35; color: white; display: flex; align-items: center; justify-content: center;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </div>
+                <span style="font-size: 9px; color: var(--text-muted);">Ma</span>
+              </div>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--ink); color: white; display: flex; align-items: center; justify-content: center; position: relative; font-family: Sora; font-size: 12px; font-weight: 600;">13
+                  <div style="position: absolute; top: -2px; right: -2px; width: 14px; height: 14px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center;">
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                  </div>
+                </div>
+                <span style="font-size: 9px; color: var(--text-muted);">Di</span>
+              </div>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--ink); color: white; display: flex; align-items: center; justify-content: center; position: relative; font-family: Sora; font-size: 12px; font-weight: 600;">14
+                  <div style="position: absolute; top: -2px; right: -2px; width: 14px; height: 14px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center;">
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                  </div>
+                </div>
+                <span style="font-size: 9px; color: var(--text-muted);">Wo</span>
+              </div>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--ink); color: white; display: flex; align-items: center; justify-content: center; position: relative; font-family: Sora; font-size: 12px; font-weight: 600;">15
+                  <div style="position: absolute; top: -2px; right: -2px; width: 14px; height: 14px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center;">
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                  </div>
+                </div>
+                <span style="font-size: 9px; color: var(--text-muted);">Do</span>
+              </div>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--ink); color: white; display: flex; align-items: center; justify-content: center; position: relative; font-family: Sora; font-size: 12px; font-weight: 600;">16
+                  <div style="position: absolute; top: -2px; right: -2px; width: 14px; height: 14px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center;">
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                  </div>
+                </div>
+                <span style="font-size: 9px; color: var(--text-muted);">Vr</span>
+              </div>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; opacity: 0.3;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(12,12,34,0.08); display: flex; align-items: center; justify-content: center; font-family: Sora; font-size: 12px; font-weight: 600; color: var(--text-muted);">17</div>
+                <span style="font-size: 9px; color: var(--text-muted);">Za</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Infinite carousel at bottom -->
+        <div style="overflow: hidden; padding: 16px 0 28px; margin: 0 -1px;">
+          <div style="display: flex; gap: 10px; width: max-content; animation: streakCarousel 20s linear infinite;">
+            <div style="display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: var(--raised); border-radius: 999px; white-space: nowrap; box-shadow: 0 2px 10px rgba(12,12,34,0.05);">
+              <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+              <span style="font-size: 12px; font-weight: 600; color: var(--text-primary);">Rustdag tegoed</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: var(--raised); border-radius: 999px; white-space: nowrap; box-shadow: 0 2px 10px rgba(12,12,34,0.05);">
+              <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--purple); display: flex; align-items: center; justify-content: center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+              <span style="font-size: 12px; font-weight: 600; color: var(--text-primary);">Streak pauzeren</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: var(--raised); border-radius: 999px; white-space: nowrap; box-shadow: 0 2px 10px rgba(12,12,34,0.05);">
+              <div style="width: 24px; height: 24px; border-radius: 50%; background: #FF6B35; display: flex; align-items: center; justify-content: center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></div>
+              <span style="font-size: 12px; font-weight: 600; color: var(--text-primary);">Reismodus actief</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: var(--raised); border-radius: 999px; white-space: nowrap; box-shadow: 0 2px 10px rgba(12,12,34,0.05);">
+              <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--pink); display: flex; align-items: center; justify-content: center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="var(--ink)"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+              <span style="font-size: 12px; font-weight: 600; color: var(--text-primary);">Streak hersteld</span>
+            </div>
+            <!-- Duplicate -->
+            <div style="display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: var(--raised); border-radius: 999px; white-space: nowrap; box-shadow: 0 2px 10px rgba(12,12,34,0.05);">
+              <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+              <span style="font-size: 12px; font-weight: 600; color: var(--text-primary);">Rustdag tegoed</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: var(--raised); border-radius: 999px; white-space: nowrap; box-shadow: 0 2px 10px rgba(12,12,34,0.05);">
+              <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--purple); display: flex; align-items: center; justify-content: center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+              <span style="font-size: 12px; font-weight: 600; color: var(--text-primary);">Streak pauzeren</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: var(--raised); border-radius: 999px; white-space: nowrap; box-shadow: 0 2px 10px rgba(12,12,34,0.05);">
+              <div style="width: 24px; height: 24px; border-radius: 50%; background: #FF6B35; display: flex; align-items: center; justify-content: center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></div>
+              <span style="font-size: 12px; font-weight: 600; color: var(--text-primary);">Reismodus actief</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: var(--raised); border-radius: 999px; white-space: nowrap; box-shadow: 0 2px 10px rgba(12,12,34,0.05);">
+              <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--pink); display: flex; align-items: center; justify-content: center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="var(--ink)"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+              <span style="font-size: 12px; font-weight: 600; color: var(--text-primary);">Streak hersteld</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Dagelijkse planner -->
+      <div class="feature-card reveal">
+        <div class="feature-card-content">
+          <h3>Dagelijkse planner</h3>
+          <p>Een simpel overzicht dat alleen laat zien wat vandaag relevant is.</p>
+        </div>
+        <div style="padding: 0 28px 28px; flex: 1; display: flex; flex-direction: column; gap: 12px;">
+          <!-- Greeting header -->
+          <div style="background: rgba(109,46,255,0.04); border-radius: 16px; padding: 16px; border: 1px solid rgba(109,46,255,0.06);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <div>
+                <span style="font-family: Sora; font-size: 16px; font-weight: 600; color: var(--text-primary);">Goedemorgen!</span>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">dinsdag 25 maart</div>
+              </div>
+              <div style="padding: 4px 12px; background: var(--purple); color: white; border-radius: 999px; font-size: 11px; font-weight: 600;">15%</div>
+            </div>
+            <div style="width: 100%; height: 4px; background: rgba(12,12,34,0.06); border-radius: 999px; overflow: hidden;">
+              <div style="width: 15%; height: 100%; background: var(--purple); border-radius: 999px;"></div>
+            </div>
+          </div>
+          <!-- Todo items -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(12,12,34,0.02); border-radius: 12px; border: 1px solid rgba(12,12,34,0.04);">
+              <div style="width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--purple); flex-shrink: 0;"></div>
+              <span style="font-size: 13px; color: var(--text-muted); min-width: 36px;">10:00</span>
+              <span style="font-size: 13px; font-weight: 500; color: var(--text-primary); flex: 1;">Mama bellen</span>
+              <span style="font-size: 11px; color: var(--purple); background: rgba(109,46,255,0.08); padding: 2px 8px; border-radius: 999px;">Verjaardag</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(12,12,34,0.02); border-radius: 12px; border: 1px solid rgba(12,12,34,0.04);">
+              <div style="width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--pink); flex-shrink: 0;"></div>
+              <span style="font-size: 13px; color: var(--text-muted); min-width: 36px;">14:00</span>
+              <span style="font-size: 13px; font-weight: 500; color: var(--text-primary); flex: 1;">Bloemen bestellen</span>
+              <span style="font-size: 11px; color: var(--pink); background: rgba(255,162,255,0.08); padding: 2px 8px; border-radius: 999px;">Trouwdag</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(12,12,34,0.02); border-radius: 12px; border: 1px solid rgba(12,12,34,0.04);">
+              <div style="width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--green); flex-shrink: 0;"></div>
+              <span style="font-size: 13px; color: var(--text-muted); min-width: 36px;">17:00</span>
+              <span style="font-size: 13px; font-weight: 500; color: var(--text-primary); flex: 1;">Sarah feliciteren</span>
+              <span style="font-size: 11px; color: var(--green); background: rgba(0,255,128,0.08); padding: 2px 8px; border-radius: 999px;">Promotie</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(12,12,34,0.02); border-radius: 12px; border: 1px solid rgba(12,12,34,0.04);">
+              <div style="width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--teal); flex-shrink: 0;"></div>
+              <span style="font-size: 13px; color: var(--text-muted); min-width: 36px;">20:00</span>
+              <span style="font-size: 13px; font-weight: 500; color: var(--text-primary); flex: 1;">Kaart schrijven</span>
+              <span style="font-size: 11px; color: var(--teal); background: rgba(45,155,155,0.08); padding: 2px 8px; border-radius: 999px;">Voor opa</span>
+            </div>
+          </div>
+          <!-- AI suggestion floating -->
+          <div style="background: rgba(109,46,255,0.06); border-radius: 12px; padding: 10px 14px; border: 1px dashed rgba(109,46,255,0.2); display: flex; align-items: center; gap: 8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--purple)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            <span style="font-size: 11px; color: var(--purple); font-weight: 500;">AI suggestie: Verplaats bellen naar 19:00 (rustigere periode)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Mensen & momenten (full width) -->
+      <div class="feature-card feature-card-full reveal" style="flex-direction: row; min-height: 500px; background: var(--raised);">
+        <div class="feature-card-content" style="flex: 0 0 38%; display: flex; flex-direction: column; justify-content: center;">
+          <h3>Mensen &amp; momenten</h3>
+          <p>Al je belangrijke mensen op een plek. Met alles wat je nodig hebt om er voor ze te zijn.</p>
+          <a href="#" class="btn btn-dark" style="margin-top: 20px; display: inline-flex; align-self: flex-start;">Voeg je eerste persoon toe</a>
+        </div>
+        <div style="flex: 1; padding: 28px; display: flex; flex-direction: column; gap: 14px;">
+          <!-- People grid -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div style="background: rgba(0,255,128,0.1); border-radius: 18px; padding: 16px; border: 1px solid rgba(0,255,128,0.12);">
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--green); color: var(--ink); display: flex; align-items: center; justify-content: center; font-family: Sora; font-weight: 700; font-size: 16px;">M</div>
+                <div>
+                  <div style="font-family: Sora; font-size: 15px; font-weight: 600; color: var(--text-primary);">Mama</div>
+                  <div style="font-size: 11px; color: var(--text-muted);">Moeder</div>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 4px;">
+                <div style="font-size: 11px; color: var(--text-body); display: flex; align-items: center; gap: 4px;">
+                  <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--purple);"></div>
+                  Verjaardag over 3d
+                </div>
+                <div style="font-size: 11px; color: var(--text-body); display: flex; align-items: center; gap: 4px;">
+                  <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--green);"></div>
+                  Cadeau: fotoboek klaar
+                </div>
+              </div>
+            </div>
+            <div style="background: rgba(255,162,255,0.1); border-radius: 18px; padding: 16px; border: 1px solid rgba(255,162,255,0.12);">
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--pink); color: var(--ink); display: flex; align-items: center; justify-content: center; font-family: Sora; font-weight: 700; font-size: 16px;">E</div>
+                <div>
+                  <div style="font-family: Sora; font-size: 15px; font-weight: 600; color: var(--text-primary);">Emma</div>
+                  <div style="font-size: 11px; color: var(--text-muted);">Vriendin</div>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 4px;">
+                <div style="font-size: 11px; color: var(--text-body); display: flex; align-items: center; gap: 4px;">
+                  <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--pink);"></div>
+                  Trouwdag 12 apr
+                </div>
+                <div style="font-size: 11px; color: var(--text-body); display: flex; align-items: center; gap: 4px;">
+                  <div style="width: 6px; height: 6px; border-radius: 50%; background: rgba(12,12,34,0.2);"></div>
+                  Bloemen bezorgen
+                </div>
+              </div>
+            </div>
+            <div style="background: rgba(109,46,255,0.1); border-radius: 18px; padding: 16px; border: 1px solid rgba(109,46,255,0.12);">
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--purple); color: white; display: flex; align-items: center; justify-content: center; font-family: Sora; font-weight: 700; font-size: 16px;">J</div>
+                <div>
+                  <div style="font-family: Sora; font-size: 15px; font-weight: 600; color: var(--text-primary);">Jake</div>
+                  <div style="font-size: 11px; color: var(--text-muted);">Beste vriend</div>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 4px;">
+                <div style="font-size: 11px; color: var(--text-body); display: flex; align-items: center; gap: 4px;">
+                  <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--purple);"></div>
+                  Jarig 28 maart
+                </div>
+                <div style="font-size: 11px; color: var(--text-body); display: flex; align-items: center; gap: 4px;">
+                  <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--green);"></div>
+                  42 dagen streak
+                </div>
+              </div>
+            </div>
+            <div style="background: rgba(232,255,60,0.08); border-radius: 18px; padding: 16px; border: 1px solid rgba(232,255,60,0.12);">
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--yellow); color: var(--ink); display: flex; align-items: center; justify-content: center; font-family: Sora; font-weight: 700; font-size: 16px;">O</div>
+                <div>
+                  <div style="font-family: Sora; font-size: 15px; font-weight: 600; color: var(--text-primary);">Opa Henk</div>
+                  <div style="font-size: 11px; color: var(--text-muted);">Grootvader</div>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 4px;">
+                <div style="font-size: 11px; color: var(--text-body); display: flex; align-items: center; gap: 4px;">
+                  <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--teal);"></div>
+                  Bel volgende week
+                </div>
+                <div style="font-size: 11px; color: var(--text-body); display: flex; align-items: center; gap: 4px;">
+                  <div style="width: 6px; height: 6px; border-radius: 50%; background: rgba(12,12,34,0.2);"></div>
+                  Kaart sturen
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Add person hint -->
+          <div style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border: 2px dashed rgba(12,12,34,0.08); border-radius: 14px; cursor: pointer;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span style="font-size: 12px; color: var(--text-muted); font-weight: 500;">Voeg nog iemand toe</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4: Wekelijks overzicht -->
+      <div class="feature-card reveal" style="background: var(--raised);">
+        <div class="feature-card-content">
+          <h3>Wekelijks overzicht</h3>
+          <p>Een helder overzicht van je week. Wat je gedaan hebt en wat er nog aankomt.</p>
+        </div>
+        <div style="padding: 0 28px 28px; flex: 1; display: flex; flex-direction: column; gap: 14px;">
+          <!-- Week header -->
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-family: Sora; font-size: 14px; font-weight: 600; color: var(--text-primary);">Week 13 &middot; maart</div>
+            <div style="font-size: 11px; color: var(--purple); font-weight: 600; background: rgba(109,46,255,0.08); padding: 4px 10px; border-radius: 999px;">86% er-zijn</div>
+          </div>
+          <!-- Circular progress -->
+          <div style="display: flex; justify-content: space-around; gap: 8px;">
+            <div style="text-align: center;">
+              <div style="width: 72px; height: 72px; border-radius: 50%; border: 5px solid rgba(12,12,34,0.06); border-top-color: var(--purple); border-right-color: var(--purple); border-bottom-color: var(--purple); display: flex; align-items: center; justify-content: center; margin: 0 auto 6px;">
+                <span style="font-family: Sora; font-size: 16px; font-weight: 700; color: var(--text-primary);">86%</span>
+              </div>
+              <div style="font-size: 11px; color: var(--text-muted);">Momenten</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="width: 72px; height: 72px; border-radius: 50%; border: 5px solid var(--green); display: flex; align-items: center; justify-content: center; margin: 0 auto 6px;">
+                <span style="font-family: Sora; font-size: 16px; font-weight: 700; color: var(--text-primary);">100%</span>
+              </div>
+              <div style="font-size: 11px; color: var(--text-muted);">Cadeaus</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="width: 72px; height: 72px; border-radius: 50%; border: 5px solid rgba(12,12,34,0.06); border-top-color: var(--pink); border-right-color: var(--pink); border-bottom-color: var(--pink); display: flex; align-items: center; justify-content: center; margin: 0 auto 6px;">
+                <span style="font-family: Sora; font-size: 16px; font-weight: 700; color: var(--text-primary);">71%</span>
+              </div>
+              <div style="font-size: 11px; color: var(--text-muted);">Berichten</div>
+            </div>
+          </div>
+          <!-- Stat boxes -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div style="background: rgba(12,12,34,0.03); border-radius: 14px; padding: 14px;">
+              <div style="font-family: Sora; font-size: 22px; font-weight: 700; color: var(--text-primary);">12</div>
+              <div style="font-size: 11px; color: var(--text-muted);">Streaks volgehouden</div>
+              <div style="display: flex; align-items: center; gap: 4px; margin-top: 4px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--green)"><path d="M7 14l5-5 5 5z"/></svg>
+                <span style="font-size: 10px; color: var(--green); font-weight: 500;">+3 deze week</span>
+              </div>
+            </div>
+            <div style="background: rgba(12,12,34,0.03); border-radius: 14px; padding: 14px;">
+              <div style="font-family: Sora; font-size: 22px; font-weight: 700; color: var(--text-primary);">07</div>
+              <div style="font-size: 11px; color: var(--text-muted);">Momenten gedeeld</div>
+              <div style="display: flex; align-items: center; gap: 4px; margin-top: 4px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--cyan)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                <span style="font-size: 10px; color: var(--cyan); font-weight: 500;">4u 20m totaal</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5: Attente herinneringen (dark, frosted glass) -->
+      <div class="feature-card feature-card-reminders reveal">
+        <div class="feature-card-content" style="position: relative; z-index: 1;">
+          <h3>Attente herinneringen</h3>
+          <p>Korte, warme nudges die je helpen om er te zijn. Zonder te pushen.</p>
+        </div>
+        <div style="padding: 0 28px 28px; position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; gap: 12px;">
+          <!-- Scattered faded background texts -->
+          <div style="position: absolute; inset: 0; overflow: hidden; z-index: 0; opacity: 0.12; padding: 20px; font-size: 12px; color: rgba(255,248,238,1); line-height: 2.4;">
+            Vergeet mama niet &middot; Bel opa &middot; Cadeau bestellen &middot; Bloemen sturen &middot; Feliciteren &middot; Check-in &middot; Kaart schrijven &middot; Verjaardagskaart &middot; Date night plannen &middot; Bedankje sturen &middot; Housewarming &middot; Promotie vieren &middot; Jubileum herinnering &middot; Bel je zus &middot; Stuur een berichtje
+          </div>
+          <!-- Main reminder notification -->
+          <div class="reminder-notification" style="position: relative; z-index: 1;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+              <span style="font-size: 12px; color: rgba(255,248,238,0.4);">20:30 &middot; Avond check-in</span>
+              <span style="font-size: 10px; color: rgba(255,248,238,0.3); background: rgba(255,248,238,0.06); padding: 3px 8px; border-radius: 999px;">nu</span>
+            </div>
+            <div style="font-family: Sora; font-size: 15px; font-weight: 600; color: rgba(255,248,238,0.9); margin-bottom: 6px;">Mama bellen voor haar verjaardag</div>
+            <div style="font-size: 13px; color: rgba(255,248,238,0.45); line-height: 1.5; margin-bottom: 14px;">Ze wordt morgen 62. Een belletje maakt haar dag.</div>
+            <div style="display: flex; gap: 8px;">
+              <button style="padding: 8px 20px; background: var(--purple); color: white; border: none; border-radius: var(--radius-full); font-family: DM Sans; font-size: 12px; font-weight: 500; cursor: pointer;">Doe ik</button>
+              <button style="padding: 8px 20px; background: rgba(255,248,238,0.06); color: rgba(255,248,238,0.5); border: none; border-radius: var(--radius-full); font-family: DM Sans; font-size: 12px; font-weight: 500; cursor: pointer;">Later</button>
+            </div>
+          </div>
+          <!-- Second stacked reminder (offset behind) -->
+          <div style="position: relative; z-index: 0; background: rgba(255,248,238,0.04); border: 1px solid rgba(255,248,238,0.06); border-radius: 16px; padding: 14px 18px; margin-top: -4px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+              <span style="font-size: 11px; color: rgba(255,248,238,0.3);">21:00 &middot; Herinnering</span>
+              <span style="font-size: 10px; color: rgba(255,248,238,0.2); background: rgba(255,248,238,0.04); padding: 3px 8px; border-radius: 999px;">straks</span>
+            </div>
+            <div style="font-family: Sora; font-size: 13px; font-weight: 600; color: rgba(255,248,238,0.6);">Date night plannen met Emma</div>
+            <div style="font-size: 12px; color: rgba(255,248,238,0.3); margin-top: 2px;">Jullie trouwdag komt eraan. Zorg voor quality time.</div>
+          </div>
+          <!-- Third stacked hint -->
+          <div style="position: relative; z-index: 0; background: rgba(255,248,238,0.03); border: 1px solid rgba(255,248,238,0.04); border-radius: 14px; padding: 10px 16px; margin-top: -4px; opacity: 0.6;">
+            <div style="font-family: Sora; font-size: 12px; font-weight: 500; color: rgba(255,248,238,0.4);">+ 2 meer herinneringen voor morgen</div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
-  <div class="container footer-bottom">
-    <p>&copy; 2026 Attent &middot; <span data-i18n="footer.credit">Gemaakt met liefde door Studio BLEACH</span></p>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ==========================================
+     DOWNLOAD SECTION
+     ========================================== -->
+<section class="download-section">
+  <div style="max-width: 1200px; margin: 0 auto; padding: 0 30px; display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap;">
+    <div class="rating-badge">
+      <span class="rating-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+      <span>4.9 beoordeling (early access gebruikers)</span>
+    </div>
+    <a href="#" class="btn btn-dark">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+      Download voor iPhone
+    </a>
+    <a href="#" class="btn btn-secondary">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 11.8l1.7-2.9c.1-.2 0-.4-.2-.5-.2-.1-.4 0-.5.2l-1.7 3c-1.3-.6-2.7-.9-4.2-.9s-2.9.3-4.2.9L6.8 8.6c-.1-.2-.3-.3-.5-.2-.2.1-.3.3-.2.5l1.7 2.9C4.5 13.6 2.5 17 2.5 21h18.5c0-4-2-7.4-5.2-9.2zM7.5 18c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm8.5 0c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1z"/></svg>
+      Download voor Android
+    </a>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ==========================================
+     USE CASES — Boxed with frosted glass
+     ========================================== -->
+<section class="section" id="usecases">
+  <div class="section-inner">
+    <div class="usecase-box">
+      <!-- Header: centered -->
+      <div class="usecase-header reveal">
+        <div class="section-badge" style="margin: 0 auto 20px;">Past bij elke levensstijl</div>
+        <h2 class="section-title" style="text-align: center; max-width: 600px; margin: 0 auto 28px;">Gemaakt voor mensen die geven maar vergeten.</h2>
+        <div class="use-cases-tabs">
+          <button class="use-tab active" data-tab="professionals">Professionals</button>
+          <button class="use-tab" data-tab="parents">Ouders</button>
+          <button class="use-tab" data-tab="friends">Vrienden &amp; sociaal</button>
+          <button class="use-tab" data-tab="couples">Stellen</button>
+        </div>
+      </div>
+
+      <!-- Image with frosted glass overlay -->
+      <div class="use-case-content active" id="tab-professionals">
+        <div class="usecase-image-box">
+          <img src="input/Attent Pics/2a73a769687ea705734c17ccce41a3de.jpg" alt="" loading="lazy">
+          <div class="usecase-glass">
+            <p>Voor iedereen die jongleert met meetings, deadlines en het constante schuldgevoel dat je iemands verjaardag bent vergeten.</p>
+            <div class="usecase-glass-stat">
+              <span class="usecase-glass-number">87%</span>
+              <span class="usecase-glass-label">Wekelijkse consistentie</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="use-case-content" id="tab-parents">
+        <div class="usecase-image-box">
+          <img src="input/Attent Pics/45945e6e7262bd2703b2d8dd3e48d71d.jpg" alt="" loading="lazy">
+          <div class="usecase-glass">
+            <p>Voor ouders die al op hun tandvlees lopen maar nog steeds de coole tante, de attente neef, de aanwezige vriend willen zijn.</p>
+            <div class="usecase-glass-stat">
+              <span class="usecase-glass-number">92%</span>
+              <span class="usecase-glass-label">Minder gemiste momenten</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="use-case-content" id="tab-friends">
+        <div class="usecase-image-box">
+          <img src="input/Attent Pics/b29a2d1d956e310032cfe8f4f95e1310.jpg" alt="" loading="lazy">
+          <div class="usecase-glass">
+            <p>Voor de vriend die altijd van plan is te appen maar dan gaan er drie weken voorbij en is het ineens awkward.</p>
+            <div class="usecase-glass-stat">
+              <span class="usecase-glass-number">3x</span>
+              <span class="usecase-glass-label">Meer check-ins per maand</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="use-case-content" id="tab-couples">
+        <div class="usecase-image-box">
+          <img src="input/Attent Pics/9a47de014ad4b094f3900b67cbf74f89.jpg" alt="" loading="lazy">
+          <div class="usecase-glass">
+            <p>Voor stellen die weten dat de trouwdag "ergens in juni" is maar de exacte datum niet onder ede zouden durven zeggen.</p>
+            <div class="usecase-glass-stat">
+              <span class="usecase-glass-number">100%</span>
+              <span class="usecase-glass-label">Partner-goedkeuring</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ==========================================
+     EARLY ADOPTERS — Infinite Carousel
+     ========================================== -->
+<section class="section" id="metrics">
+  <div class="section-inner">
+    <div style="text-align: center; margin-bottom: 48px;">
+      <div class="section-badge reveal" style="margin: 0 auto 24px;">Vertrouwde early adopters</div>
+      <h2 class="section-title reveal" style="max-width: 600px; margin: 0 auto; text-align: center;">Wat mensen bereiken met Attent.</h2>
+    </div>
+  </div>
+  <div style="overflow: hidden; width: 100%;">
+    <div class="proof-carousel">
+      <!-- Set 1 -->
+      <div class="proof-card-img">
+        <img src="input/Attent Pics/4a9ceee3172674a92409e3b920a9d6e1.jpg" alt="Sara" loading="lazy">
+        <div class="proof-overlay">
+          <div style="font-family: Sora; font-size: 14px; font-weight: 600;">Sara &middot; Drukke ouder</div>
+          <div style="font-size: 14px; line-height: 1.4; margin-top: 8px; color: rgba(255,255,255,0.85);">Nooit meer een verjaardag gemist sinds ze Attent downloadde. 42-dagen streak.</div>
+        </div>
+      </div>
+      <div class="proof-card-img">
+        <img src="input/Attent Pics/67fa9e9ddaa33405f186fae1107ab8b9.jpg" alt="Leo" loading="lazy">
+        <div class="proof-overlay">
+          <div style="font-family: Sora; font-size: 14px; font-weight: 600;">Leo &middot; Creatieve professional</div>
+          <div style="font-size: 14px; line-height: 1.4; margin-top: 8px; color: rgba(255,255,255,0.85);">Stuurde deze maand doordachte cadeaus naar 8 vrienden.</div>
+        </div>
+      </div>
+      <div class="proof-card-img">
+        <img src="input/Attent Pics/248777c5c404051722dd831a52821412.jpg" alt="Ramya" loading="lazy">
+        <div class="proof-overlay">
+          <div style="font-family: Sora; font-size: 14px; font-weight: 600;">Ramya &middot; Software developer</div>
+          <div style="font-size: 14px; line-height: 1.4; margin-top: 8px; color: rgba(255,255,255,0.85);">Houdt haar familiemomenten georganiseerd zonder moeite.</div>
+        </div>
+      </div>
+      <div class="proof-card-img">
+        <img src="input/Attent Pics/90fa8e09482c7ff359193c2fbf425ab5.jpg" alt="Maya" loading="lazy">
+        <div class="proof-overlay">
+          <div style="font-family: Sora; font-size: 14px; font-weight: 600;">Maya &middot; Student</div>
+          <div style="font-size: 14px; line-height: 1.4; margin-top: 8px; color: rgba(255,255,255,0.85);">21 dagen streak. Haar vriendengroep is onder de indruk.</div>
+        </div>
+      </div>
+      <div class="proof-card-img">
+        <img src="input/Attent Pics/b7a860aeef1802877d260bc335c31bb9.jpg" alt="Daniel" loading="lazy">
+        <div class="proof-overlay">
+          <div style="font-family: Sora; font-size: 14px; font-weight: 600;">Daniel &middot; Founder</div>
+          <div style="font-size: 14px; line-height: 1.4; margin-top: 8px; color: rgba(255,255,255,0.85);">87% meer attent in vergelijking met vorig jaar.</div>
+        </div>
+      </div>
+      <div class="proof-card-img">
+        <img src="input/Attent Pics/ebea52536f2a43b9705e6832cc234ab7.jpg" alt="Aaron" loading="lazy">
+        <div class="proof-overlay">
+          <div style="font-family: Sora; font-size: 14px; font-weight: 600;">Aaron &middot; Remote engineer</div>
+          <div style="font-size: 14px; line-height: 1.4; margin-top: 8px; color: rgba(255,255,255,0.85);">Stopt met momenten missen sinds hij Attent gebruikt.</div>
+        </div>
+      </div>
+      <!-- Set 2 (duplicate for seamless loop) -->
+      <div class="proof-card-img">
+        <img src="input/Attent Pics/4a9ceee3172674a92409e3b920a9d6e1.jpg" alt="Sara" loading="lazy">
+        <div class="proof-overlay">
+          <div style="font-family: Sora; font-size: 14px; font-weight: 600;">Sara &middot; Drukke ouder</div>
+          <div style="font-size: 14px; line-height: 1.4; margin-top: 8px; color: rgba(255,255,255,0.85);">Nooit meer een verjaardag gemist sinds ze Attent downloadde. 42-dagen streak.</div>
+        </div>
+      </div>
+      <div class="proof-card-img">
+        <img src="input/Attent Pics/67fa9e9ddaa33405f186fae1107ab8b9.jpg" alt="Leo" loading="lazy">
+        <div class="proof-overlay">
+          <div style="font-family: Sora; font-size: 14px; font-weight: 600;">Leo &middot; Creatieve professional</div>
+          <div style="font-size: 14px; line-height: 1.4; margin-top: 8px; color: rgba(255,255,255,0.85);">Stuurde deze maand doordachte cadeaus naar 8 vrienden.</div>
+        </div>
+      </div>
+      <div class="proof-card-img">
+        <img src="input/Attent Pics/248777c5c404051722dd831a52821412.jpg" alt="Ramya" loading="lazy">
+        <div class="proof-overlay">
+          <div style="font-family: Sora; font-size: 14px; font-weight: 600;">Ramya &middot; Software developer</div>
+          <div style="font-size: 14px; line-height: 1.4; margin-top: 8px; color: rgba(255,255,255,0.85);">Houdt haar familiemomenten georganiseerd zonder moeite.</div>
+        </div>
+      </div>
+      <div class="proof-card-img">
+        <img src="input/Attent Pics/90fa8e09482c7ff359193c2fbf425ab5.jpg" alt="Maya" loading="lazy">
+        <div class="proof-overlay">
+          <div style="font-family: Sora; font-size: 14px; font-weight: 600;">Maya &middot; Student</div>
+          <div style="font-size: 14px; line-height: 1.4; margin-top: 8px; color: rgba(255,255,255,0.85);">21 dagen streak. Haar vriendengroep is onder de indruk.</div>
+        </div>
+      </div>
+      <div class="proof-card-img">
+        <img src="input/Attent Pics/b7a860aeef1802877d260bc335c31bb9.jpg" alt="Daniel" loading="lazy">
+        <div class="proof-overlay">
+          <div style="font-family: Sora; font-size: 14px; font-weight: 600;">Daniel &middot; Founder</div>
+          <div style="font-size: 14px; line-height: 1.4; margin-top: 8px; color: rgba(255,255,255,0.85);">87% meer attent in vergelijking met vorig jaar.</div>
+        </div>
+      </div>
+      <div class="proof-card-img">
+        <img src="input/Attent Pics/ebea52536f2a43b9705e6832cc234ab7.jpg" alt="Aaron" loading="lazy">
+        <div class="proof-overlay">
+          <div style="font-family: Sora; font-size: 14px; font-weight: 600;">Aaron &middot; Remote engineer</div>
+          <div style="font-size: 14px; line-height: 1.4; margin-top: 8px; color: rgba(255,255,255,0.85);">Stopt met momenten missen sinds hij Attent gebruikt.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ==========================================
+     AI SUGGESTIONS
+     ========================================== -->
+<section class="section" id="ai">
+  <div class="section-inner">
+    <!-- Top: Two column — text left, phone right -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; margin-bottom: 80px;">
+      <div>
+        <div class="section-badge reveal">Slimmer er zijn</div>
+        <h2 class="section-title reveal">AI-suggesties die zich aanpassen aan jouw dag.</h2>
+        <p class="section-desc reveal">Attent leert je patronen en biedt kleine, nuttige suggesties die je helpen om consistent te zijn. Zonder te hoeven nadenken over wat je moet doen.</p>
+        <div class="reveal" style="margin-top: 32px;">
+          <a href="#" class="btn btn-dark">Ontdek hoe het werkt</a>
+        </div>
+      </div>
+      <div style="position: relative; min-height: 500px;">
+        <!-- Phone mockup -->
+        <div style="width: 280px; height: 540px; background: var(--ink); border-radius: 36px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); overflow: hidden; margin-left: auto; position: relative;">
+          <div style="padding: 48px 20px 20px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="text-align: center; padding: 8px;">
+              <div style="font-family: Sora; font-size: 11px; color: rgba(255,248,238,0.4);">Vandaag</div>
+            </div>
+            <div style="background: rgba(109,46,255,0.12); border-radius: 14px; padding: 14px;">
+              <div style="font-size: 13px; font-weight: 600; color: rgba(255,248,238,0.9);">&#127874; Mama bellen</div>
+              <div style="font-size: 11px; color: rgba(255,248,238,0.4); margin-top: 2px;">Verjaardag morgen &middot; AI suggestie</div>
+            </div>
+            <div style="background: rgba(0,255,128,0.08); border-radius: 14px; padding: 14px;">
+              <div style="font-size: 13px; font-weight: 600; color: rgba(255,248,238,0.9);">&#9989; Ochtendwandeling</div>
+              <div style="font-size: 11px; color: rgba(255,248,238,0.4); margin-top: 2px;">Voltooid om 7:18</div>
+            </div>
+            <div style="background: rgba(255,248,238,0.04); border-radius: 14px; padding: 14px;">
+              <div style="font-size: 13px; font-weight: 600; color: rgba(255,248,238,0.9);">&#128144; Bloemen voor Emma</div>
+              <div style="font-size: 11px; color: rgba(255,248,238,0.4); margin-top: 2px;">Trouwdag over 3 dagen</div>
+            </div>
+          </div>
+        </div>
+        <!-- Floating suggestion cards -->
+        <div class="ai-float-card" style="position: absolute; top: 60px; left: 0; background: var(--raised); border-radius: 16px; padding: 16px 20px; box-shadow: var(--shadow-float); max-width: 240px;">
+          <div style="font-size: 14px; font-weight: 500; color: var(--text-primary);">Verplaats bellen naar 19:00</div>
+          <div style="margin-top: 8px;"><span style="display: inline-block; padding: 4px 12px; background: var(--purple); color: white; border-radius: 999px; font-size: 12px; font-weight: 500; cursor: pointer;">Toepassen</span></div>
+        </div>
+        <div class="ai-float-card" style="position: absolute; top: 220px; left: -20px; background: var(--raised); border-radius: 16px; padding: 16px 20px; box-shadow: var(--shadow-float); max-width: 260px;">
+          <div style="font-size: 14px; font-weight: 500; color: var(--text-primary);">Combineer met "bloemen kopen"</div>
+          <div style="margin-top: 8px;"><span style="display: inline-block; padding: 4px 12px; background: rgba(12,12,34,0.06); color: var(--text-body); border-radius: 999px; font-size: 12px; font-weight: 500;">Probeer deze week</span></div>
+        </div>
+        <div class="ai-float-card" style="position: absolute; bottom: 100px; left: 20px; background: var(--raised); border-radius: 16px; padding: 16px 20px; box-shadow: var(--shadow-float); max-width: 260px;">
+          <div style="font-size: 14px; font-weight: 500; color: var(--text-primary);">Verkort wachttijd naar 2 dagen</div>
+          <div style="margin-top: 8px;"><span style="display: inline-block; padding: 4px 12px; background: rgba(12,12,34,0.06); color: var(--text-body); border-radius: 999px; font-size: 12px; font-weight: 500;">Probeer deze week</span></div>
+        </div>
+      </div>
+    </div>
+    <!-- Bottom: 4 feature cards in a row -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+      <div style="background: var(--raised); border-radius: var(--radius-md); padding: 32px; box-shadow: var(--shadow-card);">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(109,46,255,0.1); display: flex; align-items: center; justify-content: center; margin-bottom: 80px; font-size: 24px;">&#128276;</div>
+        <h4 style="font-family: Sora; font-size: 18px; font-weight: 600; margin-bottom: 8px;">Slimme timing</h4>
+        <p style="font-size: 14px; color: var(--text-body); line-height: 1.5;">Stelt het beste moment voor om je te herinneren.</p>
+      </div>
+      <div style="background: var(--raised); border-radius: var(--radius-md); padding: 32px; box-shadow: var(--shadow-card);">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(255,77,77,0.1); display: flex; align-items: center; justify-content: center; margin-bottom: 80px; font-size: 24px;">&#128203;</div>
+        <h4 style="font-family: Sora; font-size: 18px; font-weight: 600; margin-bottom: 8px;">Prioriteiten</h4>
+        <p style="font-size: 14px; color: var(--text-body); line-height: 1.5;">Herschikt momenten op drukke dagen.</p>
+      </div>
+      <div style="background: var(--raised); border-radius: var(--radius-md); padding: 32px; box-shadow: var(--shadow-card);">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(109,46,255,0.1); display: flex; align-items: center; justify-content: center; margin-bottom: 80px; font-size: 24px;">&#128202;</div>
+        <h4 style="font-family: Sora; font-size: 18px; font-weight: 600; margin-bottom: 8px;">Inzichten</h4>
+        <p style="font-size: 14px; color: var(--text-body); line-height: 1.5;">Laat zien wat werkt en wat beter kan.</p>
+      </div>
+      <div style="background: var(--raised); border-radius: var(--radius-md); padding: 32px; box-shadow: var(--shadow-card);">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(0,255,128,0.1); display: flex; align-items: center; justify-content: center; margin-bottom: 80px; font-size: 24px;">&#128161;</div>
+        <h4 style="font-family: Sora; font-size: 18px; font-weight: 600; margin-bottom: 8px;">Herstel suggestie</h4>
+        <p style="font-size: 14px; color: var(--text-body); line-height: 1.5;">Helpt je herstellen als je een dag mist.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ==========================================
+     TESTIMONIALS
+     ========================================== -->
+<section class="section">
+  <div class="section-inner">
+    <div style="text-align: center; margin-bottom: 48px;">
+      <div class="section-badge reveal" style="margin: 0 auto 24px;">Van dichtbij bekeken</div>
+      <h2 class="section-title reveal" style="max-width: 600px; margin: 0 auto 8px; text-align: center;">Wat mensen zeggen over Attent.</h2>
+      <p class="reveal" style="font-size: 14px; color: var(--text-muted);">4.9 &#9733;&#9733;&#9733;&#9733;&#9733; (vertrouwd door early access gebruikers)</p>
+    </div>
+
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal">
+        <p class="testimonial-text">"Attent zorgde ervoor dat ik de meest attente persoon in mijn vriendengroep leek. Dat ben ik niet. De app doet gewoon al het werk."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar-placeholder">M</div>
+          <div><div class="testimonial-name">Maya Z.</div><div class="testimonial-role">Student</div></div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal reveal-delay-1">
+        <p class="testimonial-text">"Ik negeerde altijd herinneringen van andere apps. Deze voelen alsof een vriend me appt. Ik doe er daadwerkelijk iets mee."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar-placeholder">E</div>
+          <div><div class="testimonial-name">Ethan M.</div><div class="testimonial-role">Sportcoach</div></div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal reveal-delay-2">
+        <p class="testimonial-text">"Het is de eerste app die me geen slecht gevoel geeft als ik iets vergeet. Het helpt me gewoon om het op te lossen."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar-placeholder">H</div>
+          <div><div class="testimonial-name">Hannah L.</div><div class="testimonial-role">Contentschrijver</div></div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal">
+        <p class="testimonial-text">"De cadeaucatalogus alleen al is het waard. Nooit meer 'cadeau voor papa die alles al heeft' googlen om 23:00."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar-placeholder">D</div>
+          <div><div class="testimonial-name">Daniel P.</div><div class="testimonial-role">Software engineer</div></div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal reveal-delay-1">
+        <p class="testimonial-text">"Mijn partner vroeg of ik een persoonlijke assistent had ingehuurd. Nee. Gewoon Attent die z'n ding doet."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar-placeholder">K</div>
+          <div><div class="testimonial-name">Kevin B.</div><div class="testimonial-role">Fitnesscoach</div></div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal reveal-delay-2">
+        <p class="testimonial-text">"Ik ben nu echt consistent met er zijn. Kleine stappen tellen op. Mijn relaties zijn nog nooit zo goed geweest."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar-placeholder">S</div>
+          <div><div class="testimonial-name">Sofia M.</div><div class="testimonial-role">UX researcher</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;" class="reveal">
+      <a href="#" class="btn btn-dark">Bekijk alle reviews</a>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ==========================================
+     FAQ
+     ========================================== -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-badge reveal">Veelgestelde vragen</div>
+    <h2 class="section-title reveal">Veelgestelde vragen.</h2>
+
+    <div class="faq-layout">
+      <div class="faq-cta-card reveal">
+        <div style="width: 48px; height: 48px; background: var(--purple); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </div>
+        <h3>Antwoord niet gevonden?</h3>
+        <p>We helpen je graag. Neem contact op en we reageren sneller dan je een verjaardag kunt vergeten.</p>
+        <a href="#" class="btn btn-dark" style="margin-top: 8px;">Neem contact op</a>
+      </div>
+
+      <div class="faq-list">
+        <div class="faq-item reveal">
+          <button class="faq-question">
+            Hoeveel contacten kan ik toevoegen?
+            <span class="faq-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">Zoveel als je wilt. Attent groeit mee met je netwerk. Familie, vrienden, collega's, je special someone. Voeg ze allemaal toe. Wij houden het bij zodat jij dat niet hoeft.</div>
+          </div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question">
+            Werken herinneringen op alle apparaten?
+            <span class="faq-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">Ja. iPhone, Android, waar je ook bent. Zet notificaties aan en je mist nooit meer iets. Dat is eigenlijk het hele punt.</div>
+          </div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question">
+            Wat als ik een moment mis?
+            <span class="faq-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">Geen schuldgevoel. Attent suggereert een alsnog-gebaar zodat je toch nog er kunt zijn. Beter laat dan nooit, toch? Je streak krijgt misschien een deuk, maar we helpen je een nieuwe te starten.</div>
+          </div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question">
+            Kan ik cadeaus direct via de app sturen?
+            <span class="faq-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">Ja. Onze uitgelezen cadeaucatalogus laat je iets doordachts kiezen en in een paar tikken versturen. Geen generieke cadeaubonnen. Geen sokken. Tenzij ze echt sokken willen.</div>
+          </div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question">
+            Is Attent gratis?
+            <span class="faq-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">De kernervaring is helemaal gratis. Herinneringen, contacten, streaks, alles. Premium features zoals de volledige cadeaucatalogus en AI-suggesties komen met een abonnement. Maar je kunt nu al gratis beginnen met er zijn.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     FINAL CTA
+     ========================================== -->
+<section class="final-cta">
+  <div class="section-inner">
+    <h2 class="final-cta-title reveal">Er zijn voor de mensen die ertoe doen.</h2>
+    <p class="final-cta-desc reveal">Het is gratis. Het is makkelijk. En het zorgt ervoor dat je er echt goed uitkomt.</p>
+    <div class="final-cta-buttons reveal">
+      <a href="#" class="btn btn-dark">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        Download voor iPhone
+      </a>
+      <a href="#" class="btn btn-secondary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 11.8l1.7-2.9c.1-.2 0-.4-.2-.5-.2-.1-.4 0-.5.2l-1.7 3c-1.3-.6-2.7-.9-4.2-.9s-2.9.3-4.2.9L6.8 8.6c-.1-.2-.3-.3-.5-.2-.2.1-.3.3-.2.5l1.7 2.9C4.5 13.6 2.5 17 2.5 21h18.5c0-4-2-7.4-5.2-9.2zM7.5 18c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm8.5 0c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1z"/></svg>
+        Download voor Android
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     FOOTER
+     ========================================== -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <svg viewBox="0 0 137 137" xmlns="http://www.w3.org/2000/svg" style="height: 32px; width: 32px;">
+          <rect fill="#6D2EFF" width="137" height="137" rx="3.16" ry="3.16"/>
+          <path fill="#FFF8EE" d="M10.6,94.12c0-10.41,9.36-24.12,37.56-24.12h.92c7.25-17.79,18.45-43.36,35.19-43.36,5.14,0,8.7.79,12.92,1.85l-5.93,41.51h12.52l-1.45,10.67h-12.52l-.79,5.14c-1.45,9.62,1.45,14.37,7.91,14.37,8.04,0,14.1-6.46,19.64-17l8.7,4.22c-6.19,12.52-16.47,23.59-30.84,23.46-12.12,0-20.95-8.04-18.19-25.04l.79-5.14h-19.24l-.26.53c-8.43,20.3-17.26,29.78-30.18,29.78-8.04,0-16.74-5.53-16.74-16.87ZM28.26,100.45c6.19,0,10.81-7.38,16.34-19.64-14.23.79-22.41,6.85-22.41,13.58,0,3.95,2.64,6.06,6.06,6.06ZM78.74,70.01l5.01-32.03h-.66c-6.59,0-14.37,16.34-20.95,32.03h16.61Z"/>
+        </svg>
+        <p>Mis nooit meer een moment dat ertoe doet. Attent helpt je er te zijn voor je mensen met slimme herinneringen, een uitgelezen cadeaucatalogus en streaks die je op gang houden.</p>
+        <div class="footer-newsletter">
+          <input type="email" placeholder="Je e-mailadres">
+          <button>Aanmelden</button>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Functies</h4>
+        <a href="#features">Slimme tijdlijnen</a>
+        <a href="#features">Contactprofielen</a>
+        <a href="#features">Cadeaucatalogus</a>
+        <a href="#ai">AI-suggesties</a>
+        <a href="#features">Brutale herinneringen</a>
+      </div>
+      <div class="footer-col">
+        <h4>Bedrijf</h4>
+        <a href="#">Over ons</a>
+        <a href="#">Wachtlijst</a>
+        <a href="#">Changelog</a>
+        <a href="#">Vacatures</a>
+      </div>
+      <div class="footer-col">
+        <h4>Ondersteuning</h4>
+        <a href="#">Veelgestelde vragen</a>
+        <a href="#">Contact</a>
+        <a href="#">Privacybeleid</a>
+        <a href="#">Algemene voorwaarden</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Attent. Alle rechten voorbehouden.</span>
+      <div class="footer-social">
+        <a href="#" title="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+        <a href="#" title="LinkedIn"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        <a href="#" title="X"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+        <a href="#" title="TikTok"><svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></a>
+      </div>
+    </div>
   </div>
 </footer>
 
-<script src="js/main.js"></script>
+<!-- Floating CTA -->
+<a href="#" class="floating-cta">
+  <span class="floating-cta-dot"></span>
+  Gratis downloaden
+</a>
+
+<!-- ==========================================
+     JAVASCRIPT
+     ========================================== -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+  // Statement text scroll fill
+  var stWords = document.querySelectorAll('.statement-text .stword');
+  if (stWords.length) {
+    var stObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) entry.target.classList.add('filled');
+      });
+    }, { threshold: 0.5, rootMargin: '-10% 0px -30% 0px' });
+    stWords.forEach(function(w, i) {
+      w.style.transitionDelay = (i * 0.04) + 's';
+      stObserver.observe(w);
+    });
+  }
+
+  // Statement image cycling
+  document.querySelectorAll('.statement-img').forEach(function(container) {
+    var imgs = container.querySelectorAll('img');
+    if (imgs.length < 2) return;
+    var idx = 0;
+    setInterval(function() {
+      imgs[idx].classList.remove('statement-img-active');
+      idx = (idx + 1) % imgs.length;
+      imgs[idx].classList.add('statement-img-active');
+    }, 3500);
+  });
+
+  // Text cycle animation
+  (function() {
+    var cycle = document.getElementById('heroCycle');
+    if (!cycle) return;
+    var words = cycle.querySelectorAll('.text-cycle-word');
+    if (words.length < 2) return;
+    var idx = 0;
+    var measurer = document.createElement('span');
+    measurer.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;pointer-events:none;font:inherit';
+    cycle.parentNode.appendChild(measurer);
+    function setW() { measurer.textContent = words[idx].textContent; cycle.style.width = measurer.offsetWidth + 'px'; }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(setW);
+    setTimeout(setW, 100);
+    setTimeout(setW, 500);
+    window.addEventListener('resize', setW);
+    setInterval(function() {
+      var prev = idx;
+      idx = (idx + 1) % words.length;
+      words[prev].classList.remove('active');
+      words[prev].classList.add('exit');
+      words[idx].classList.add('active');
+      setW();
+      setTimeout(function() { words[prev].classList.remove('exit'); }, 300);
+    }, 3000);
+  })();
+});
+
+// Scroll Reveal
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+// Nav scroll behavior
+const nav = document.getElementById('mainNav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 100);
+});
+
+// FAQ Accordion
+document.querySelectorAll('.faq-question').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.parentElement;
+    const wasOpen = item.classList.contains('open');
+    // Close all
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    // Toggle current
+    if (!wasOpen) item.classList.add('open');
+  });
+});
+
+// Tab switching
+document.querySelectorAll('.use-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.use-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.use-case-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// (Counter section removed)
+
+// Smooth scroll for nav links
+document.querySelectorAll('.nav-links a').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Update active
+      document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+    }
+  });
+});
+
+// Active nav on scroll
+const sections = document.querySelectorAll('section[id]');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(section => {
+    const top = section.offsetTop - 200;
+    if (window.scrollY >= top) current = section.getAttribute('id');
+  });
+  document.querySelectorAll('.nav-links a').forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+  });
+});
+</script>
+
 </body>
 </html>
