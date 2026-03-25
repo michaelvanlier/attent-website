@@ -1,0 +1,35 @@
+{
+  "appearAnimation": {
+    "initial": { "opacity": 0, "y": 20 },
+    "animate": { "opacity": 1, "y": 0 },
+    "transition": { "duration": 0.45, "ease": [0.44, 0, 0.56, 1], "type": "tween" },
+    "animateOnce": true,
+    "note": "All scroll-reveal elements use this same fadeUp pattern with staggered delays"
+  },
+  "hoverTransition": {
+    "duration": 0.2,
+    "ease": [0.27, 0, 0.51, 1],
+    "type": "tween"
+  },
+  "tickerScrolling": {
+    "type": "JS-driven requestAnimationFrame, not CSS @keyframes",
+    "behavior": "Continuous translateX scroll, Framer Motion controls the transform matrix",
+    "implementation": "Use CSS animation with translateX(-50%) for our clone"
+  },
+  "navScrollTrigger": {
+    "threshold": 0.5,
+    "direction": "down",
+    "effect": "Background becomes white with shadow"
+  },
+  "breakpoints": {
+    "desktop": "(min-width: 1200px)",
+    "tablet": "(min-width: 810px) and (max-width: 1199.98px)",
+    "phone": "(max-width: 809.98px)"
+  },
+  "cssEasing": "cubic-bezier(0.44, 0, 0.56, 1)",
+  "fonts": {
+    "heading": "Stack Sans Headline (substitute: Outfit)",
+    "body": "Google Sans Flex (substitute: DM Sans)",
+    "ui": "Geist (for buttons, labels)"
+  }
+}

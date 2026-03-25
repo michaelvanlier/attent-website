@@ -1,0 +1,12 @@
+[
+  {"idx":0,"name":"Hero","bg":"#131515","height":1282,"headings":["Build habits that actually stick"],"subNames":["Container","Content","Top","Tagline","Buttons","Bottom(3 phones: Left/Center/Right)"]},
+  {"idx":1,"name":"About/Features","bg":"transparent","height":3659,"headings":["Build steady daily habits...","A layout that keeps your day clear."],"subNames":["About(statement+showcase)","Features(bento grid: streak rules, smart planner, routine stacks, weekly reflection, gentle reminders)"]},
+  {"idx":2,"name":"Use Case","bg":"transparent","height":1238,"headings":["Adapted for the way you live and work"],"subNames":["Tabs(Professionals/Students/Parents)","Image+Stat overlay","Hashtag pills"]},
+  {"idx":3,"name":"Social","bg":"transparent","height":845,"headings":["What users are achieving with Habitline"],"subNames":["Avatar stack +51 worldwide","Horizontal scroll cards(Priya/Leo/Ramya/Maya/Daniel/Aaron)"]},
+  {"idx":4,"name":"Counter","bg":"transparent","height":1127,"headings":["How people stay consistent over time","62,000+"],"subNames":["Globe graphic","Big number","Stats row(87%/46/32+)","Ticker rows with avatars"]},
+  {"idx":5,"name":"AI Suggestions","bg":"transparent","height":1290,"headings":["AI suggestions that adjust to your day"],"subNames":["Phone mockup with floating cards","4 feature cards(Morning walk/Habit Priorities/Routine Insights/Recovery Suggestion)"]},
+  {"idx":6,"name":"Reviews","bg":"transparent","height":1873,"headings":["How people use Habitline every day"],"subNames":["Rating badge 4.5/5","3 video cards carousel","9 text review cards grid"]},
+  {"idx":7,"name":"FAQs","bg":"transparent","height":484,"headings":["Frequently asked questions"],"subNames":["Left CTA card","Right accordion(5 questions)"]},
+  {"idx":8,"name":"CTA","bg":"transparent","height":1800,"headings":["Build better habits with less effort"],"subNames":["Cloud bg images","Phone in hand PNG","QR code SVG","Download buttons"]},
+  {"idx":9,"name":"Footer","subNames":["Logo","Newsletter subscribe","3 link columns","Social icons","Attribution"]}
+]

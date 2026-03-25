@@ -1,0 +1,32 @@
+{
+  "bodyBg": "#F7F7F7",
+  "heroBg": "#131515",
+  "surface": "#FFFFFF",
+  "surfaceDark": "#1A1A1A",
+  "textPrimary": "#1A1A1A",
+  "textSecondary": "#666666",
+  "textMuted": "#999999",
+  "orange": "#ff9803",
+  "orangeHover": "#E88700",
+  "headingFont": "Stack Sans Headline (use Outfit as substitute)",
+  "bodyFont": "Google Sans Flex (use DM Sans as substitute)",
+  "h1Size": "90px",
+  "h1Weight": "500-600",
+  "h1LetterSpacing": "-0.03em",
+  "brandPill": { "bg": "#FFFFFF", "borderRadius": "20px", "padding": "16px", "size": "166x64" },
+  "navLinks": { "fontSize": "14px", "fontWeight": "500" },
+  "badge": { "bg": "rgba(255,255,255,0.1)", "borderRadius": "50px", "padding": "6px 18px 6px 6px" },
+  "buttons": { "borderRadius": "100px", "padding": "16px 34px" },
+  "cardRadius": "20-24px",
+  "sectionOrder": ["Hero", "About/Features", "Use Case", "Social", "Counter", "AI Suggestions", "Reviews", "FAQs", "CTA", "Footer"],
+  "sectionHeights": { "Hero": 1282, "About/Features": 3659, "UseCase": 1238, "Social": 845, "Counter": 1127, "AISuggestions": 1290, "Reviews": 1873, "FAQs": 484, "CTA": 1800 },
+  "framerTokens": {
+    "orange": "#ff9803",
+    "green": "#12a70a",
+    "blue": "#0059ff",
+    "purple": "#9000ff",
+    "red": "red",
+    "pink": "#ff00a1",
+    "darkOverlay": "#13151580"
+  }
+}

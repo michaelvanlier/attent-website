@@ -1,0 +1,70 @@
+{
+  "hero": {
+    "bgPhoto": "5AAyXsYWLAPDHoR0Qd3rIax2A4.jpg",
+    "leftPhoneSvg": "J6tYwRM8iq0YqS6ObBlnUEGwtk.svg",
+    "centerPhoneSvg": "OGzYNaZSYQsNCwj4a6L79KkrdA.svg",
+    "rightPhoneSvg": "nI2Ch2iiqtacQc0WAW4xJLQicfc.svg",
+    "blurOverlayBottom": "pUHkyH58LSJDgk8jqtzFiFqUyvY.svg"
+  },
+  "nav": {
+    "logo": "3AsTMGQpJ4jcC8fwNEWoVEO0k.svg",
+    "appleIcon": "BZYkl56vzaLH9uCPqEid8uQg9ZE.svg",
+    "playIcon": "J4VPLNaOdWSrA6fBUpuZ0eLYNAI.svg"
+  },
+  "statement": {
+    "aboutImages": ["xWPekEuNbvgPERKSnbylJIlw5o.jpg","tyQlVexPG6JIDCWExGwbiGuN5h8.jpg","EvRLW1yV1DMzPgDGTRFL8268Y.jpg","HXp1j2ozGA25sNyS8ZbVMkMuV3A.jpg"]
+  },
+  "phoneShowcase": {
+    "centerPhone": "HOI14HQm9TteAT5Gus0apcpG1o.png",
+    "rowPhotos": ["xWPekEuNbvgPERKSnbylJIlw5o.jpg","tyQlVexPG6JIDCWExGwbiGuN5h8.jpg","EvRLW1yV1DMzPgDGTRFL8268Y.jpg","HXp1j2ozGA25sNyS8ZbVMkMuV3A.jpg"]
+  },
+  "features": {
+    "routineStacksBg": "yyE2pUgUrjBeDKRRIF0gWhZRuhM.jpg",
+    "routineStacksPhone": "GCmP0bgqstik77X2yDWYranE.svg"
+  },
+  "useCases": {
+    "professionals": "ubUH31gw3mKXQBS06KHaijaBY.jpg",
+    "students": "kmAong4xy6gvqhgzcssHKUFJnmA.jpg",
+    "parents": "GrOi64i02AZCaZvYDyn1wZuzEo.jpg"
+  },
+  "achievements": {
+    "priya": "WvRGvc2l8SkYOYTv4oMiBGMYX4.jpg",
+    "leo": "xGAsuu5UcfFaHNbH4vHyXTsE9A.jpg",
+    "ramya": "GsMwNqFuEInpXifqbAUBIX5BtbI.jpg",
+    "maya": "qMZFyawlggBHVBoh6ddN1JiBY.jpg",
+    "daniel": "fqGFx9fe7ocFZ2fppp0P3V8zCc.jpg",
+    "aaron": "5Y4qLvBGVPY87FFtnxrK7aKIYQw.jpg",
+    "more": ["O60jXYDk3ETktyW0xrtlLeC0.jpg","XJ6pIVMN5yKo34rV6wNJ6AFRcXk.jpg"]
+  },
+  "metrics": {
+    "globe": "yWxRZ8t5CVMV4D5n7KRMmGL04.png",
+    "avatars": ["gDcaZH5xt6hqSU2VbK2snAw.jpg","Wu0ngxjedkJ31EstGJABQBoafk.jpg","5O8P63EQwkFO1m5OTR4jsw7hI8.jpg","CChKPhjar0Z3WFjF2BWc2QYAhM.jpg","lBDnhYYdiFDDzKLziT6CyXW3maU.jpg","622M5cyJBdKPIK1fPnBlo3qONk.jpg"]
+  },
+  "aiSection": {
+    "phone": "otkB8TZsvM2ULa0N3ALnKskG5ag.png",
+    "bellIcon": "LuRk2mi9PkL9qpq8u7aAhmN27dM.png"
+  },
+  "reviews": {
+    "videoThumbnails": ["ZzBHGGaTqk0aSLMiZ87omsIk5Yc.jpg","1Gm8xH2RytPJQrcLAGShFH8LuM.jpg","360Mpxs47saxpqyH2hnDZ2G9GU.jpg"],
+    "moreVideoThumbs": ["7dKCE0xdVPy08DUKqzOy8dtxWg.jpg","XtZSnP4lf3r3xqtGfWddUZ7DwhI.jpg","pmABpxPTuD1JS2FQjWsbhiqm7g.jpg"],
+    "reviewAvatars": ["hYfCvJ3IVdEznEOwIQiiAxWOsPY.jpg","E0DlVQ4cHxgNCHBSHOdAc7mG7w.jpg","pfX9Sn5qRme6iCFMisneY4YIt7I.jpg","X0ECJ5xGgYrCVgHB8RYd3RABTQ.jpg","bphS41hVtvFCNiuHkZkxk8imJk.jpg","P0sSNnMlhW7adaGkZFmKHL828bY.jpg","W13V3WO2YwDah4yBxCcZc70Es.jpg","CYC5VQ0ZcK8uEE5jBbm51FTJq0.jpg","gDcaZH5xt6hqSU2VbK2snAw.jpg"],
+    "starRating": "FfmG8vzlH3tOeU2kFU0oUxANr9Y.svg"
+  },
+  "finalCta": {
+    "phoneInHand": "Yxyz4xAO2Afi4x2mrtShsiVlWA.png",
+    "bgPhoto": "RJlhAjk8TyvYLx9IXX5jSt9s0.jpg",
+    "qrCode": "IZP7ndOJbXLF7y92URQe9epVO0.svg",
+    "clouds": ["c5yKOUxAULPtn3CoxX5b92vgJ8U.png","bWh0pVd78Am5KRfPjOhMoF5Ddk.png","vK1naOOAfBeOfzjSqlloxH7w.png","oUscxluBetLnso5wtiCRMM5TpDE.png","Z13RlvdoTurS0rPL8TlEtyXaTWA.png","7AeCYMcqGCsC65f7s3s7l9eKk4.png","W3nBncXQ3FLPgBR3WohrCEac.png"],
+    "storeButtons": ["tZgMAFzyPGsO40W7ech3SKx8UjM.svg","QxyLFSYgQIUx9LdkimXlQpsWjw.svg","HxrEf4QLeUEF6jotcSj8g2zVVM.svg"],
+    "qrFrame": "brIjjE7gbxjDG8XxRBGLy13Wkk.svg",
+    "vectorDecoration": "FjJKfi9C6Ko7SX1a8tCVf24.svg"
+  },
+  "footer": {
+    "socialIcons": {
+      "instagram": "I7kuXsHoNupDKpXkTcxbdwxo1c.svg",
+      "linkedin": "COOQGgpm6jSUCi7iId7APipilns.svg",
+      "facebook": "bMZF184RX8NMVdedkSoFjeUIk.svg",
+      "x": "xA3haEWkHhpeiKLMxOQGOu5jeY.svg"
+    }
+  }
+}
