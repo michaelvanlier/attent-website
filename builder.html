@@ -1,0 +1,3552 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attent — Section Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   @property for animated gradient borders
+   ============================================================ */
+@property --gradient-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* ============================================================
+   DESIGN SYSTEM TOKENS
+   ============================================================ */
+:root {
+  --bg: #0C0C22;
+  --bg-raised: rgba(20, 20, 50, 0.6);
+  --bg-surface: #1a1a3e;
+  --text-primary: rgba(255,248,238,0.95);
+  --text-body: rgba(255,248,238,0.65);
+  --text-muted: rgba(255,248,238,0.35);
+  --border: rgba(255,248,238,0.08);
+  --border-md: rgba(255,248,238,0.14);
+  --purple: #6D2EFF;
+  --pink: #FFA2FF;
+  --yellow: #E8FF3C;
+  --cyan: #7DFFFF;
+  --green: #00FF80;
+  --cream: #FFF8EE;
+  --ink: #0C0C22;
+
+  /* Spacing scale (ONLY use these) */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+  --s8: 64px;
+  --s9: 96px;
+  --s10: 140px;
+
+  /* Typography scale */
+  --t-display: clamp(40px, 6vw, 72px);
+  --t-h1: clamp(32px, 4.5vw, 56px);
+  --t-h2: clamp(24px, 3vw, 40px);
+  --t-h3: 20px;
+  --t-body: 17px;
+  --t-small: 14px;
+  --t-micro: 12px;
+
+  /* Easing (NO overshoot) */
+  --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --font-heading: 'Sora', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text-body);
+  font-size: var(--t-body);
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Noise grain texture overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  mix-blend-mode: overlay;
+}
+
+img { display: block; max-width: 100%; height: auto; }
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; }
+h1, h2, h3, h4 { font-family: var(--font-heading); color: var(--text-primary); line-height: 1.15; font-weight: 500; }
+
+/* ============================================================
+   LAYOUT: PREVIEW + SIDEBAR
+   ============================================================ */
+.builder-layout { display: flex; min-height: 100vh; }
+.preview { flex: 1; min-width: 0; margin-right: 260px; }
+
+/* Frosted glass sidebar */
+.sidebar {
+  position: fixed;
+  top: 0; right: 0;
+  width: 260px;
+  height: 100vh;
+  background: var(--bg-raised);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-left: 1px solid rgba(255,248,238,0.06);
+  overflow-y: auto;
+  z-index: 1000;
+  padding: var(--s5) var(--s4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+}
+.sidebar-title {
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--s4);
+  padding-bottom: var(--s3);
+  border-bottom: 1px solid var(--border-md);
+  letter-spacing: 0.02em;
+}
+.sidebar-section { padding: var(--s2) 0; }
+.sidebar-label {
+  font-size: var(--t-micro);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: color 200ms var(--ease-out);
+}
+@media (hover: hover) {
+  .sidebar-label:hover { color: var(--text-primary); }
+}
+.sidebar-buttons { display: flex; gap: 6px; }
+.sidebar-buttons button {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  transition: color 160ms var(--ease-out), border-color 160ms var(--ease-out), background 160ms var(--ease-out), transform 160ms var(--ease-out);
+}
+@media (hover: hover) {
+  .sidebar-buttons button:hover {
+    color: var(--text-primary);
+    border-color: var(--border-md);
+    background: rgba(109,46,255,0.12);
+  }
+}
+.sidebar-buttons button.active {
+  background: var(--purple);
+  color: #fff;
+  border-color: var(--purple);
+}
+.sidebar-buttons button:active { transform: scale(0.97); }
+.export-btn {
+  margin-top: auto;
+  padding: var(--s3);
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--purple), var(--pink));
+  color: #fff;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 13px;
+  transition: opacity 200ms var(--ease-out), transform 160ms var(--ease-out);
+  text-align: center;
+}
+@media (hover: hover) { .export-btn:hover { opacity: 0.85; } }
+.export-btn:active { transform: scale(0.97); }
+
+/* ============================================================
+   SECTION GROUP / VARIANT VISIBILITY
+   ============================================================ */
+.section-group { position: relative; }
+.variant { display: none; }
+.variant.active { display: block; }
+
+/* Gradient section dividers */
+.section-group + .section-group::before {
+  content: '';
+  display: block;
+  height: 1px;
+  max-width: 600px;
+  margin: 0 auto;
+  background: linear-gradient(90deg, transparent, var(--pink), var(--purple), var(--cyan), transparent);
+  opacity: 0.4;
+}
+
+/* ============================================================
+   CONTAINER
+   ============================================================ */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 var(--s5);
+}
+
+/* ============================================================
+   SHARED COMPONENTS
+   ============================================================ */
+
+/* Badge pills */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  font-family: var(--font-heading);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pink);
+  background: rgba(255,162,255,0.08);
+  padding: 6px var(--s4);
+  border-radius: 999px;
+  margin-bottom: var(--s5);
+  border: 1px solid rgba(255,162,255,0.1);
+}
+.badge::before {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23FFA2FF'%3E%3Cpath d='M8 0l2.5 5.5L16 8l-5.5 2.5L8 16l-2.5-5.5L0 8l5.5-2.5z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  flex-shrink: 0;
+}
+
+.section-title {
+  font-size: var(--t-h1);
+  font-weight: 500;
+  margin-bottom: var(--s4);
+}
+.section-sub {
+  font-size: var(--t-body);
+  color: var(--text-body);
+  max-width: 540px;
+  margin: 0 auto var(--s7);
+  line-height: 1.75;
+}
+
+/* BUTTONS */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px var(--s6);
+  border-radius: 999px;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 15px;
+  transition: box-shadow 200ms var(--ease-out), transform 160ms var(--ease-out), opacity 200ms var(--ease-out);
+  text-decoration: none;
+}
+.btn:active { transform: scale(0.97); }
+.btn-neon {
+  background: var(--purple);
+  color: #fff;
+  box-shadow: 0 0 24px rgba(109,46,255,0.4), 0 0 60px rgba(109,46,255,0.15);
+}
+@media (hover: hover) {
+  .btn-neon:hover { box-shadow: 0 0 40px rgba(109,46,255,0.6), 0 0 80px rgba(109,46,255,0.2); transform: translateY(-1px); }
+}
+.btn-gradient {
+  background: linear-gradient(135deg, var(--purple), var(--pink));
+  color: #fff;
+  box-shadow: 0 4px 24px rgba(109,46,255,0.3);
+}
+@media (hover: hover) {
+  .btn-gradient:hover { box-shadow: 0 4px 40px rgba(109,46,255,0.5); transform: translateY(-1px); }
+}
+.btn-outline {
+  border: 1px solid var(--border-md);
+  color: var(--text-primary);
+  background: transparent;
+}
+@media (hover: hover) {
+  .btn-outline:hover { border-color: var(--purple); color: var(--purple); }
+}
+.btn-text {
+  color: var(--text-body);
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 200ms var(--ease-out);
+}
+@media (hover: hover) {
+  .btn-text:hover { color: var(--text-primary); }
+  .btn-text:hover .arrow { transform: translateX(4px); }
+}
+.btn-text .arrow { transition: transform 200ms var(--ease-out); }
+
+/* ============================================================
+   TEXT CYCLE — ALL WORDS position:absolute, width via JS
+   ============================================================ */
+.text-cycle {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  height: 1.2em;
+  vertical-align: bottom;
+  transition: width 500ms var(--ease-out);
+}
+.text-cycle-word {
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(24px);
+  filter: blur(10px);
+  transition: opacity 400ms var(--ease-out), transform 400ms var(--ease-out), filter 400ms var(--ease-out);
+}
+.text-cycle-word.active {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+.text-cycle-word.exit {
+  opacity: 0;
+  transform: translateY(-24px);
+  filter: blur(10px);
+}
+
+/* GRADIENT TEXT */
+.gradient-text {
+  background: linear-gradient(135deg, #FFA2FF, #6D2EFF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* SHIMMER — 5s cycle */
+.shimmer-text {
+  background: linear-gradient(90deg, var(--text-primary) 0%, var(--pink) 40%, var(--purple) 60%, var(--text-primary) 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 5s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* STAR SVG */
+.star-svg { fill: #FFD700; width: 18px; height: 18px; filter: drop-shadow(0 0 4px rgba(255,215,0,0.3)); }
+
+/* ============================================================
+   CARD SYSTEM — Nexora-quality hover
+   ============================================================ */
+.card {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: var(--s6);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 300ms var(--ease-out), transform 300ms var(--ease-out), box-shadow 300ms var(--ease-out);
+}
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(109,46,255,0.08), rgba(255,162,255,0.05) 40%, rgba(125,255,255,0.03));
+  opacity: 0;
+  transition: opacity 500ms var(--ease-out);
+  pointer-events: none;
+}
+@media (hover: hover) {
+  .card:hover { border-color: var(--border-md); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,248,238,0.06); }
+  .card:hover::before { opacity: 1; }
+}
+.card > * { position: relative; z-index: 1; }
+
+/* ============================================================
+   SCROLL INDICATOR
+   ============================================================ */
+.scroll-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s6) 0 0;
+  opacity: 0.4;
+}
+.scroll-indicator-line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(180deg, var(--text-muted), transparent);
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+.scroll-indicator-text {
+  font-family: var(--font-heading);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   HERO GRADIENT BG — JS-driven 21st.dev breathing orb
+   ============================================================ */
+.hero-gradient-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  will-change: background;
+}
+
+/* ============================================================
+   MARQUEE
+   ============================================================ */
+.marquee-row {
+  overflow: hidden;
+  padding: var(--s2) 0;
+  position: relative;
+}
+.marquee-row::before,
+.marquee-row::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 120px;
+  z-index: 2;
+  pointer-events: none;
+}
+.marquee-row::before { left: 0; background: linear-gradient(90deg, var(--bg), transparent); }
+.marquee-row::after { right: 0; background: linear-gradient(-90deg, var(--bg), transparent); }
+.marquee-track {
+  display: flex;
+  gap: var(--s3);
+  width: max-content;
+}
+.marquee-right .marquee-track { animation: marqueeRight 35s linear infinite; }
+.marquee-left .marquee-track { animation: marqueeLeft 35s linear infinite; }
+@keyframes marqueeRight { from { transform: translateX(0); } to { transform: translateX(-33.333%); } }
+@keyframes marqueeLeft { from { transform: translateX(-33.333%); } to { transform: translateX(0); } }
+.marquee-track img {
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   PHONE MOCKUP
+   ============================================================ */
+.phone-mockup-frame {
+  width: 280px;
+  margin: 0 auto;
+  background: var(--bg-surface);
+  border-radius: 36px;
+  border: 2px solid var(--border-md);
+  padding: var(--s3);
+  position: relative;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3), 0 0 40px rgba(109,46,255,0.1), inset 0 1px 0 rgba(255,248,238,0.04);
+}
+.phone-notch-el {
+  width: 100px;
+  height: 24px;
+  background: var(--bg);
+  border-radius: 0 0 16px 16px;
+  margin: 0 auto var(--s2);
+}
+.phone-screen-area {
+  background: var(--bg);
+  border-radius: 24px;
+  padding: 20px var(--s4);
+  min-height: 400px;
+  position: relative;
+  overflow: hidden;
+}
+.phone-screen-view { display: none; }
+.phone-screen-view.active { display: block; }
+.screen-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--s4);
+}
+.screen-title {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+.screen-count {
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-size: var(--t-micro);
+  padding: 2px var(--s2);
+  border-radius: 999px;
+}
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: var(--t-small);
+  color: var(--ink);
+  flex-shrink: 0;
+}
+.contact-info { display: flex; flex-direction: column; gap: 2px; }
+.contact-name { font-size: var(--t-small); font-weight: 500; color: var(--text-primary); }
+.contact-detail { font-size: var(--t-micro); color: var(--text-muted); }
+.reminder-card-phone {
+  background: var(--bg-surface);
+  border-radius: 14px;
+  padding: var(--s3);
+  margin-bottom: 10px;
+  border: 1px solid var(--border);
+}
+.reminder-card-phone.urgent { border-color: var(--purple); }
+.reminder-time-ph { font-size: 11px; color: var(--text-muted); margin-bottom: var(--s1); }
+.reminder-title-ph { font-size: var(--t-small); font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+.reminder-hint-ph { font-size: var(--t-micro); color: var(--text-body); }
+.streak-display { text-align: center; padding: 20px 0; }
+.streak-flame { margin-bottom: var(--s2); }
+.streak-count {
+  font-family: var(--font-heading);
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--pink);
+  display: block;
+}
+.streak-label { font-size: var(--t-small); color: var(--text-muted); }
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: var(--s2) 0;
+  font-size: 13px;
+  color: var(--text-body);
+}
+
+/* ============================================================
+   CARD STACK
+   ============================================================ */
+.card-stack-wrap {
+  position: relative;
+  height: 240px;
+  max-width: 440px;
+  margin: 0 auto;
+}
+.stack-card-el {
+  position: absolute;
+  left: 0; right: 0;
+  transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-out), box-shadow 500ms var(--ease-out);
+  opacity: 0;
+  transform: translateY(30px) scale(0.92);
+  pointer-events: none;
+}
+.stack-card-el[data-pos="0"] {
+  opacity: 1;
+  transform: translateY(0) scale(1) rotate(0deg);
+  z-index: 3;
+  pointer-events: auto;
+}
+.stack-card-el[data-pos="1"] {
+  opacity: 0.6;
+  transform: translateY(18px) scale(0.96) rotate(0.5deg);
+  z-index: 2;
+}
+.stack-card-el[data-pos="2"] {
+  opacity: 0.3;
+  transform: translateY(36px) scale(0.92) rotate(-0.5deg);
+  z-index: 1;
+}
+.stack-card-inner-el {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px var(--s5);
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,248,238,0.04);
+}
+.stack-card-emoji { font-size: 32px; flex-shrink: 0; }
+.stack-card-content-el { flex: 1; }
+.stack-card-content-el strong { display: block; color: var(--text-primary); font-size: 15px; margin-bottom: 2px; }
+.stack-card-content-el span { display: block; font-size: 13px; color: var(--text-body); }
+.stack-card-content-el small { display: block; font-size: var(--t-micro); color: var(--text-muted); margin-top: var(--s1); }
+.stack-card-action-el {
+  padding: var(--s2) var(--s4);
+  border-radius: 999px;
+  font-size: var(--t-micro);
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   SECTION-SPECIFIC STYLES
+   ============================================================ */
+
+/* --- HERO --- */
+.hero-section {
+  position: relative;
+  padding: var(--s10) 0 var(--s9);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+.hero-section h1 {
+  font-size: var(--t-display);
+  font-weight: 500;
+  line-height: 1.1;
+  margin-bottom: var(--s5);
+}
+.hero-sub { font-size: 18px; color: var(--text-body); margin-bottom: var(--s7); max-width: 500px; line-height: 1.75; }
+.hero-actions { display: flex; gap: var(--s4); align-items: center; flex-wrap: wrap; }
+
+/* Hero V1: centered + gradient */
+.hero-v1 { text-align: center; justify-content: center; }
+.hero-v1 .hero-content { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; }
+.hero-v1 .hero-sub { margin-left: auto; margin-right: auto; }
+.hero-v1 .hero-actions { justify-content: center; }
+
+/* Hero V2: 55/45 split, photo bleeds right */
+.hero-v2 .hero-grid {
+  display: grid;
+  grid-template-columns: 55fr 45fr;
+  gap: 0;
+  align-items: center;
+  max-width: 100%;
+}
+.hero-v2 .hero-text-col { padding-left: 80px; padding-right: var(--s7); }
+.hero-v2 .hero-photo { position: relative; height: 100vh; }
+.hero-v2 .hero-photo img {
+  border-radius: 20px 0 0 20px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Hero V3: cinematic full photo */
+.hero-v3 { text-align: center; justify-content: flex-end; padding-bottom: var(--s9); }
+.hero-v3 .hero-bg-photo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.hero-v3 .hero-bg-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.hero-v3 .hero-bg-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(12,12,34,0.4) 30%, rgba(12,12,34,0.9) 100%);
+}
+.hero-v3 .hero-content { position: relative; z-index: 2; max-width: 700px; margin: 0 auto; }
+.hero-v3 .hero-sub { margin-left: auto; margin-right: auto; }
+.hero-v3 .hero-actions { justify-content: center; }
+
+/* Hero V4: text + floating cards */
+.hero-v4 { min-height: 85vh; }
+.hero-v4 .hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s8);
+  align-items: center;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 var(--s5);
+}
+
+/* Hero V5: minimal, just words */
+.hero-v5 {
+  text-align: center;
+  justify-content: center;
+  min-height: 80vh;
+}
+.hero-v5 .hero-content { max-width: 700px; margin: 0 auto; }
+.hero-v5 h1 {
+  font-size: clamp(48px, 8vw, 96px);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+.hero-v5 .hero-sub { margin-left: auto; margin-right: auto; font-size: var(--t-body); }
+.hero-v5 .hero-actions { justify-content: center; }
+
+/* --- PHOTO STRIP --- */
+.strip-section { padding: var(--s7) 0; overflow: hidden; }
+.strip-section img { width: 160px; height: 200px; object-fit: cover; border-radius: 12px; flex-shrink: 0; }
+
+/* Strip V2: larger */
+.strip-v2 img { width: 240px; height: 300px; border: 2px solid rgba(255,248,238,0.1); }
+.strip-v2 .marquee-track { animation-duration: 50s; gap: var(--s4); }
+
+/* Strip V3: static 5-column grid */
+.strip-v3 .photo-grid {
+  display: flex;
+  justify-content: center;
+  gap: var(--s4);
+  padding: var(--s7) var(--s5);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.strip-v3 .photo-grid img {
+  width: 200px;
+  height: 200px;
+  border-radius: 16px;
+  object-fit: cover;
+}
+
+/* Strip V4: text + photos */
+.strip-v4 .marquee-track { align-items: center; }
+.strip-v4 .marquee-word {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--pink), var(--purple), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  padding: 0 var(--s2);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Strip V5: divider */
+.strip-v5 { padding: 0; }
+.strip-v5 .divider-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--pink), var(--purple), var(--cyan), transparent);
+  margin: 80px auto;
+  max-width: 100%;
+  opacity: 0.5;
+}
+
+/* --- PROBLEM --- */
+.problem-section { padding: var(--s10) 0; }
+
+/* V1: Three statement cards */
+.problem-v1 .problem-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s5);
+}
+.problem-v1 .p-card {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 300ms var(--ease-out), transform 300ms var(--ease-out), box-shadow 300ms var(--ease-out);
+}
+.problem-v1 .p-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(109,46,255,0.08), rgba(255,162,255,0.05) 40%, rgba(125,255,255,0.03));
+  opacity: 0;
+  transition: opacity 500ms var(--ease-out);
+  pointer-events: none;
+}
+@media (hover: hover) {
+  .problem-v1 .p-card:hover { border-color: var(--border-md); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,248,238,0.06); }
+  .problem-v1 .p-card:hover::before { opacity: 1; }
+}
+.problem-v1 .p-stat {
+  font-family: var(--font-heading);
+  font-size: clamp(40px, 5vw, 56px);
+  font-weight: 500;
+  color: rgba(255,248,238,0.7);
+  line-height: 1;
+  margin-bottom: var(--s4);
+  position: relative;
+  z-index: 1;
+}
+.problem-v1 .p-card p { color: var(--text-body); font-size: var(--t-body); line-height: 1.75; position: relative; z-index: 1; }
+
+/* V2: Photo + text split */
+.problem-v2 .problem-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s7);
+  align-items: center;
+}
+.problem-v2 .problem-photo img {
+  border-radius: 0 20px 20px 0;
+  width: 100%;
+  height: 100%;
+  min-height: 500px;
+  object-fit: cover;
+}
+.problem-v2 .problem-texts { display: flex; flex-direction: column; gap: var(--s5); padding: var(--s7) var(--s5); }
+.problem-v2 .problem-texts p {
+  font-size: var(--t-body);
+  color: var(--text-body);
+  line-height: 1.75;
+  padding-left: var(--s5);
+  border-left: 2px solid var(--border-md);
+}
+
+/* V3: Single full-width statement */
+.problem-v3 { text-align: center; }
+.problem-v3 .big-statement {
+  font-family: var(--font-heading);
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 500;
+  color: var(--text-primary);
+  max-width: 800px;
+  margin: 0 auto var(--s8);
+  line-height: 1.3;
+}
+.problem-v3 .stat-row {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0;
+  max-width: 700px;
+  margin: 0 auto;
+}
+.problem-v3 .stat-item {
+  flex: 1;
+  text-align: center;
+  padding: 0 var(--s6);
+}
+.problem-v3 .stat-item + .stat-item { border-left: 1px solid var(--border-md); }
+.problem-v3 .stat-val {
+  font-family: var(--font-heading);
+  font-size: clamp(32px, 4vw, 56px);
+  font-weight: 500;
+  color: var(--text-primary);
+  display: block;
+  line-height: 1.1;
+  margin-bottom: var(--s2);
+}
+.problem-v3 .stat-lbl {
+  font-size: var(--t-small);
+  color: var(--text-muted);
+  display: block;
+}
+
+/* V4: Numbered cards vertical */
+.problem-v4 .numbered-list { display: flex; flex-direction: column; gap: 0; }
+.problem-v4 .numbered-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s6);
+  padding: var(--s7) 0;
+  border-bottom: 1px solid var(--border);
+}
+.problem-v4 .numbered-item:last-child { border-bottom: none; }
+.problem-v4 .item-num {
+  font-family: var(--font-heading);
+  font-size: 56px;
+  font-weight: 800;
+  color: rgba(255,248,238,0.08);
+  line-height: 1;
+  flex-shrink: 0;
+  width: 80px;
+}
+.problem-v4 .item-content { flex: 1; padding-top: var(--s2); }
+.problem-v4 .item-title {
+  font-family: var(--font-heading);
+  font-size: var(--t-h3);
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: var(--s2);
+}
+.problem-v4 .item-text { color: var(--text-body); font-size: var(--t-body); line-height: 1.75; }
+
+/* V5: Dark bento grid */
+.problem-v5 .bento-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  grid-template-rows: auto auto;
+  gap: var(--s5);
+}
+.problem-v5 .bento-tall {
+  grid-row: span 2;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  transition: border-color 300ms var(--ease-out), box-shadow 300ms var(--ease-out);
+}
+@media (hover: hover) {
+  .problem-v5 .bento-tall:hover { border-color: var(--border-md); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+}
+.problem-v5 .bento-tall img {
+  width: 100%;
+  height: 60%;
+  object-fit: cover;
+}
+.problem-v5 .bento-tall-content {
+  padding: var(--s6);
+}
+.problem-v5 .bento-tall .p-stat {
+  font-family: var(--font-heading);
+  font-size: clamp(36px, 4vw, 56px);
+  font-weight: 500;
+  color: rgba(255,248,238,0.7);
+  margin-bottom: var(--s2);
+}
+.problem-v5 .bento-small {
+  background: var(--bg-raised);
+  border-radius: 20px;
+  padding: var(--s6);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 300ms var(--ease-out), box-shadow 300ms var(--ease-out);
+}
+.problem-v5 .bento-small--pink { border: 1px solid rgba(255,162,255,0.15); }
+.problem-v5 .bento-small--purple { border: 1px solid rgba(109,46,255,0.15); }
+@media (hover: hover) {
+  .problem-v5 .bento-small:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+}
+.problem-v5 .bento-small h3 { font-size: var(--t-h3); margin-bottom: var(--s3); }
+.problem-v5 .bento-small p { color: var(--text-body); font-size: var(--t-body); line-height: 1.75; }
+
+/* --- PIVOT --- */
+.pivot-section { padding: var(--s10) 0; }
+
+/* V1: Photo split 60/40 */
+.pivot-v1 .pivot-grid {
+  display: grid;
+  grid-template-columns: 60fr 40fr;
+  gap: var(--s8);
+  align-items: center;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 var(--s5);
+}
+.pivot-v1 .pivot-photo { position: relative; }
+.pivot-v1 .pivot-photo img {
+  border-radius: 0 20px 20px 0;
+  width: 100%;
+  height: 520px;
+  object-fit: cover;
+}
+/* Vignette */
+.pivot-v1 .pivot-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(12,12,34,0.5));
+  pointer-events: none;
+}
+.pivot-v1 h2 { font-size: clamp(32px, 4vw, 52px); }
+
+/* V2: Full text centered */
+.pivot-v2 { text-align: center; padding: 200px 0; }
+.pivot-v2 h2 {
+  font-size: clamp(36px, 5vw, 64px);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* V3: Full-bleed photo */
+.pivot-v3 {
+  position: relative;
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.pivot-v3 .pivot-bg {
+  position: absolute;
+  inset: 0;
+}
+.pivot-v3 .pivot-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.pivot-v3 .pivot-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(12,12,34,0.6), rgba(12,12,34,0.85));
+}
+.pivot-v3 .pivot-content {
+  position: relative;
+  z-index: 1;
+  max-width: 700px;
+  padding: 0 var(--s5);
+}
+.pivot-v3 h2 { font-size: clamp(28px, 4vw, 52px); }
+
+/* V4: Before / After */
+.pivot-v4 .ba-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s5);
+  max-width: 900px;
+  margin: 0 auto;
+}
+.pivot-v4 .ba-card {
+  border-radius: 20px;
+  padding: var(--s7) var(--s6);
+  text-align: center;
+}
+.pivot-v4 .ba-before {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+}
+.pivot-v4 .ba-after {
+  background: linear-gradient(135deg, rgba(109,46,255,0.15), rgba(255,162,255,0.1));
+  border: 1px solid rgba(109,46,255,0.3);
+}
+.pivot-v4 .ba-title {
+  font-family: var(--font-heading);
+  font-size: var(--t-h3);
+  font-weight: 500;
+  margin-bottom: var(--s5);
+}
+.pivot-v4 .ba-before .ba-title { color: var(--text-muted); }
+.pivot-v4 .ba-after .ba-title { color: var(--purple); }
+.pivot-v4 .ba-stat {
+  font-family: var(--font-heading);
+  font-size: 40px;
+  font-weight: 500;
+  margin-bottom: var(--s2);
+}
+.pivot-v4 .ba-before .ba-stat { color: var(--text-muted); }
+.pivot-v4 .ba-after .ba-stat { color: var(--pink); }
+.pivot-v4 .ba-desc { color: var(--text-body); font-size: 15px; margin-bottom: var(--s5); }
+
+/* V5: Video placeholder */
+.pivot-v5 { text-align: center; }
+.pivot-v5 h2 {
+  font-size: clamp(28px, 3.5vw, 44px);
+  margin-bottom: var(--s7);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.pivot-v5 .video-placeholder {
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  aspect-ratio: 16 / 9;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 300ms var(--ease-out), box-shadow 300ms var(--ease-out);
+}
+@media (hover: hover) {
+  .pivot-v5 .video-placeholder:hover { border-color: var(--purple); box-shadow: 0 0 40px rgba(109,46,255,0.2); }
+  .pivot-v5 .video-placeholder:hover .play-circle { transform: scale(1.08); }
+}
+.pivot-v5 .play-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--purple);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 40px rgba(109,46,255,0.4);
+  transition: transform 300ms var(--ease-out);
+}
+.pivot-v5 .play-circle svg { margin-left: 4px; }
+
+/* --- HOW IT WORKS --- */
+.how-section { padding: var(--s10) 0; }
+
+/* V1: Steps + phone */
+.how-v1 .how-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s8);
+  align-items: start;
+}
+.how-step-btn {
+  width: 100%;
+  text-align: left;
+  padding: var(--s5) 28px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  margin-bottom: var(--s3);
+  transition: border-color 200ms var(--ease-out), background 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+  cursor: pointer;
+}
+.how-step-btn.active {
+  border-color: var(--purple);
+  border-left: 3px solid var(--purple);
+  background: rgba(109,46,255,0.08);
+  box-shadow: 0 0 20px rgba(109,46,255,0.1);
+}
+.how-step-btn .step-num {
+  font-family: var(--font-heading);
+  font-size: var(--t-micro);
+  font-weight: 700;
+  color: var(--purple);
+  margin-bottom: var(--s1);
+}
+.how-step-btn h3 {
+  font-size: 16px;
+  margin-bottom: 0;
+  transition: color 200ms var(--ease-out);
+}
+.how-step-btn .step-desc {
+  font-size: var(--t-small);
+  color: var(--text-body);
+  margin-top: var(--s2);
+  display: none;
+  line-height: 1.5;
+}
+.how-step-btn.active .step-desc { display: block; }
+
+/* V2: 3 columns */
+.how-v2 .how-cols {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s5);
+}
+.how-v2 .how-col {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px 28px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 300ms var(--ease-out), transform 300ms var(--ease-out), box-shadow 300ms var(--ease-out);
+}
+.how-v2 .how-col::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(109,46,255,0.08), rgba(255,162,255,0.05) 40%, rgba(125,255,255,0.03));
+  opacity: 0;
+  transition: opacity 500ms var(--ease-out);
+  pointer-events: none;
+}
+@media (hover: hover) {
+  .how-v2 .how-col:hover { border-color: var(--border-md); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,248,238,0.06); }
+  .how-v2 .how-col:hover::before { opacity: 1; }
+}
+.how-v2 .how-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: rgba(109,46,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--s4);
+  font-size: 24px;
+  position: relative;
+  z-index: 1;
+}
+.how-v2 .how-num {
+  font-family: var(--font-heading);
+  font-size: var(--t-micro);
+  font-weight: 700;
+  color: var(--purple);
+  margin-bottom: var(--s2);
+  position: relative;
+  z-index: 1;
+}
+.how-v2 .how-col h3 { font-size: 18px; margin-bottom: 10px; position: relative; z-index: 1; }
+.how-v2 .how-col p { font-size: var(--t-small); color: var(--text-body); position: relative; z-index: 1; }
+
+/* V3: Vertical timeline */
+.how-v3 .timeline {
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+  padding-left: 40px;
+}
+.how-v3 .timeline::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--purple), var(--pink), var(--cyan));
+}
+.how-v3 .timeline-step {
+  position: relative;
+  padding: 0 0 var(--s7) var(--s5);
+}
+.how-v3 .timeline-step:last-child { padding-bottom: 0; }
+.how-v3 .timeline-dot {
+  position: absolute;
+  left: -32px;
+  top: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--purple);
+  border: 3px solid var(--bg);
+  box-shadow: 0 0 12px rgba(109,46,255,0.4);
+}
+.how-v3 .timeline-num {
+  font-family: var(--font-heading);
+  font-size: var(--t-micro);
+  font-weight: 700;
+  color: var(--purple);
+  margin-bottom: 6px;
+}
+.how-v3 .timeline-step h3 { font-size: var(--t-h3); margin-bottom: var(--s2); }
+.how-v3 .timeline-step p { font-size: 15px; color: var(--text-body); }
+
+/* V4: Steps + floating cards */
+.how-v4 .how-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s8);
+  align-items: start;
+}
+
+/* V5: Full-width carousel steps */
+.how-v5 { text-align: center; }
+.how-v5 .step-carousel {
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+  min-height: 200px;
+}
+.how-v5 .carousel-step { display: none; text-align: center; }
+.how-v5 .carousel-step.active { display: block; }
+.how-v5 .carousel-step .step-big-num {
+  font-family: var(--font-heading);
+  font-size: 72px;
+  font-weight: 800;
+  color: var(--purple);
+  opacity: 0.3;
+  margin-bottom: var(--s4);
+}
+.how-v5 .carousel-step h3 { font-size: 28px; margin-bottom: var(--s3); }
+.how-v5 .carousel-step p { font-size: var(--t-body); color: var(--text-body); max-width: 480px; margin: 0 auto; }
+.carousel-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s4);
+  margin-top: var(--s7);
+}
+.carousel-arrow {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  font-size: 20px;
+  transition: border-color 200ms var(--ease-out), color 200ms var(--ease-out), transform 160ms var(--ease-out);
+}
+@media (hover: hover) {
+  .carousel-arrow:hover { border-color: var(--purple); color: var(--purple); }
+}
+.carousel-arrow:active { transform: scale(0.97); }
+.carousel-dots { display: flex; gap: var(--s2); }
+.carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: background 200ms var(--ease-out), transform 200ms var(--ease-out);
+}
+.carousel-dot.active { background: var(--purple); transform: scale(1.3); }
+
+/* --- STORIES --- */
+.stories-section { padding: var(--s10) 0; }
+
+/* V1: Alternating photo + text */
+.stories-v1 .story-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s7);
+  align-items: center;
+  margin-bottom: var(--s7);
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 var(--s5);
+}
+.stories-v1 .story-card:nth-child(even) { direction: rtl; }
+.stories-v1 .story-card:nth-child(even) > * { direction: ltr; }
+.stories-v1 .story-photo img {
+  border-radius: 20px;
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  transition: transform 600ms var(--ease-out);
+}
+@media (hover: hover) {
+  .stories-v1 .story-photo:hover img { transform: scale(1.03); }
+}
+.stories-v1 .story-text { max-width: 480px; }
+.stories-v1 .story-text p { font-size: 18px; color: var(--text-body); line-height: 1.7; margin-bottom: var(--s3); }
+.story-tag {
+  display: inline-block;
+  font-family: var(--font-heading);
+  font-size: var(--t-micro);
+  font-weight: 600;
+  color: var(--purple);
+  background: rgba(109,46,255,0.08);
+  padding: var(--s1) 14px;
+  border-radius: 999px;
+}
+
+/* V2: Full-width photo cards */
+.stories-v2 .story-wide {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: var(--s5);
+  height: 400px;
+}
+.stories-v2 .story-wide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 600ms var(--ease-out);
+}
+@media (hover: hover) {
+  .stories-v2 .story-wide:hover img { transform: scale(1.03); }
+}
+.stories-v2 .story-wide-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(12,12,34,0.95) 0%, rgba(12,12,34,0.1) 50%, transparent 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: var(--s7);
+}
+.stories-v2 .story-wide-overlay p { font-size: var(--t-h3); color: var(--text-primary); max-width: 500px; line-height: 1.6; margin-bottom: var(--s3); font-weight: 500; }
+.stories-v2 .story-wide-overlay .story-tag { color: var(--pink); background: rgba(255,162,255,0.1); }
+
+/* V3: Three equal cards with hover */
+.stories-v3 .story-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s5);
+}
+.stories-v3 .story-grid-card {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  transition: border-color 300ms var(--ease-out), transform 300ms var(--ease-out), box-shadow 300ms var(--ease-out);
+}
+.stories-v3 .story-grid-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(109,46,255,0.08), rgba(255,162,255,0.05) 40%, rgba(125,255,255,0.03));
+  opacity: 0;
+  transition: opacity 500ms var(--ease-out);
+  pointer-events: none;
+  z-index: 1;
+}
+@media (hover: hover) {
+  .stories-v3 .story-grid-card:hover { border-color: var(--border-md); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+  .stories-v3 .story-grid-card:hover::before { opacity: 1; }
+  .stories-v3 .story-grid-card:hover img { transform: scale(1.03); }
+}
+.stories-v3 .story-grid-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  transition: transform 600ms var(--ease-out);
+}
+.stories-v3 .story-grid-card-text { padding: var(--s5); position: relative; z-index: 2; }
+.stories-v3 .story-grid-card-text p { font-size: 15px; color: var(--text-body); line-height: 1.6; margin-bottom: 10px; }
+
+/* V4: Large quote style */
+.stories-v4 .quote-cards { display: flex; flex-direction: column; gap: var(--s7); max-width: 700px; margin: 0 auto; }
+.stories-v4 .quote-card { display: flex; gap: var(--s5); align-items: flex-start; }
+.stories-v4 .quote-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.stories-v4 .quote-card p {
+  font-family: var(--font-heading);
+  font-size: clamp(18px, 2.5vw, 24px);
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.5;
+  font-style: italic;
+}
+.stories-v4 .quote-card .story-tag {
+  color: var(--cyan);
+  margin-top: var(--s2);
+}
+
+/* V5: Carousel */
+.stories-v5 .story-carousel {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+}
+.stories-v5 .carousel-slide { display: none; }
+.stories-v5 .carousel-slide.active {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s7);
+  align-items: center;
+}
+.stories-v5 .carousel-slide img {
+  border-radius: 20px;
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+}
+.stories-v5 .carousel-slide p { font-size: var(--t-body); color: var(--text-body); line-height: 1.7; margin-bottom: var(--s3); }
+
+/* --- SOCIAL PROOF --- */
+.proof-section { padding: var(--s10) 0; }
+
+.proof-card {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: var(--s6);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 300ms var(--ease-out), transform 300ms var(--ease-out), box-shadow 300ms var(--ease-out);
+}
+.proof-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(109,46,255,0.08), rgba(255,162,255,0.05) 40%, rgba(125,255,255,0.03));
+  opacity: 0;
+  transition: opacity 500ms var(--ease-out);
+  pointer-events: none;
+}
+@media (hover: hover) {
+  .proof-card:hover { border-color: var(--border-md); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,248,238,0.06); }
+  .proof-card:hover::before { opacity: 1; }
+}
+.proof-card blockquote { position: relative; z-index: 1; }
+.proof-card blockquote p {
+  font-size: 16px;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin-bottom: var(--s3);
+  font-style: italic;
+}
+.proof-card blockquote footer { font-size: 13px; color: var(--text-muted); }
+.proof-card--pink { border-color: rgba(255,162,255,0.15); background: rgba(255,162,255,0.06); }
+.proof-card--purple { border-color: rgba(109,46,255,0.15); background: rgba(109,46,255,0.06); }
+.proof-card--cyan { border-color: rgba(125,255,255,0.15); background: rgba(125,255,255,0.06); }
+
+/* Decorative quote mark for proof cards */
+.proof-card .deco-quote {
+  font-family: var(--font-heading);
+  font-size: 72px;
+  font-weight: 800;
+  line-height: 0.6;
+  color: rgba(109,46,255,0.06);
+  position: absolute;
+  top: 16px;
+  left: 20px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* V1 */
+.proof-v1 .proof-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s5); margin-bottom: var(--s7); }
+.proof-rating {
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s3);
+}
+.proof-rating .stars { display: flex; gap: var(--s1); }
+.proof-rating span { font-size: var(--t-small); color: var(--text-muted); }
+
+/* V2: Rotating single quote */
+.proof-v2 { text-align: center; }
+.proof-v2 .rotating-quote {
+  max-width: 700px;
+  margin: 0 auto;
+  min-height: 200px;
+  position: relative;
+}
+.proof-v2 .rq-item {
+  opacity: 0;
+  transform: translateY(8px);
+  filter: blur(4px);
+  transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out), filter 600ms var(--ease-out);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.proof-v2 .rq-item.active {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0px);
+  position: relative;
+  pointer-events: auto;
+}
+.proof-v2 .rq-item p {
+  font-family: var(--font-heading);
+  font-size: clamp(22px, 3vw, 32px);
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.4;
+  margin-bottom: var(--s4);
+  font-style: italic;
+}
+.proof-v2 .rq-item footer { font-size: var(--t-small); color: var(--text-muted); }
+
+/* V3: Stat row + quotes */
+.proof-v3 .stats-row {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin-bottom: var(--s8);
+  padding: var(--s7) 0;
+}
+.proof-v3 .stat-item {
+  flex: 1;
+  text-align: center;
+  padding: 0 var(--s6);
+}
+.proof-v3 .stat-item + .stat-item { border-left: 1px solid var(--border-md); }
+.proof-v3 .stat-item .stat-val {
+  font-family: var(--font-heading);
+  font-size: clamp(40px, 5vw, 56px);
+  font-weight: 500;
+  color: var(--text-primary);
+  display: block;
+  line-height: 1.1;
+  margin-bottom: var(--s2);
+}
+.proof-v3 .stat-item .stat-lbl {
+  font-size: var(--t-small);
+  color: var(--text-muted);
+  display: block;
+  line-height: 1.4;
+}
+.proof-v3 .proof-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s5); }
+
+/* V4: Masonry testimonial wall */
+.proof-v4 .masonry {
+  column-count: 3;
+  column-gap: var(--s5);
+}
+.proof-v4 .masonry .proof-card {
+  break-inside: avoid;
+  margin-bottom: var(--s5);
+}
+
+/* V5: Single large quote */
+.proof-v5 { text-align: center; position: relative; }
+.proof-v5 .quote-mark {
+  font-family: var(--font-heading);
+  font-size: 200px;
+  font-weight: 800;
+  line-height: 0.6;
+  color: rgba(109,46,255,0.06);
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+}
+.proof-v5 .quote-mark--open { top: 40px; left: 50%; transform: translateX(-200px); }
+.proof-v5 .quote-mark--close { bottom: 40px; right: 50%; transform: translateX(200px); }
+.proof-v5 blockquote { position: relative; z-index: 1; }
+.proof-v5 blockquote p {
+  font-family: var(--font-heading);
+  font-size: clamp(24px, 3.5vw, 36px);
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.4;
+  max-width: 700px;
+  margin: 0 auto var(--s4);
+  font-style: italic;
+}
+.proof-v5 blockquote footer { font-size: var(--t-small); color: var(--text-muted); margin-bottom: var(--s5); display: block; }
+
+/* --- REMINDER CARDS --- */
+.reminders-section { padding: var(--s10) 0; text-align: center; }
+
+/* V2: Horizontal scroll */
+.reminders-v2 .cards-scroll {
+  display: flex;
+  gap: var(--s4);
+  overflow-x: auto;
+  padding: var(--s5) var(--s5);
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+}
+.reminders-v2 .cards-scroll::-webkit-scrollbar { display: none; }
+.reminders-v2 .scroll-card {
+  flex: 0 0 360px;
+  scroll-snap-align: start;
+}
+
+/* V3: Grid */
+.reminders-v3 .cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s4);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* V4: Spotlight */
+.reminders-v4 .spotlight {
+  max-width: 500px;
+  margin: 0 auto;
+  min-height: 120px;
+}
+.reminders-v4 .spotlight-card { display: none; }
+.reminders-v4 .spotlight-card.active { display: block; }
+
+/* --- FINAL CTA --- */
+.cta-section { padding: var(--s10) 0; text-align: center; }
+
+/* V1 */
+.cta-v1 .cta-photo {
+  margin-bottom: var(--s7);
+  border-radius: 20px;
+  overflow: hidden;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.cta-v1 .cta-photo img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 20px;
+}
+.cta-v1 h2 { font-size: var(--t-h1); margin-bottom: var(--s5); }
+.cta-v1 .cta-sub { font-size: var(--t-h3); color: var(--text-body); margin-bottom: var(--s6); }
+
+/* V2: Gradient bg */
+.cta-v2 { position: relative; overflow: hidden; }
+.cta-v2 .cta-gradient-bg {
+  position: absolute;
+  inset: 0;
+  will-change: background;
+}
+.cta-v2 .cta-content { position: relative; z-index: 1; }
+.cta-v2 h2 { font-size: clamp(28px, 4vw, 48px); margin-bottom: var(--s5); }
+
+/* V3: Split + phone */
+.cta-v3 .cta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s8);
+  align-items: center;
+  text-align: left;
+}
+.cta-v3 h2 { font-size: clamp(28px, 3.5vw, 40px); margin-bottom: var(--s3); }
+.cta-v3 .cta-sub { font-size: var(--t-body); color: var(--text-body); margin-bottom: var(--s6); }
+
+/* V4: Pure minimal */
+.cta-v4 { min-height: 50vh; display: flex; align-items: center; justify-content: center; padding: 200px 0; }
+.cta-v4 h2 { font-size: clamp(32px, 5vw, 56px); margin-bottom: var(--s6); }
+
+/* V5: Photo background */
+.cta-v5 {
+  position: relative;
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.cta-v5 .cta-bg {
+  position: absolute;
+  inset: -40px;
+}
+.cta-v5 .cta-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 100ms linear;
+}
+.cta-v5 .cta-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(12,12,34,0.7), rgba(12,12,34,0.85));
+}
+.cta-v5 .cta-content { position: relative; z-index: 1; }
+.cta-v5 h2 { font-size: clamp(28px, 4vw, 48px); margin-bottom: var(--s5); }
+
+/* Store badges */
+.store-badges {
+  display: flex;
+  gap: var(--s3);
+  justify-content: center;
+  margin-top: var(--s5);
+}
+.store-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  transition: border-color 200ms var(--ease-out), transform 160ms var(--ease-out);
+  color: var(--cream);
+}
+@media (hover: hover) {
+  .store-badge:hover { border-color: var(--border-md); }
+}
+.store-badge:active { transform: scale(0.97); }
+.store-badge small { font-size: 10px; color: var(--text-muted); display: block; }
+.store-badge strong { font-size: var(--t-small); display: block; }
+
+/* --- FOOTER --- */
+.footer-section { padding: 80px 0 40px; border-top: 1px solid var(--border); }
+
+/* V1: 4-col grid */
+.footer-v1 .footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: var(--s7);
+  margin-bottom: var(--s7);
+}
+.footer-logo-svg { width: 100px; height: auto; margin-bottom: var(--s3); display: block; }
+.footer-tagline { font-size: var(--t-small); color: var(--text-muted); }
+.footer-col h4 {
+  font-family: var(--font-heading);
+  font-size: var(--t-small);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--s3);
+}
+.footer-col ul { list-style: none; }
+.footer-col ul li { margin-bottom: var(--s2); }
+.footer-col ul li a { font-size: var(--t-small); color: var(--text-body); transition: color 200ms var(--ease-out); }
+@media (hover: hover) {
+  .footer-col ul li a:hover { color: var(--text-primary); }
+}
+.footer-bottom {
+  padding-top: var(--s5);
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* V2: Centered */
+.footer-v2 { text-align: center; }
+.footer-v2 .footer-logo-svg { margin: 0 auto var(--s3); }
+.footer-v2 .footer-links { display: flex; gap: var(--s5); justify-content: center; margin: var(--s5) 0; flex-wrap: wrap; }
+.footer-v2 .footer-links a { font-size: var(--t-small); color: var(--text-body); transition: color 200ms var(--ease-out); }
+@media (hover: hover) {
+  .footer-v2 .footer-links a:hover { color: var(--text-primary); }
+}
+
+/* V3: Minimal */
+.footer-v3 { text-align: center; }
+.footer-v3 .footer-logo-svg { margin: 0 auto var(--s4); }
+
+/* V4: Social icons */
+.footer-v4 .footer-wide {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--s5);
+  flex-wrap: wrap;
+  gap: var(--s5);
+}
+.footer-v4 .social-icons { display: flex; gap: var(--s3); }
+.footer-v4 .social-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 200ms var(--ease-out), background 200ms var(--ease-out), transform 160ms var(--ease-out);
+}
+@media (hover: hover) {
+  .footer-v4 .social-icon:hover { border-color: var(--purple); background: rgba(109,46,255,0.1); }
+}
+.footer-v4 .social-icon:active { transform: scale(0.97); }
+.footer-v4 .social-icon svg { width: 18px; height: 18px; fill: var(--text-body); }
+
+/* V5: Email signup */
+.footer-v5 .signup-row {
+  display: flex;
+  gap: var(--s3);
+  max-width: 420px;
+  margin: var(--s5) auto;
+}
+.footer-v5 .signup-input {
+  flex: 1;
+  padding: var(--s3) var(--s4);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--t-small);
+  outline: none;
+  transition: border-color 200ms var(--ease-out);
+}
+.footer-v5 .signup-input:focus { border-color: var(--purple); }
+.footer-v5 .signup-input::placeholder { color: var(--text-muted); }
+.footer-v5 .signup-btn {
+  padding: var(--s3) var(--s5);
+  border-radius: 12px;
+  background: var(--purple);
+  color: #fff;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: var(--t-small);
+  white-space: nowrap;
+  transition: opacity 200ms var(--ease-out), transform 160ms var(--ease-out);
+}
+@media (hover: hover) {
+  .footer-v5 .signup-btn:hover { opacity: 0.85; }
+}
+.footer-v5 .signup-btn:active { transform: scale(0.97); }
+
+/* ============================================================
+   SCROLL REVEAL
+   ============================================================ */
+.rv {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 700ms var(--ease-expo), transform 700ms var(--ease-expo);
+}
+.rv.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px) {
+  .preview { margin-right: 0; margin-bottom: 72px; }
+  .sidebar {
+    position: fixed;
+    top: auto; bottom: 0; left: 0; right: 0;
+    width: 100%; height: auto;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 10px 12px;
+    gap: 12px;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    z-index: 1000;
+  }
+  .sidebar-title { display: none; }
+  .sidebar-section { padding: 0; flex-shrink: 0; display: flex; align-items: center; gap: 6px; }
+  .sidebar-label { margin-bottom: 0; font-size: 10px; }
+  .sidebar-buttons { gap: 4px; }
+  .sidebar-buttons button { width: 28px; height: 28px; font-size: 11px; border-radius: 8px; }
+  .export-btn { display: none; }
+  .scroll-indicator { display: none; }
+
+  .hero-v2 .hero-grid,
+  .hero-v4 .hero-grid,
+  .pivot-v1 .pivot-grid,
+  .pivot-v4 .ba-grid,
+  .how-v1 .how-grid,
+  .how-v4 .how-grid,
+  .cta-v3 .cta-grid,
+  .footer-v1 .footer-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero-v2 .hero-text-col { padding-left: var(--s5); padding-right: var(--s5); }
+  .hero-v2 .hero-photo { height: 400px; }
+  .hero-v2 .hero-photo img { border-radius: 20px; }
+  .problem-v1 .problem-cards,
+  .problem-v2 .problem-split,
+  .problem-v5 .bento-grid,
+  .how-v2 .how-cols,
+  .stories-v1 .story-card,
+  .stories-v3 .story-grid,
+  .stories-v5 .carousel-slide.active,
+  .proof-v1 .proof-grid,
+  .proof-v3 .stats-row,
+  .proof-v3 .proof-grid,
+  .proof-v4 .masonry {
+    grid-template-columns: 1fr;
+    column-count: 1;
+  }
+  .proof-v3 .stats-row { flex-direction: column; gap: var(--s5); }
+  .proof-v3 .stat-item + .stat-item { border-left: none; border-top: 1px solid var(--border-md); padding-top: var(--s5); }
+  .problem-v3 .stat-row { flex-direction: column; gap: var(--s5); }
+  .problem-v3 .stat-item + .stat-item { border-left: none; border-top: 1px solid var(--border-md); padding-top: var(--s5); }
+  .stories-v1 .story-card:nth-child(even) { direction: ltr; }
+  .reminders-v3 .cards-grid { grid-template-columns: 1fr; }
+  .problem-v5 .bento-tall { grid-row: span 1; }
+}
+</style>
+</head>
+<body>
+
+<div class="builder-layout">
+<main class="preview" id="preview">
+
+<!-- ================================================================
+     1. HERO
+     ================================================================ -->
+<div class="section-group" data-section="hero" id="section-hero">
+
+  <!-- HERO V1: The Statement (Gradient Orb) -->
+  <div class="variant active" data-variant="1">
+    <section class="hero-section hero-v1">
+      <div class="hero-gradient-bg"></div>
+      <div class="hero-content rv">
+        <h1>
+          Mis nooit meer een<br>
+          <span class="gradient-text text-cycle" data-cycle="hero-v1">
+            <span class="text-cycle-word active">verjaardag</span>
+            <span class="text-cycle-word">jubileum</span>
+            <span class="text-cycle-word">moment</span>
+            <span class="text-cycle-word">mijlpaal</span>
+            <span class="text-cycle-word">kans</span>
+          </span>
+        </h1>
+        <p class="hero-sub">Attent helpt je om er te zijn op de momenten die ertoe doen.</p>
+        <div class="hero-actions">
+          <a href="#" class="btn btn-neon">Download gratis</a>
+          <a href="#" class="btn btn-outline">Bekijk hoe het werkt</a>
+        </div>
+      </div>
+    </section>
+    <div class="scroll-indicator">
+      <div class="scroll-indicator-line"></div>
+      <span class="scroll-indicator-text">scroll</span>
+    </div>
+  </div>
+
+  <!-- HERO V2: The Split (Photo Hero) -->
+  <div class="variant" data-variant="2">
+    <section class="hero-section hero-v2">
+      <div class="hero-grid">
+        <div class="hero-text-col rv">
+          <h1>
+            Mis nooit meer een<br>
+            <span class="gradient-text text-cycle" data-cycle="hero-v2">
+              <span class="text-cycle-word active">verjaardag</span>
+              <span class="text-cycle-word">jubileum</span>
+              <span class="text-cycle-word">moment</span>
+              <span class="text-cycle-word">mijlpaal</span>
+              <span class="text-cycle-word">kans</span>
+            </span>
+          </h1>
+          <p class="hero-sub">Attent helpt je om er te zijn op de momenten die ertoe doen.</p>
+          <div class="hero-actions">
+            <a href="#" class="btn btn-neon">Download gratis</a>
+          </div>
+        </div>
+        <div class="hero-photo">
+          <img src="assets/images/hero-couple.jpg" alt="Stel dat samen lacht" loading="eager">
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- HERO V3: The Cinematic (Full Photo) -->
+  <div class="variant" data-variant="3">
+    <section class="hero-section hero-v3">
+      <div class="hero-bg-photo">
+        <img src="assets/images/hero-couple.jpg" alt="" loading="eager">
+      </div>
+      <div class="hero-content rv">
+        <h1>
+          Mis nooit meer een<br>
+          <span class="gradient-text text-cycle" data-cycle="hero-v3">
+            <span class="text-cycle-word active">verjaardag</span>
+            <span class="text-cycle-word">jubileum</span>
+            <span class="text-cycle-word">moment</span>
+            <span class="text-cycle-word">mijlpaal</span>
+            <span class="text-cycle-word">kans</span>
+          </span>
+        </h1>
+        <p class="hero-sub">Attent helpt je om er te zijn op de momenten die ertoe doen.</p>
+        <div class="hero-actions">
+          <a href="#" class="btn btn-gradient">Download gratis <span class="arrow" style="margin-left:8px">&rsaquo;</span></a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- HERO V4: The Product (Text + App Preview) -->
+  <div class="variant" data-variant="4">
+    <section class="hero-section hero-v4">
+      <div class="hero-grid">
+        <div class="hero-text-col rv">
+          <h1>
+            Mis nooit meer een<br>
+            <span class="gradient-text text-cycle" data-cycle="hero-v4">
+              <span class="text-cycle-word active">verjaardag</span>
+              <span class="text-cycle-word">jubileum</span>
+              <span class="text-cycle-word">moment</span>
+              <span class="text-cycle-word">mijlpaal</span>
+              <span class="text-cycle-word">kans</span>
+            </span>
+          </h1>
+          <p class="hero-sub">Attent helpt je om er te zijn op de momenten die ertoe doen.</p>
+          <div class="hero-actions">
+            <a href="#" class="btn btn-neon">Download gratis</a>
+          </div>
+        </div>
+        <div class="hero-cards-col">
+          <div class="card-stack-wrap" data-stack="hero-v4">
+            <div class="stack-card-el" data-pos="0">
+              <div class="stack-card-inner-el">
+                <div class="stack-card-emoji">&#127874;</div>
+                <div class="stack-card-content-el">
+                  <strong>Mama's verjaardag</strong>
+                  <span>Over 19 dagen &mdash; 12 april</span>
+                  <small>Tip: ze wilde een nieuwe Sancerre proberen</small>
+                </div>
+                <div class="stack-card-action-el" style="background:rgba(109,46,255,0.08);color:var(--purple)">Plan cadeau</div>
+              </div>
+            </div>
+            <div class="stack-card-el" data-pos="1">
+              <div class="stack-card-inner-el">
+                <div class="stack-card-emoji">&#128141;</div>
+                <div class="stack-card-content-el">
+                  <strong>Trouwdag met Emma</strong>
+                  <span>Over 45 dagen &mdash; 8 mei</span>
+                  <small>Vorig jaar: diner bij Jules. Overtref jezelf.</small>
+                </div>
+                <div class="stack-card-action-el" style="background:rgba(255,162,255,0.08);color:var(--pink)">Verras haar</div>
+              </div>
+            </div>
+            <div class="stack-card-el" data-pos="2">
+              <div class="stack-card-inner-el">
+                <div class="stack-card-emoji">&#127881;</div>
+                <div class="stack-card-content-el">
+                  <strong>Jaap's nieuwe baan</strong>
+                  <span>Vandaag</span>
+                  <small>Een felicitatiebericht doet wonderen.</small>
+                </div>
+                <div class="stack-card-action-el" style="background:rgba(0,255,128,0.08);color:#00994d">Stuur bericht</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="scroll-indicator">
+      <div class="scroll-indicator-line"></div>
+      <span class="scroll-indicator-text">scroll</span>
+    </div>
+  </div>
+
+  <!-- HERO V5: The Minimal (Just Words) -->
+  <div class="variant" data-variant="5">
+    <section class="hero-section hero-v5">
+      <div class="hero-content rv">
+        <h1>
+          Mis nooit meer een
+          <span class="gradient-text text-cycle" data-cycle="hero-v5">
+            <span class="text-cycle-word active">verjaardag</span>
+            <span class="text-cycle-word">jubileum</span>
+            <span class="text-cycle-word">moment</span>
+            <span class="text-cycle-word">mijlpaal</span>
+            <span class="text-cycle-word">kans</span>
+          </span>
+        </h1>
+        <p class="hero-sub">Attent helpt je om er te zijn op de momenten die ertoe doen.</p>
+        <div class="hero-actions">
+          <a href="#" class="btn-text" style="font-size:18px">Download gratis <span class="arrow">&rarr;</span></a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</div>
+
+<!-- ================================================================
+     2. PHOTO STRIP
+     ================================================================ -->
+<div class="section-group" data-section="strip" id="section-strip">
+
+  <!-- STRIP V1: Two-Row Marquee -->
+  <div class="variant active" data-variant="1">
+    <section class="strip-section strip-v1">
+      <div class="marquee-row marquee-right">
+        <div class="marquee-track">
+          <img src="assets/images/selfie-woman.jpg" alt="" width="160" height="200">
+          <img src="assets/images/phone-lying.jpg" alt="" width="160" height="200">
+          <img src="assets/images/friends-piggyback.jpg" alt="" width="160" height="200">
+          <img src="assets/images/van-woman.jpg" alt="" width="160" height="200">
+          <img src="assets/images/headphones-smile.jpg" alt="" width="160" height="200">
+          <img src="assets/images/selfie-woman.jpg" alt="" width="160" height="200">
+          <img src="assets/images/phone-lying.jpg" alt="" width="160" height="200">
+          <img src="assets/images/friends-piggyback.jpg" alt="" width="160" height="200">
+          <img src="assets/images/van-woman.jpg" alt="" width="160" height="200">
+          <img src="assets/images/headphones-smile.jpg" alt="" width="160" height="200">
+          <img src="assets/images/selfie-woman.jpg" alt="" width="160" height="200">
+          <img src="assets/images/phone-lying.jpg" alt="" width="160" height="200">
+          <img src="assets/images/friends-piggyback.jpg" alt="" width="160" height="200">
+          <img src="assets/images/van-woman.jpg" alt="" width="160" height="200">
+          <img src="assets/images/headphones-smile.jpg" alt="" width="160" height="200">
+        </div>
+      </div>
+      <div class="marquee-row marquee-left">
+        <div class="marquee-track">
+          <img src="assets/images/heart-hands.jpg" alt="" width="160" height="200">
+          <img src="assets/images/beach-laugh.jpg" alt="" width="160" height="200">
+          <img src="assets/images/spinning-joy.jpg" alt="" width="160" height="200">
+          <img src="assets/images/friends-phones.jpg" alt="" width="160" height="200">
+          <img src="assets/images/hero-couple.jpg" alt="" width="160" height="200">
+          <img src="assets/images/heart-hands.jpg" alt="" width="160" height="200">
+          <img src="assets/images/beach-laugh.jpg" alt="" width="160" height="200">
+          <img src="assets/images/spinning-joy.jpg" alt="" width="160" height="200">
+          <img src="assets/images/friends-phones.jpg" alt="" width="160" height="200">
+          <img src="assets/images/hero-couple.jpg" alt="" width="160" height="200">
+          <img src="assets/images/heart-hands.jpg" alt="" width="160" height="200">
+          <img src="assets/images/beach-laugh.jpg" alt="" width="160" height="200">
+          <img src="assets/images/spinning-joy.jpg" alt="" width="160" height="200">
+          <img src="assets/images/friends-phones.jpg" alt="" width="160" height="200">
+          <img src="assets/images/hero-couple.jpg" alt="" width="160" height="200">
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- STRIP V2: Single Large Row -->
+  <div class="variant" data-variant="2">
+    <section class="strip-section strip-v2">
+      <div class="marquee-row marquee-right">
+        <div class="marquee-track">
+          <img src="assets/images/selfie-woman.jpg" alt="" width="240" height="300">
+          <img src="assets/images/phone-lying.jpg" alt="" width="240" height="300">
+          <img src="assets/images/friends-piggyback.jpg" alt="" width="240" height="300">
+          <img src="assets/images/van-woman.jpg" alt="" width="240" height="300">
+          <img src="assets/images/headphones-smile.jpg" alt="" width="240" height="300">
+          <img src="assets/images/heart-hands.jpg" alt="" width="240" height="300">
+          <img src="assets/images/beach-laugh.jpg" alt="" width="240" height="300">
+          <img src="assets/images/selfie-woman.jpg" alt="" width="240" height="300">
+          <img src="assets/images/phone-lying.jpg" alt="" width="240" height="300">
+          <img src="assets/images/friends-piggyback.jpg" alt="" width="240" height="300">
+          <img src="assets/images/van-woman.jpg" alt="" width="240" height="300">
+          <img src="assets/images/headphones-smile.jpg" alt="" width="240" height="300">
+          <img src="assets/images/heart-hands.jpg" alt="" width="240" height="300">
+          <img src="assets/images/beach-laugh.jpg" alt="" width="240" height="300">
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- STRIP V3: Static Grid -->
+  <div class="variant" data-variant="3">
+    <section class="strip-section strip-v3">
+      <div class="photo-grid rv">
+        <img src="assets/images/selfie-woman.jpg" alt="">
+        <img src="assets/images/friends-piggyback.jpg" alt="">
+        <img src="assets/images/van-woman.jpg" alt="">
+        <img src="assets/images/beach-laugh.jpg" alt="">
+        <img src="assets/images/spinning-joy.jpg" alt="">
+      </div>
+    </section>
+  </div>
+
+  <!-- STRIP V4: Text + Photo Alternating -->
+  <div class="variant" data-variant="4">
+    <section class="strip-section strip-v4">
+      <div class="marquee-row marquee-right">
+        <div class="marquee-track">
+          <img src="assets/images/selfie-woman.jpg" alt="" width="160" height="200">
+          <span class="marquee-word">verjaardag</span>
+          <img src="assets/images/phone-lying.jpg" alt="" width="160" height="200">
+          <span class="marquee-word">jubileum</span>
+          <img src="assets/images/friends-piggyback.jpg" alt="" width="160" height="200">
+          <span class="marquee-word">moment</span>
+          <img src="assets/images/van-woman.jpg" alt="" width="160" height="200">
+          <span class="marquee-word">cadeau</span>
+          <img src="assets/images/headphones-smile.jpg" alt="" width="160" height="200">
+          <span class="marquee-word">vriendschap</span>
+          <img src="assets/images/selfie-woman.jpg" alt="" width="160" height="200">
+          <span class="marquee-word">verjaardag</span>
+          <img src="assets/images/phone-lying.jpg" alt="" width="160" height="200">
+          <span class="marquee-word">jubileum</span>
+          <img src="assets/images/friends-piggyback.jpg" alt="" width="160" height="200">
+          <span class="marquee-word">moment</span>
+          <img src="assets/images/van-woman.jpg" alt="" width="160" height="200">
+          <span class="marquee-word">cadeau</span>
+          <img src="assets/images/headphones-smile.jpg" alt="" width="160" height="200">
+          <span class="marquee-word">vriendschap</span>
+          <img src="assets/images/selfie-woman.jpg" alt="" width="160" height="200">
+          <span class="marquee-word">verjaardag</span>
+          <img src="assets/images/phone-lying.jpg" alt="" width="160" height="200">
+          <span class="marquee-word">jubileum</span>
+          <img src="assets/images/friends-piggyback.jpg" alt="" width="160" height="200">
+          <span class="marquee-word">moment</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- STRIP V5: Divider Only -->
+  <div class="variant" data-variant="5">
+    <section class="strip-section strip-v5">
+      <div class="divider-line"></div>
+    </section>
+  </div>
+
+</div>
+
+<!-- ================================================================
+     3. PROBLEM
+     ================================================================ -->
+<div class="section-group" data-section="problem" id="section-problem">
+
+  <!-- PROBLEM V1: Three Statement Cards -->
+  <div class="variant active" data-variant="1">
+    <section class="problem-section problem-v1">
+      <div class="container">
+        <span class="badge rv">DE HARDE WAARHEID</span>
+        <h2 class="section-title rv">Iedereen wil attent zijn.<br>Bijna niemand is het.</h2>
+        <div class="problem-cards rv">
+          <div class="p-card">
+            <div class="p-stat">92%</div>
+            <p>wil attenter zijn voor hun dierbaren</p>
+          </div>
+          <div class="p-card">
+            <div class="p-stat">5+</div>
+            <p>apps met je data verspreid</p>
+          </div>
+          <div class="p-card">
+            <div class="p-stat">0 dagen</div>
+            <p>aanlooptijd bij je herinnering</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- PROBLEM V2: Photo + Text Split -->
+  <div class="variant" data-variant="2">
+    <section class="problem-section problem-v2">
+      <div class="problem-split">
+        <div class="problem-photo">
+          <img src="assets/images/heart-hands.jpg" alt="Hartgebaar" loading="lazy">
+        </div>
+        <div class="problem-texts rv">
+          <span class="badge">DE HARDE WAARHEID</span>
+          <h2 class="section-title">Iedereen wil attent zijn.<br>Bijna niemand is het.</h2>
+          <p>92% wil attenter zijn voor hun dierbaren. Het willen is niet het probleem.</p>
+          <p>Je weet dat mama jarig is. Maar je weet niet precies wanneer. Of wat haar ringmaat is.</p>
+          <p>Een herinnering op de dag zelf is een herinnering om je schuldig te voelen.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- PROBLEM V3: Single Full-Width Statement -->
+  <div class="variant" data-variant="3">
+    <section class="problem-section problem-v3">
+      <div class="container">
+        <span class="badge rv" style="display:inline-flex">DE HARDE WAARHEID</span>
+        <div class="big-statement rv">Je weet dat mama jarig is. Je weet alleen niet wanneer precies.</div>
+        <div class="stat-row rv">
+          <div class="stat-item">
+            <span class="stat-val">92%</span>
+            <span class="stat-lbl">wil attenter zijn</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-val">5+</span>
+            <span class="stat-lbl">apps met data verspreid</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-val">0 dagen</span>
+            <span class="stat-lbl">aanlooptijd</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- PROBLEM V4: Numbered Cards with Large Numbers -->
+  <div class="variant" data-variant="4">
+    <section class="problem-section problem-v4">
+      <div class="container">
+        <span class="badge rv">DE HARDE WAARHEID</span>
+        <h2 class="section-title rv">Iedereen wil attent zijn.<br>Bijna niemand is het.</h2>
+        <div class="numbered-list rv">
+          <div class="numbered-item">
+            <div class="item-num">01</div>
+            <div class="item-content">
+              <div class="item-title">92% wil attenter zijn</div>
+              <p class="item-text">Het willen is niet het probleem. Het leven is druk, en goede bedoelingen verdwijnen in de chaos van alledag.</p>
+            </div>
+          </div>
+          <div class="numbered-item">
+            <div class="item-num">02</div>
+            <div class="item-content">
+              <div class="item-title">0 dagen van tevoren</div>
+              <p class="item-text">Je weet dat mama jarig is. Maar je vergeet het toch &mdash; tot het te laat is voor iets moois.</p>
+            </div>
+          </div>
+          <div class="numbered-item">
+            <div class="item-num">03</div>
+            <div class="item-content">
+              <div class="item-title">1 op 3 vergeet een moment</div>
+              <p class="item-text">Niet omdat ze niet geven, maar omdat het leven druk is. En er geen systeem is dat je helpt.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- PROBLEM V5: Dark Bento Grid -->
+  <div class="variant" data-variant="5">
+    <section class="problem-section problem-v5">
+      <div class="container">
+        <span class="badge rv">DE HARDE WAARHEID</span>
+        <h2 class="section-title rv">Iedereen wil attent zijn.<br>Bijna niemand is het.</h2>
+        <div class="bento-grid rv">
+          <div class="bento-tall">
+            <img src="assets/images/heart-hands.jpg" alt="Hartgebaar" loading="lazy">
+            <div class="bento-tall-content">
+              <div class="p-stat">92%</div>
+              <p style="color:var(--text-body);font-size:var(--t-body)">wil attenter zijn voor hun dierbaren. Het willen is niet het probleem.</p>
+            </div>
+          </div>
+          <div class="bento-small bento-small--pink">
+            <h3 style="color:var(--pink)">5+ apps</h3>
+            <p>Je data zit verspreid over agenda, WhatsApp, notities, en je geheugen. Niets werkt samen.</p>
+          </div>
+          <div class="bento-small bento-small--purple">
+            <h3 style="color:var(--purple)">0 dagen</h3>
+            <p>Een herinnering op de dag zelf is een herinnering om je schuldig te voelen. Te laat voor iets moois.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</div>
+
+<!-- ================================================================
+     4. PIVOT
+     ================================================================ -->
+<div class="section-group" data-section="pivot" id="section-pivot">
+
+  <!-- PIVOT V1: Photo Split -->
+  <div class="variant active" data-variant="1">
+    <section class="pivot-section pivot-v1">
+      <div class="pivot-grid">
+        <div class="pivot-photo">
+          <img src="assets/images/spinning-joy.jpg" alt="Vrouw die draait van vreugde" loading="lazy">
+        </div>
+        <div class="rv">
+          <h2 class="shimmer-text">Stel je voor dat je nooit meer een moment mist.</h2>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- PIVOT V2: Full Text -->
+  <div class="variant" data-variant="2">
+    <section class="pivot-section pivot-v2">
+      <div class="container rv">
+        <h2 class="shimmer-text">Stel je voor dat je nooit meer een moment mist.</h2>
+      </div>
+    </section>
+  </div>
+
+  <!-- PIVOT V3: Photo Full-Bleed -->
+  <div class="variant" data-variant="3">
+    <section class="pivot-section pivot-v3">
+      <div class="pivot-bg">
+        <img src="assets/images/spinning-joy.jpg" alt="" loading="lazy">
+      </div>
+      <div class="pivot-content rv">
+        <h2 class="shimmer-text">Stel je voor dat je nooit meer een moment mist.</h2>
+      </div>
+    </section>
+  </div>
+
+  <!-- PIVOT V4: Before / After -->
+  <div class="variant" data-variant="4">
+    <section class="pivot-section pivot-v4">
+      <div class="container">
+        <h2 class="section-title rv" style="text-align:center;margin-bottom:var(--s7)">Stel je voor dat je nooit meer een moment mist.</h2>
+        <div class="ba-grid rv">
+          <div class="ba-card ba-before">
+            <div class="ba-title">Zonder Attent</div>
+            <div class="ba-stat">0 dagen</div>
+            <p class="ba-desc">Herinnering op de dag zelf. Paniek. Schuld.</p>
+            <div class="ba-stat">62%</div>
+            <p class="ba-desc">vergeet minstens 1 verjaardag per jaar</p>
+            <div class="ba-stat">&#128532;</div>
+            <p class="ba-desc">Weer een paniektekstje</p>
+          </div>
+          <div class="ba-card ba-after">
+            <div class="ba-title">Met Attent</div>
+            <div class="ba-stat">3 weken</div>
+            <p class="ba-desc">Vroeg genoeg om iets moois te regelen</p>
+            <div class="ba-stat">100%</div>
+            <p class="ba-desc">nooit meer een moment gemist</p>
+            <div class="ba-stat">&#128293;</div>
+            <p class="ba-desc">Streaks die je motiveren</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- PIVOT V5: Video Placeholder -->
+  <div class="variant" data-variant="5">
+    <section class="pivot-section pivot-v5">
+      <div class="container">
+        <h2 class="shimmer-text rv">Stel je voor dat je nooit meer een moment mist.</h2>
+        <div class="video-placeholder rv">
+          <div class="play-circle">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff"><polygon points="6 3 20 12 6 21"/></svg>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</div>
+
+<!-- ================================================================
+     5. HOW IT WORKS
+     ================================================================ -->
+<div class="section-group" data-section="how" id="section-how">
+
+  <!-- HOW V1: Steps + Phone -->
+  <div class="variant active" data-variant="1">
+    <section class="how-section how-v1">
+      <div class="container">
+        <span class="badge rv">HOE HET WERKT</span>
+        <h2 class="section-title rv">Drie stappen om nooit meer te vergeten</h2>
+        <div class="how-grid rv">
+          <div class="how-steps-col" data-phone-target="how-v1-phone">
+            <button class="how-step-btn active" data-step="1" onclick="switchStep(this)">
+              <div class="step-num">01</div>
+              <h3>Voeg je mensen toe</h3>
+              <p class="step-desc">Importeer contacten of voeg ze handmatig toe. Stel verjaardagen, jubilea en alles wat ertoe doet in.</p>
+            </button>
+            <button class="how-step-btn" data-step="2" onclick="switchStep(this)">
+              <div class="step-num">02</div>
+              <h3>Krijg slimme herinneringen</h3>
+              <p class="step-desc">Attent vertelt het je vroeg genoeg om iets te doen. Niet op de dag zelf als je alleen nog een paniektekstje kunt sturen.</p>
+            </button>
+            <button class="how-step-btn" data-step="3" onclick="switchStep(this)">
+              <div class="step-num">03</div>
+              <h3>Laat zien dat je er bent</h3>
+              <p class="step-desc">Stuur een cadeautje, schrijf een berichtje, of check gewoon even in. Elke actie bouwt aan je streak.</p>
+            </button>
+          </div>
+          <div class="phone-mockup-frame" id="how-v1-phone">
+            <div class="phone-notch-el"></div>
+            <div class="phone-screen-area">
+              <div class="phone-screen-view active" data-screen="1">
+                <div class="screen-header">
+                  <span class="screen-title">Mijn mensen</span>
+                  <span class="screen-count">12</span>
+                </div>
+                <div class="contact-item">
+                  <div class="avatar" style="background:var(--pink);">S</div>
+                  <div class="contact-info"><span class="contact-name">Sarah de Vries</span><span class="contact-detail">Verjaardag: 14 april</span></div>
+                </div>
+                <div class="contact-item">
+                  <div class="avatar" style="background:var(--purple);color:#fff;">M</div>
+                  <div class="contact-info"><span class="contact-name">Mama</span><span class="contact-detail">Verjaardag: 8 juni</span></div>
+                </div>
+                <div class="contact-item">
+                  <div class="avatar" style="background:var(--cyan);">T</div>
+                  <div class="contact-info"><span class="contact-name">Thomas</span><span class="contact-detail">Jubileum: 22 mei</span></div>
+                </div>
+                <div class="contact-item">
+                  <div class="avatar" style="background:var(--yellow);color:var(--ink);">L</div>
+                  <div class="contact-info"><span class="contact-name">Lisa</span><span class="contact-detail">Verjaardag: 3 dec</span></div>
+                </div>
+              </div>
+              <div class="phone-screen-view" data-screen="2">
+                <div class="screen-header"><span class="screen-title">Herinneringen</span></div>
+                <div class="reminder-card-phone urgent">
+                  <div class="reminder-time-ph">Over 3 weken</div>
+                  <div class="reminder-title-ph">Sarah wordt 30!</div>
+                  <div class="reminder-hint-ph">Tijd om een cadeau te regelen</div>
+                </div>
+                <div class="reminder-card-phone">
+                  <div class="reminder-time-ph">Over 6 weken</div>
+                  <div class="reminder-title-ph">Mama&rsquo;s verjaardag</div>
+                  <div class="reminder-hint-ph">Ze wilde dat boek van Kluun</div>
+                </div>
+                <div class="reminder-card-phone">
+                  <div class="reminder-time-ph">Over 2 maanden</div>
+                  <div class="reminder-title-ph">Jubileum Thomas &amp; Eva</div>
+                  <div class="reminder-hint-ph">Dinertje boeken?</div>
+                </div>
+              </div>
+              <div class="phone-screen-view" data-screen="3">
+                <div class="screen-header"><span class="screen-title">Activiteit</span></div>
+                <div class="streak-display">
+                  <div class="streak-flame"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--pink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 3 2.5 3.5 3.5 4.5A5 5 0 0 1 17 10c0 3.5-2 5-5 7.5C9 15 7 13.5 7 10a5 5 0 0 1 1.5-3.5C9.5 5.5 11 5 12 2z"/></svg></div>
+                  <span class="streak-count">7</span>
+                  <span class="streak-label">dagen op rij</span>
+                </div>
+                <div class="activity-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Cadeau verstuurd naar Sarah</span></div>
+                <div class="activity-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Ingecheckt bij Thomas</span></div>
+                <div class="activity-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Berichtje gestuurd naar Lisa</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- HOW V2: Three Columns -->
+  <div class="variant" data-variant="2">
+    <section class="how-section how-v2">
+      <div class="container">
+        <span class="badge rv" style="display:block;text-align:center">HOE HET WERKT</span>
+        <h2 class="section-title rv" style="text-align:center;margin-bottom:var(--s7)">Drie stappen om nooit meer te vergeten</h2>
+        <div class="how-cols rv">
+          <div class="how-col">
+            <div class="how-icon">&#128100;</div>
+            <div class="how-num">01</div>
+            <h3>Voeg je mensen toe</h3>
+            <p>Importeer contacten of voeg ze handmatig toe. Stel verjaardagen, jubilea en alles wat ertoe doet in.</p>
+          </div>
+          <div class="how-col">
+            <div class="how-icon">&#128276;</div>
+            <div class="how-num">02</div>
+            <h3>Krijg slimme herinneringen</h3>
+            <p>Attent vertelt het je vroeg genoeg om iets te doen. Niet op de dag zelf.</p>
+          </div>
+          <div class="how-col">
+            <div class="how-icon">&#128293;</div>
+            <div class="how-num">03</div>
+            <h3>Laat zien dat je er bent</h3>
+            <p>Stuur een cadeautje, schrijf een berichtje, of check gewoon even in. Elke actie bouwt aan je streak.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- HOW V3: Vertical Timeline -->
+  <div class="variant" data-variant="3">
+    <section class="how-section how-v3">
+      <div class="container">
+        <span class="badge rv" style="display:block;text-align:center">HOE HET WERKT</span>
+        <h2 class="section-title rv" style="text-align:center;margin-bottom:var(--s8)">Drie stappen om nooit meer te vergeten</h2>
+        <div class="timeline rv">
+          <div class="timeline-step"><div class="timeline-dot"></div><div class="timeline-num">01</div><h3>Voeg je mensen toe</h3><p>Importeer contacten of voeg ze handmatig toe. Stel verjaardagen, jubilea en alles wat ertoe doet in.</p></div>
+          <div class="timeline-step"><div class="timeline-dot"></div><div class="timeline-num">02</div><h3>Krijg slimme herinneringen</h3><p>Attent vertelt het je vroeg genoeg om iets te doen. Niet op de dag zelf als je alleen nog een paniektekstje kunt sturen.</p></div>
+          <div class="timeline-step"><div class="timeline-dot"></div><div class="timeline-num">03</div><h3>Laat zien dat je er bent</h3><p>Stuur een cadeautje, schrijf een berichtje, of check gewoon even in. Elke actie bouwt aan je streak.</p></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- HOW V4: Steps + Floating Cards -->
+  <div class="variant" data-variant="4">
+    <section class="how-section how-v4">
+      <div class="container">
+        <span class="badge rv">HOE HET WERKT</span>
+        <h2 class="section-title rv">Drie stappen om nooit meer te vergeten</h2>
+        <div class="how-grid rv">
+          <div class="how-steps-col">
+            <button class="how-step-btn active" data-step="1" onclick="switchStep(this)"><div class="step-num">01</div><h3>Voeg je mensen toe</h3><p class="step-desc">Importeer contacten of voeg ze handmatig toe. Stel verjaardagen, jubilea en alles wat ertoe doet in.</p></button>
+            <button class="how-step-btn" data-step="2" onclick="switchStep(this)"><div class="step-num">02</div><h3>Krijg slimme herinneringen</h3><p class="step-desc">Attent vertelt het je vroeg genoeg om iets te doen.</p></button>
+            <button class="how-step-btn" data-step="3" onclick="switchStep(this)"><div class="step-num">03</div><h3>Laat zien dat je er bent</h3><p class="step-desc">Stuur een cadeautje, schrijf een berichtje, of check gewoon even in.</p></button>
+          </div>
+          <div>
+            <div class="card-stack-wrap" data-stack="how-v4">
+              <div class="stack-card-el" data-pos="0"><div class="stack-card-inner-el"><div class="stack-card-emoji">&#127874;</div><div class="stack-card-content-el"><strong>Mama's verjaardag</strong><span>Over 19 dagen</span><small>Tip: ze wilde een nieuwe Sancerre</small></div><div class="stack-card-action-el" style="background:rgba(109,46,255,0.08);color:var(--purple)">Plan cadeau</div></div></div>
+              <div class="stack-card-el" data-pos="1"><div class="stack-card-inner-el"><div class="stack-card-emoji">&#128141;</div><div class="stack-card-content-el"><strong>Trouwdag met Emma</strong><span>Over 45 dagen</span><small>Overtref jezelf.</small></div><div class="stack-card-action-el" style="background:rgba(255,162,255,0.08);color:var(--pink)">Verras haar</div></div></div>
+              <div class="stack-card-el" data-pos="2"><div class="stack-card-inner-el"><div class="stack-card-emoji">&#127881;</div><div class="stack-card-content-el"><strong>Jaap's nieuwe baan</strong><span>Vandaag</span><small>Een felicitatie doet wonderen.</small></div><div class="stack-card-action-el" style="background:rgba(0,255,128,0.08);color:#00994d">Stuur bericht</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- HOW V5: Full-Width Steps Carousel -->
+  <div class="variant" data-variant="5">
+    <section class="how-section how-v5">
+      <div class="container">
+        <span class="badge rv" style="display:block;text-align:center">HOE HET WERKT</span>
+        <h2 class="section-title rv" style="text-align:center;margin-bottom:var(--s7)">Drie stappen om nooit meer te vergeten</h2>
+        <div class="step-carousel rv" data-carousel="how-v5">
+          <div class="carousel-step active" data-cstep="1"><div class="step-big-num">01</div><h3>Voeg je mensen toe</h3><p>Importeer contacten of voeg ze handmatig toe. Stel verjaardagen, jubilea en alles wat ertoe doet in.</p></div>
+          <div class="carousel-step" data-cstep="2"><div class="step-big-num">02</div><h3>Krijg slimme herinneringen</h3><p>Attent vertelt het je vroeg genoeg om iets te doen. Niet op de dag zelf als je alleen nog een paniektekstje kunt sturen.</p></div>
+          <div class="carousel-step" data-cstep="3"><div class="step-big-num">03</div><h3>Laat zien dat je er bent</h3><p>Stuur een cadeautje, schrijf een berichtje, of check gewoon even in. Elke actie bouwt aan je streak.</p></div>
+        </div>
+        <div class="carousel-nav rv">
+          <button class="carousel-arrow" onclick="navigateCarousel('how-v5', -1)">&larr;</button>
+          <div class="carousel-dots" data-dots="how-v5"><div class="carousel-dot active"></div><div class="carousel-dot"></div><div class="carousel-dot"></div></div>
+          <button class="carousel-arrow" onclick="navigateCarousel('how-v5', 1)">&rarr;</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</div>
+
+<!-- ================================================================
+     6. STORY CARDS
+     ================================================================ -->
+<div class="section-group" data-section="stories" id="section-stories">
+
+  <!-- STORIES V1: Alternating Photo + Text -->
+  <div class="variant active" data-variant="1">
+    <section class="stories-section stories-v1">
+      <div class="container">
+        <div class="story-card rv">
+          <div class="story-photo"><img src="assets/images/friends-phones.jpg" alt="Vriendinnen met telefoons" loading="lazy"></div>
+          <div class="story-text"><p>Sarah wordt 30 over 3 weken. Attent vertelde het je op tijd. Je hebt een cadeau geregeld. Je bent de held.</p><span class="story-tag">Slimme herinneringen</span></div>
+        </div>
+        <div class="story-card rv">
+          <div class="story-photo"><img src="assets/images/headphones-smile.jpg" alt="Vrouw met koptelefoon" loading="lazy"></div>
+          <div class="story-text"><p>Je weet nog dat je klant van sushi houdt. Dat je collega vorige maand vader is geworden. Kleine details, groot verschil.</p><span class="story-tag">Alles op &eacute;&eacute;n plek</span></div>
+        </div>
+        <div class="story-card rv">
+          <div class="story-photo"><img src="assets/images/beach-laugh.jpg" alt="Vrouw op strand" loading="lazy"></div>
+          <div class="story-text"><p>7 dagen op rij attent geweest. Je streak groeit. Je wordt er een beetje competitief van.</p><span class="story-tag">Streaks die het leuk maken</span></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- STORIES V2: Full-Width Photo Cards -->
+  <div class="variant" data-variant="2">
+    <section class="stories-section stories-v2">
+      <div class="container">
+        <div class="story-wide rv"><img src="assets/images/friends-phones.jpg" alt="" loading="lazy"><div class="story-wide-overlay"><p>Sarah wordt 30 over 3 weken. Attent vertelde het je op tijd. Je bent de held.</p><span class="story-tag">Slimme herinneringen</span></div></div>
+        <div class="story-wide rv"><img src="assets/images/headphones-smile.jpg" alt="" loading="lazy"><div class="story-wide-overlay"><p>Kleine details, groot verschil. Attent onthoudt wat jij vergeet.</p><span class="story-tag">Alles op &eacute;&eacute;n plek</span></div></div>
+        <div class="story-wide rv"><img src="assets/images/beach-laugh.jpg" alt="" loading="lazy"><div class="story-wide-overlay"><p>7 dagen op rij attent. Je streak groeit. Je wordt er competitief van.</p><span class="story-tag">Streaks die het leuk maken</span></div></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- STORIES V3: Three Equal Cards -->
+  <div class="variant" data-variant="3">
+    <section class="stories-section stories-v3">
+      <div class="container">
+        <div class="story-grid rv">
+          <div class="story-grid-card"><img src="assets/images/friends-phones.jpg" alt="" loading="lazy"><div class="story-grid-card-text"><p>Sarah wordt 30 over 3 weken. Attent vertelde het je op tijd. Je bent de held.</p><span class="story-tag">Slimme herinneringen</span></div></div>
+          <div class="story-grid-card"><img src="assets/images/headphones-smile.jpg" alt="" loading="lazy"><div class="story-grid-card-text"><p>Je weet nog dat je klant van sushi houdt. Kleine details, groot verschil.</p><span class="story-tag">Alles op &eacute;&eacute;n plek</span></div></div>
+          <div class="story-grid-card"><img src="assets/images/beach-laugh.jpg" alt="" loading="lazy"><div class="story-grid-card-text"><p>7 dagen op rij attent geweest. Je streak groeit.</p><span class="story-tag">Streaks die het leuk maken</span></div></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- STORIES V4: Large Quote Style -->
+  <div class="variant" data-variant="4">
+    <section class="stories-section stories-v4">
+      <div class="container">
+        <div class="quote-cards rv">
+          <div class="quote-card"><img class="quote-avatar" src="assets/images/friends-phones.jpg" alt="" loading="lazy"><div><p>&ldquo;Sarah wordt 30 over 3 weken. Attent vertelde het je op tijd. Je hebt een cadeau geregeld. Je bent de held.&rdquo;</p><span class="story-tag">Slimme herinneringen</span></div></div>
+          <div class="quote-card"><img class="quote-avatar" src="assets/images/headphones-smile.jpg" alt="" loading="lazy"><div><p>&ldquo;Je weet nog dat je klant van sushi houdt. Dat je collega vader is geworden. Kleine details, groot verschil.&rdquo;</p><span class="story-tag">Alles op &eacute;&eacute;n plek</span></div></div>
+          <div class="quote-card"><img class="quote-avatar" src="assets/images/beach-laugh.jpg" alt="" loading="lazy"><div><p>&ldquo;7 dagen op rij attent geweest. Je streak groeit. Je wordt er een beetje competitief van.&rdquo;</p><span class="story-tag">Streaks die het leuk maken</span></div></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- STORIES V5: Single Story Carousel -->
+  <div class="variant" data-variant="5">
+    <section class="stories-section stories-v5">
+      <div class="container">
+        <div class="story-carousel rv" data-carousel="stories-v5">
+          <div class="carousel-slide active" data-cstep="1"><img src="assets/images/friends-phones.jpg" alt="" loading="lazy"><div><p>Sarah wordt 30 over 3 weken. Attent vertelde het je op tijd. Je hebt een cadeau geregeld. Je bent de held.</p><span class="story-tag">Slimme herinneringen</span></div></div>
+          <div class="carousel-slide" data-cstep="2"><img src="assets/images/headphones-smile.jpg" alt="" loading="lazy"><div><p>Je weet nog dat je klant van sushi houdt. Dat je collega vader is geworden. Kleine details, groot verschil.</p><span class="story-tag">Alles op &eacute;&eacute;n plek</span></div></div>
+          <div class="carousel-slide" data-cstep="3"><img src="assets/images/beach-laugh.jpg" alt="" loading="lazy"><div><p>7 dagen op rij attent geweest. Je streak groeit. Je wordt er een beetje competitief van.</p><span class="story-tag">Streaks die het leuk maken</span></div></div>
+        </div>
+        <div class="carousel-nav rv">
+          <button class="carousel-arrow" onclick="navigateCarousel('stories-v5', -1)">&larr;</button>
+          <div class="carousel-dots" data-dots="stories-v5"><div class="carousel-dot active"></div><div class="carousel-dot"></div><div class="carousel-dot"></div></div>
+          <button class="carousel-arrow" onclick="navigateCarousel('stories-v5', 1)">&rarr;</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</div>
+
+<!-- ================================================================
+     7. SOCIAL PROOF
+     ================================================================ -->
+<div class="section-group" data-section="proof" id="section-proof">
+
+  <!-- PROOF V1: Three Quote Cards + Rating -->
+  <div class="variant active" data-variant="1">
+    <section class="proof-section proof-v1">
+      <div class="container">
+        <h2 class="section-title rv" style="text-align:center">Een probleem dat universeel werd herkend.</h2>
+        <div class="proof-grid rv">
+          <div class="proof-card proof-card--pink"><span class="deco-quote">&ldquo;</span><blockquote><p>&ldquo;Een oplossing die voelt alsof het er altijd al had moeten zijn.&rdquo;</p><footer>Founder, pitchsessie</footer></blockquote></div>
+          <div class="proof-card proof-card--purple"><span class="deco-quote">&ldquo;</span><blockquote><p>&ldquo;Ik was vorige maand letterlijk de verjaardag van mijn beste vriend vergeten. Take my money.&rdquo;</p><footer>Developer, pitchsessie</footer></blockquote></div>
+          <div class="proof-card proof-card--cyan"><span class="deco-quote">&ldquo;</span><blockquote><p>&ldquo;Het streak-ding is geniaal. Ik zou met mijn broers en zussen strijden over wie attenter is.&rdquo;</p><footer>Creative, pitchsessie</footer></blockquote></div>
+        </div>
+        <div class="proof-rating rv">
+          <div class="stars"><svg class="star-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+          <span>4.9 uit pitchsessies</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- PROOF V2: Single Rotating Quote -->
+  <div class="variant" data-variant="2">
+    <section class="proof-section proof-v2">
+      <div class="container">
+        <h2 class="section-title rv" style="text-align:center;margin-bottom:var(--s7)">Een probleem dat universeel werd herkend.</h2>
+        <div class="rotating-quote rv" data-rotate="proof-v2">
+          <div class="rq-item active"><p>&ldquo;Een oplossing die voelt alsof het er altijd al had moeten zijn.&rdquo;</p><footer>Founder, pitchsessie</footer></div>
+          <div class="rq-item"><p>&ldquo;Ik was vorige maand letterlijk de verjaardag van mijn beste vriend vergeten. Take my money.&rdquo;</p><footer>Developer, pitchsessie</footer></div>
+          <div class="rq-item"><p>&ldquo;Het streak-ding is geniaal. Ik zou met mijn broers en zussen strijden over wie attenter is.&rdquo;</p><footer>Creative, pitchsessie</footer></div>
+        </div>
+        <div class="carousel-dots rv" data-dots="proof-v2" style="justify-content:center;display:flex;gap:8px;margin-top:32px"><div class="carousel-dot active"></div><div class="carousel-dot"></div><div class="carousel-dot"></div></div>
+        <div class="proof-rating rv" style="margin-top:24px">
+          <div class="stars"><svg class="star-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+          <span>4.9 uit pitchsessies</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- PROOF V3: Stat Row + Quotes -->
+  <div class="variant" data-variant="3">
+    <section class="proof-section proof-v3">
+      <div class="container">
+        <h2 class="section-title rv" style="text-align:center">Een probleem dat universeel werd herkend.</h2>
+        <div class="stats-row rv">
+          <div class="stat-item"><span class="stat-val">100%</span><span class="stat-lbl">herkende het probleem</span></div>
+          <div class="stat-item"><span class="stat-val">14</span><span class="stat-lbl">uitgesproken interesse</span></div>
+          <div class="stat-item"><span class="stat-val">4.9</span><span class="stat-lbl">gemiddelde beoordeling</span></div>
+        </div>
+        <div class="proof-grid rv">
+          <div class="proof-card proof-card--pink"><span class="deco-quote">&ldquo;</span><blockquote><p>&ldquo;Een oplossing die voelt alsof het er altijd al had moeten zijn.&rdquo;</p><footer>Founder, pitchsessie</footer></blockquote></div>
+          <div class="proof-card proof-card--purple"><span class="deco-quote">&ldquo;</span><blockquote><p>&ldquo;Ik was vorige maand letterlijk de verjaardag van mijn beste vriend vergeten.&rdquo;</p><footer>Developer, pitchsessie</footer></blockquote></div>
+          <div class="proof-card proof-card--cyan"><span class="deco-quote">&ldquo;</span><blockquote><p>&ldquo;Het streak-ding is geniaal.&rdquo;</p><footer>Creative, pitchsessie</footer></blockquote></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- PROOF V4: Testimonial Wall (Masonry) -->
+  <div class="variant" data-variant="4">
+    <section class="proof-section proof-v4">
+      <div class="container">
+        <h2 class="section-title rv" style="text-align:center;margin-bottom:var(--s7)">Een probleem dat universeel werd herkend.</h2>
+        <div class="masonry rv">
+          <div class="proof-card proof-card--pink"><span class="deco-quote">&ldquo;</span><blockquote><p>&ldquo;Een oplossing die voelt alsof het er altijd al had moeten zijn. Zo simpel maar zo nodig.&rdquo;</p><footer>Founder, pitchsessie</footer></blockquote></div>
+          <div class="proof-card proof-card--purple"><span class="deco-quote">&ldquo;</span><blockquote><p>&ldquo;Take my money.&rdquo;</p><footer>Developer, pitchsessie</footer></blockquote></div>
+          <div class="proof-card proof-card--cyan"><span class="deco-quote">&ldquo;</span><blockquote><p>&ldquo;Het streak-ding is geniaal. Ik zou met mijn broers en zussen strijden over wie attenter is. Dit maakt attent zijn een game.&rdquo;</p><footer>Creative, pitchsessie</footer></blockquote></div>
+          <div class="proof-card"><span class="deco-quote">&ldquo;</span><blockquote><p>&ldquo;Ik was vorige maand letterlijk de verjaardag van mijn beste vriend vergeten.&rdquo;</p><footer>Developer, pitchsessie</footer></blockquote></div>
+          <div class="proof-card proof-card--pink"><span class="deco-quote">&ldquo;</span><blockquote><p>&ldquo;Mijn vrouw zou dit ook willen. En mijn moeder. Eigenlijk iedereen die ik ken.&rdquo;</p><footer>Product manager, pitchsessie</footer></blockquote></div>
+          <div class="proof-card proof-card--purple"><span class="deco-quote">&ldquo;</span><blockquote><p>&ldquo;Eindelijk een app die snapt dat attent zijn meer is dan een herinnering.&rdquo;</p><footer>Designer, pitchsessie</footer></blockquote></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- PROOF V5: Single Statement -->
+  <div class="variant" data-variant="5">
+    <section class="proof-section proof-v5">
+      <div class="container">
+        <h2 class="section-title rv" style="text-align:center;margin-bottom:var(--s7)">Een probleem dat universeel werd herkend.</h2>
+        <div class="quote-mark quote-mark--open">&ldquo;</div>
+        <div class="quote-mark quote-mark--close">&rdquo;</div>
+        <blockquote class="rv">
+          <p>&ldquo;Een oplossing die voelt alsof het er altijd al had moeten zijn.&rdquo;</p>
+          <footer>Founder, pitchsessie</footer>
+        </blockquote>
+        <div class="proof-rating rv" style="justify-content:center">
+          <div class="stars"><svg class="star-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+          <span>4.9 uit pitchsessies</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</div>
+
+<!-- ================================================================
+     8. REMINDER CARDS
+     ================================================================ -->
+<div class="section-group" data-section="reminders" id="section-reminders">
+
+  <!-- REMINDERS V1: Stacked Cycling -->
+  <div class="variant active" data-variant="1">
+    <section class="reminders-section reminders-v1">
+      <div class="container">
+        <div class="badge rv">WAT JE ONTVANGT</div>
+        <h2 class="section-title rv">Herinneringen die er echt toe doen</h2>
+        <p class="section-sub rv">Geen saaie notificaties. Persoonlijke, tijdige nudges die je helpen er te zijn.</p>
+      </div>
+      <div class="card-stack-wrap rv" data-stack="reminders-v1">
+        <div class="stack-card-el" data-pos="0"><div class="stack-card-inner-el"><div class="stack-card-emoji">&#127874;</div><div class="stack-card-content-el"><strong>Mama's verjaardag</strong><span>Over 19 dagen &mdash; 12 april</span><small>Tip: ze wilde een nieuwe Sancerre proberen</small></div><div class="stack-card-action-el" style="background:rgba(109,46,255,0.08);color:var(--purple)">Plan cadeau</div></div></div>
+        <div class="stack-card-el" data-pos="1"><div class="stack-card-inner-el"><div class="stack-card-emoji">&#128141;</div><div class="stack-card-content-el"><strong>Trouwdag met Emma</strong><span>Over 45 dagen &mdash; 8 mei</span><small>Vorig jaar: diner bij Jules. Overtref jezelf.</small></div><div class="stack-card-action-el" style="background:rgba(255,162,255,0.08);color:var(--pink)">Verras haar</div></div></div>
+        <div class="stack-card-el" data-pos="2"><div class="stack-card-inner-el"><div class="stack-card-emoji">&#127881;</div><div class="stack-card-content-el"><strong>Jaap's nieuwe baan</strong><span>Vandaag</span><small>Een felicitatiebericht doet wonderen.</small></div><div class="stack-card-action-el" style="background:rgba(0,255,128,0.08);color:#00994d">Stuur bericht</div></div></div>
+        <div class="stack-card-el" data-pos="3"><div class="stack-card-inner-el"><div class="stack-card-emoji">&#128118;</div><div class="stack-card-content-el"><strong>David werd vader</strong><span>Vorige week</span><small>Een kaartje sturen? Of een klein cadeautje?</small></div><div class="stack-card-action-el" style="background:rgba(125,255,255,0.08);color:var(--cyan)">Kies cadeau</div></div></div>
+        <div class="stack-card-el" data-pos="4"><div class="stack-card-inner-el"><div class="stack-card-emoji">&#127942;</div><div class="stack-card-content-el"><strong>7-dag streak bereikt</strong><span>Je bent on fire</span><small>Nog 3 dagen tot Blaze-status.</small></div><div class="stack-card-action-el" style="background:rgba(232,255,60,0.08);color:#7a8500">Ga zo door</div></div></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- REMINDERS V2: Horizontal Scroll -->
+  <div class="variant" data-variant="2">
+    <section class="reminders-section reminders-v2">
+      <div class="container"><div class="badge rv">WAT JE ONTVANGT</div><h2 class="section-title rv">Herinneringen die er echt toe doen</h2><p class="section-sub rv">Geen saaie notificaties. Persoonlijke, tijdige nudges.</p></div>
+      <div class="cards-scroll">
+        <div class="scroll-card"><div class="stack-card-inner-el"><div class="stack-card-emoji">&#127874;</div><div class="stack-card-content-el"><strong>Mama's verjaardag</strong><span>Over 19 dagen &mdash; 12 april</span><small>Tip: ze wilde een Sancerre</small></div><div class="stack-card-action-el" style="background:rgba(109,46,255,0.08);color:var(--purple)">Plan cadeau</div></div></div>
+        <div class="scroll-card"><div class="stack-card-inner-el"><div class="stack-card-emoji">&#128141;</div><div class="stack-card-content-el"><strong>Trouwdag met Emma</strong><span>Over 45 dagen</span><small>Overtref jezelf.</small></div><div class="stack-card-action-el" style="background:rgba(255,162,255,0.08);color:var(--pink)">Verras haar</div></div></div>
+        <div class="scroll-card"><div class="stack-card-inner-el"><div class="stack-card-emoji">&#127881;</div><div class="stack-card-content-el"><strong>Jaap's nieuwe baan</strong><span>Vandaag</span><small>Een felicitatie doet wonderen.</small></div><div class="stack-card-action-el" style="background:rgba(0,255,128,0.08);color:#00994d">Stuur bericht</div></div></div>
+        <div class="scroll-card"><div class="stack-card-inner-el"><div class="stack-card-emoji">&#128118;</div><div class="stack-card-content-el"><strong>David werd vader</strong><span>Vorige week</span><small>Een kaartje of cadeautje?</small></div><div class="stack-card-action-el" style="background:rgba(125,255,255,0.08);color:var(--cyan)">Kies cadeau</div></div></div>
+        <div class="scroll-card"><div class="stack-card-inner-el"><div class="stack-card-emoji">&#127942;</div><div class="stack-card-content-el"><strong>7-dag streak</strong><span>Je bent on fire</span><small>Nog 3 dagen tot Blaze.</small></div><div class="stack-card-action-el" style="background:rgba(232,255,60,0.08);color:#7a8500">Ga zo door</div></div></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- REMINDERS V3: Grid Display -->
+  <div class="variant" data-variant="3">
+    <section class="reminders-section reminders-v3">
+      <div class="container">
+        <div class="badge rv">WAT JE ONTVANGT</div><h2 class="section-title rv">Herinneringen die er echt toe doen</h2><p class="section-sub rv">Geen saaie notificaties. Persoonlijke, tijdige nudges.</p>
+        <div class="cards-grid rv">
+          <div><div class="stack-card-inner-el"><div class="stack-card-emoji">&#127874;</div><div class="stack-card-content-el"><strong>Mama's verjaardag</strong><span>Over 19 dagen</span><small>Tip: ze wilde een Sancerre</small></div></div></div>
+          <div><div class="stack-card-inner-el"><div class="stack-card-emoji">&#128141;</div><div class="stack-card-content-el"><strong>Trouwdag met Emma</strong><span>Over 45 dagen</span><small>Overtref jezelf.</small></div></div></div>
+          <div><div class="stack-card-inner-el"><div class="stack-card-emoji">&#127881;</div><div class="stack-card-content-el"><strong>Jaap's nieuwe baan</strong><span>Vandaag</span><small>Een felicitatie doet wonderen.</small></div></div></div>
+          <div><div class="stack-card-inner-el"><div class="stack-card-emoji">&#128118;</div><div class="stack-card-content-el"><strong>David werd vader</strong><span>Vorige week</span><small>Een kaartje of cadeautje?</small></div></div></div>
+          <div><div class="stack-card-inner-el"><div class="stack-card-emoji">&#127942;</div><div class="stack-card-content-el"><strong>7-dag streak</strong><span>Je bent on fire</span><small>Nog 3 dagen tot Blaze.</small></div></div></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- REMINDERS V4: Single Spotlight -->
+  <div class="variant" data-variant="4">
+    <section class="reminders-section reminders-v4">
+      <div class="container">
+        <div class="badge rv">WAT JE ONTVANGT</div><h2 class="section-title rv">Herinneringen die er echt toe doen</h2><p class="section-sub rv">Geen saaie notificaties. Persoonlijke, tijdige nudges.</p>
+        <div class="spotlight rv" data-spotlight="reminders-v4">
+          <div class="spotlight-card active"><div class="stack-card-inner-el"><div class="stack-card-emoji">&#127874;</div><div class="stack-card-content-el"><strong>Mama's verjaardag</strong><span>Over 19 dagen &mdash; 12 april</span><small>Tip: ze wilde een nieuwe Sancerre</small></div><div class="stack-card-action-el" style="background:rgba(109,46,255,0.08);color:var(--purple)">Plan cadeau</div></div></div>
+          <div class="spotlight-card"><div class="stack-card-inner-el"><div class="stack-card-emoji">&#128141;</div><div class="stack-card-content-el"><strong>Trouwdag met Emma</strong><span>Over 45 dagen</span><small>Overtref jezelf.</small></div><div class="stack-card-action-el" style="background:rgba(255,162,255,0.08);color:var(--pink)">Verras haar</div></div></div>
+          <div class="spotlight-card"><div class="stack-card-inner-el"><div class="stack-card-emoji">&#127881;</div><div class="stack-card-content-el"><strong>Jaap's nieuwe baan</strong><span>Vandaag</span><small>Feliciteer hem!</small></div><div class="stack-card-action-el" style="background:rgba(0,255,128,0.08);color:#00994d">Stuur bericht</div></div></div>
+          <div class="spotlight-card"><div class="stack-card-inner-el"><div class="stack-card-emoji">&#128118;</div><div class="stack-card-content-el"><strong>David werd vader</strong><span>Vorige week</span><small>Een kaartje of cadeautje?</small></div><div class="stack-card-action-el" style="background:rgba(125,255,255,0.08);color:var(--cyan)">Kies cadeau</div></div></div>
+          <div class="spotlight-card"><div class="stack-card-inner-el"><div class="stack-card-emoji">&#127942;</div><div class="stack-card-content-el"><strong>7-dag streak</strong><span>Je bent on fire</span><small>Nog 3 dagen tot Blaze.</small></div><div class="stack-card-action-el" style="background:rgba(232,255,60,0.08);color:#7a8500">Ga zo door</div></div></div>
+        </div>
+        <div class="carousel-dots rv" data-dots="reminders-v4" style="justify-content:center;display:flex;gap:8px;margin-top:24px"><div class="carousel-dot active"></div><div class="carousel-dot"></div><div class="carousel-dot"></div><div class="carousel-dot"></div><div class="carousel-dot"></div></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- REMINDERS V5: None -->
+  <div class="variant" data-variant="5">
+    <section style="padding:40px 0"></section>
+  </div>
+
+</div>
+
+<!-- ================================================================
+     9. FINAL CTA
+     ================================================================ -->
+<div class="section-group" data-section="cta" id="section-cta">
+
+  <!-- CTA V1: Photo + Text + Buttons -->
+  <div class="variant active" data-variant="1">
+    <section class="cta-section cta-v1">
+      <div class="container">
+        <div class="cta-photo rv"><img src="assets/images/friends-phones.jpg" alt="Vrienden lachen samen" loading="lazy"></div>
+        <h2 class="rv">Je mensen verdienen iemand die het onthoudt.</h2>
+        <p class="cta-sub rv">Wees diegene.</p>
+        <a href="#" class="btn btn-gradient rv">Download Attent gratis</a>
+        <div class="store-badges rv">
+          <a href="#" class="store-badge" aria-label="App Store"><svg width="20" height="20" viewBox="0 0 24 24" fill="var(--cream)"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg><div><small>Download on the</small><strong>App Store</strong></div></a>
+          <a href="#" class="store-badge" aria-label="Google Play"><svg width="20" height="20" viewBox="0 0 24 24" fill="var(--cream)"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.302 1.31a1.004 1.004 0 0 1 0 1.764l-2.302 1.31-2.536-2.536 2.536-2.536zM5.864 2.658L16.8 8.99l-2.302 2.302-8.635-8.635z"/></svg><div><small>Get it on</small><strong>Google Play</strong></div></a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- CTA V2: Gradient Background -->
+  <div class="variant" data-variant="2">
+    <section class="cta-section cta-v2">
+      <div class="cta-gradient-bg"></div>
+      <div class="container cta-content rv">
+        <h2>Je mensen verdienen iemand die het onthoudt.</h2>
+        <p style="font-size:18px;color:var(--text-body);margin-bottom:var(--s6)">Wees diegene.</p>
+        <a href="#" class="btn btn-neon" style="font-size:18px;padding:18px 40px">Download Attent gratis</a>
+      </div>
+    </section>
+  </div>
+
+  <!-- CTA V3: Split with Phone -->
+  <div class="variant" data-variant="3">
+    <section class="cta-section cta-v3">
+      <div class="container">
+        <div class="cta-grid rv">
+          <div>
+            <h2>Je mensen verdienen iemand die het onthoudt.</h2>
+            <p class="cta-sub">Wees diegene. Download Attent en begin vandaag nog.</p>
+            <a href="#" class="btn btn-gradient">Download gratis</a>
+            <div class="store-badges" style="justify-content:flex-start;margin-top:20px">
+              <a href="#" class="store-badge" aria-label="App Store"><svg width="20" height="20" viewBox="0 0 24 24" fill="var(--cream)"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg><div><small>Download on the</small><strong>App Store</strong></div></a>
+              <a href="#" class="store-badge" aria-label="Google Play"><svg width="20" height="20" viewBox="0 0 24 24" fill="var(--cream)"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.302 1.31a1.004 1.004 0 0 1 0 1.764l-2.302 1.31-2.536-2.536 2.536-2.536zM5.864 2.658L16.8 8.99l-2.302 2.302-8.635-8.635z"/></svg><div><small>Get it on</small><strong>Google Play</strong></div></a>
+            </div>
+          </div>
+          <div>
+            <div class="phone-mockup-frame">
+              <div class="phone-notch-el"></div>
+              <div class="phone-screen-area">
+                <div class="phone-screen-view active" data-screen="1">
+                  <div class="screen-header"><span class="screen-title">Herinneringen</span></div>
+                  <div class="reminder-card-phone urgent"><div class="reminder-time-ph">Over 3 weken</div><div class="reminder-title-ph">Sarah wordt 30!</div><div class="reminder-hint-ph">Tijd om een cadeau te regelen</div></div>
+                  <div class="reminder-card-phone"><div class="reminder-time-ph">Over 6 weken</div><div class="reminder-title-ph">Mama&rsquo;s verjaardag</div><div class="reminder-hint-ph">Ze wilde dat boek van Kluun</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- CTA V4: Pure Minimal -->
+  <div class="variant" data-variant="4">
+    <section class="cta-section cta-v4">
+      <div class="container rv">
+        <h2>Download Attent</h2>
+        <a href="#" class="btn btn-gradient" style="font-size:18px;padding:var(--s5) var(--s7)">Download gratis</a>
+      </div>
+    </section>
+  </div>
+
+  <!-- CTA V5: Photo Background -->
+  <div class="variant" data-variant="5">
+    <section class="cta-section cta-v5" data-parallax="cta-v5">
+      <div class="cta-bg"><img src="assets/images/friends-phones.jpg" alt="" loading="lazy"></div>
+      <div class="cta-content rv">
+        <h2>Je mensen verdienen iemand die het onthoudt.</h2>
+        <p style="font-size:18px;color:var(--text-body);margin-bottom:var(--s6)">Wees diegene.</p>
+        <a href="#" class="btn btn-gradient" style="font-size:18px;padding:18px 40px">Download Attent gratis</a>
+        <div class="store-badges">
+          <a href="#" class="store-badge" aria-label="App Store"><svg width="20" height="20" viewBox="0 0 24 24" fill="var(--cream)"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg><div><small>Download on the</small><strong>App Store</strong></div></a>
+          <a href="#" class="store-badge" aria-label="Google Play"><svg width="20" height="20" viewBox="0 0 24 24" fill="var(--cream)"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.302 1.31a1.004 1.004 0 0 1 0 1.764l-2.302 1.31-2.536-2.536 2.536-2.536zM5.864 2.658L16.8 8.99l-2.302 2.302-8.635-8.635z"/></svg><div><small>Get it on</small><strong>Google Play</strong></div></a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</div>
+
+<!-- ================================================================
+     10. FOOTER
+     ================================================================ -->
+<div class="section-group" data-section="footer" id="section-footer">
+
+  <!-- FOOTER V1: Four Columns -->
+  <div class="variant active" data-variant="1">
+    <footer class="footer-section footer-v1">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <svg class="footer-logo-svg" viewBox="0 0 394.9 135.11"><g fill="#FFF8EE"><path d="M9.38,94.14c0-10.94,9.83-25.34,39.46-25.34h.97c7.61-18.69,19.38-45.55,36.97-45.55,5.4,0,9.14.83,13.57,1.94l-6.23,43.61h13.15l-1.52,11.21h-13.15l-.83,5.4c-1.52,10.11,1.52,15.09,8.31,15.09,8.44,0,14.81-6.78,20.63-17.86l9.14,4.43c-6.51,13.15-17.31,24.78-32.4,24.64-12.74,0-22.01-8.45-19.11-26.31l.83-5.4h-20.21l-.28.55c-8.86,21.32-18.14,31.29-31.7,31.29-8.44,0-17.58-5.81-17.58-17.72ZM27.93,100.78c6.51,0,11.35-7.75,17.17-20.63-14.95.83-23.54,7.2-23.54,14.26,0,4.15,2.77,6.37,6.37,6.37ZM80.95,68.8l5.26-33.64h-.69c-6.92,0-15.09,17.17-22.01,33.64h17.44Z"/><path d="M119.85,87.08l3.46-21.18h-9.55l1.66-11.35h9.69l3.05-18.97h13.01l-3.05,18.97h17.03l-1.52,11.35h-17.44l-3.32,20.77c-1.66,9.41,1.66,13.84,9.55,13.84,7.2,0,15.78-6.37,21.32-17.86l9.14,4.43c-7.48,15.78-19.24,24.64-33.37,24.64-9,0-22.98-4.15-19.66-24.64Z"/><path d="M162.91,87.08l3.46-21.18h-9.55l1.66-11.35h9.69l3.05-18.97h13.01l-3.05,18.97h17.03l-1.52,11.35h-17.44l-3.32,20.77c-1.66,9.41,1.66,13.84,9.55,13.84,7.2,0,15.78-6.37,21.32-17.86l9.14,4.43c-7.48,15.78-19.24,24.64-33.37,24.64-9,0-22.98-4.15-19.66-24.64Z"/><path d="M234.07,53.16c11.91,0,18,7.48,18.14,15.23,0,9.83-9.55,20.49-32.12,23.54,2.91,5.81,9.28,9.14,17.86,9.14,9.97,0,20.08-5.12,26.58-18.41l9.14,4.43c-7.89,16.34-20.77,24.78-37.24,24.78-18.97,0-31.15-10.11-31.01-27.14,0-15.51,10.24-31.57,28.66-31.57ZM239.88,69.08c0-3.05-2.22-5.26-5.95-5.4-8.58,0-15.23,9.14-15.64,19.24,14.68-1.11,21.6-8.17,21.6-13.84Z"/><path d="M268.26,54.54h12.46l-1.8,12.74c5.4-7.2,14.12-13.98,24.23-14.12,10.52,0,16.61,6.78,16.75,16.34,0,8.03-4.02,17.44-4.02,23.95,0,4.71,2.91,7.06,7.2,7.06,5.81,0,12.18-5.95,18.28-17.86l9.14,4.43c-6.78,13.71-17.58,24.64-30.32,24.64-8.86,0-16.61-5.12-16.61-15.92,0-7.89,3.18-15.64,3.32-22.98,0-4.98-2.63-8.86-8.03-9-11.49,0-20.77,18-23.81,33.09l-.42,3.05-1.38,10.52h-13.01l8.03-55.93Z"/><path d="M340.53,87.08l3.32-21.18h-9.41l1.52-11.21h9.69l3.05-18.97h13.15l-3.05,18.97h17.03l-1.52,11.21h-17.44l-3.32,20.77c-1.52,9.14,1.66,14.4,8.31,14.4,5.81,0,10.94-5.12,15.78-12.04l7.89,6.09c-5.81,8.31-14.68,16.75-25.75,16.75-8.58,0-22.57-4.29-19.24-24.78Z"/></g></svg>
+            <p class="footer-tagline">De attentheidsapp.</p>
+          </div>
+          <div class="footer-col"><h4>Product</h4><ul><li><a href="#">Features</a></li><li><a href="#">Hoe het werkt</a></li><li><a href="#">Download</a></li></ul></div>
+          <div class="footer-col"><h4>Bedrijf</h4><ul><li><a href="#">Over ons</a></li><li><a href="#">Blog</a></li><li><a href="#">Contact</a></li></ul></div>
+          <div class="footer-col"><h4>Juridisch</h4><ul><li><a href="#">Privacy</a></li><li><a href="#">Voorwaarden</a></li></ul></div>
+        </div>
+        <div class="footer-bottom"><p>&copy; 2026 Attent &middot; Gemaakt met liefde door Studio BLEACH</p></div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- FOOTER V2: Centered -->
+  <div class="variant" data-variant="2">
+    <footer class="footer-section footer-v2">
+      <div class="container">
+        <svg class="footer-logo-svg" viewBox="0 0 394.9 135.11"><g fill="#FFF8EE"><path d="M9.38,94.14c0-10.94,9.83-25.34,39.46-25.34h.97c7.61-18.69,19.38-45.55,36.97-45.55,5.4,0,9.14.83,13.57,1.94l-6.23,43.61h13.15l-1.52,11.21h-13.15l-.83,5.4c-1.52,10.11,1.52,15.09,8.31,15.09,8.44,0,14.81-6.78,20.63-17.86l9.14,4.43c-6.51,13.15-17.31,24.78-32.4,24.64-12.74,0-22.01-8.45-19.11-26.31l.83-5.4h-20.21l-.28.55c-8.86,21.32-18.14,31.29-31.7,31.29-8.44,0-17.58-5.81-17.58-17.72ZM27.93,100.78c6.51,0,11.35-7.75,17.17-20.63-14.95.83-23.54,7.2-23.54,14.26,0,4.15,2.77,6.37,6.37,6.37ZM80.95,68.8l5.26-33.64h-.69c-6.92,0-15.09,17.17-22.01,33.64h17.44Z"/><path d="M119.85,87.08l3.46-21.18h-9.55l1.66-11.35h9.69l3.05-18.97h13.01l-3.05,18.97h17.03l-1.52,11.35h-17.44l-3.32,20.77c-1.66,9.41,1.66,13.84,9.55,13.84,7.2,0,15.78-6.37,21.32-17.86l9.14,4.43c-7.48,15.78-19.24,24.64-33.37,24.64-9,0-22.98-4.15-19.66-24.64Z"/><path d="M162.91,87.08l3.46-21.18h-9.55l1.66-11.35h9.69l3.05-18.97h13.01l-3.05,18.97h17.03l-1.52,11.35h-17.44l-3.32,20.77c-1.66,9.41,1.66,13.84,9.55,13.84,7.2,0,15.78-6.37,21.32-17.86l9.14,4.43c-7.48,15.78-19.24,24.64-33.37,24.64-9,0-22.98-4.15-19.66-24.64Z"/><path d="M234.07,53.16c11.91,0,18,7.48,18.14,15.23,0,9.83-9.55,20.49-32.12,23.54,2.91,5.81,9.28,9.14,17.86,9.14,9.97,0,20.08-5.12,26.58-18.41l9.14,4.43c-7.89,16.34-20.77,24.78-37.24,24.78-18.97,0-31.15-10.11-31.01-27.14,0-15.51,10.24-31.57,28.66-31.57ZM239.88,69.08c0-3.05-2.22-5.26-5.95-5.4-8.58,0-15.23,9.14-15.64,19.24,14.68-1.11,21.6-8.17,21.6-13.84Z"/><path d="M268.26,54.54h12.46l-1.8,12.74c5.4-7.2,14.12-13.98,24.23-14.12,10.52,0,16.61,6.78,16.75,16.34,0,8.03-4.02,17.44-4.02,23.95,0,4.71,2.91,7.06,7.2,7.06,5.81,0,12.18-5.95,18.28-17.86l9.14,4.43c-6.78,13.71-17.58,24.64-30.32,24.64-8.86,0-16.61-5.12-16.61-15.92,0-7.89,3.18-15.64,3.32-22.98,0-4.98-2.63-8.86-8.03-9-11.49,0-20.77,18-23.81,33.09l-.42,3.05-1.38,10.52h-13.01l8.03-55.93Z"/><path d="M340.53,87.08l3.32-21.18h-9.41l1.52-11.21h9.69l3.05-18.97h13.15l-3.05,18.97h17.03l-1.52,11.21h-17.44l-3.32,20.77c-1.52,9.14,1.66,14.4,8.31,14.4,5.81,0,10.94-5.12,15.78-12.04l7.89,6.09c-5.81,8.31-14.68,16.75-25.75,16.75-8.58,0-22.57-4.29-19.24-24.78Z"/></g></svg>
+        <p class="footer-tagline" style="margin-bottom:8px">De attentheidsapp.</p>
+        <div class="footer-links"><a href="#">Features</a><a href="#">Hoe het werkt</a><a href="#">Download</a><a href="#">Over ons</a><a href="#">Privacy</a><a href="#">Voorwaarden</a></div>
+        <div class="footer-bottom"><p>&copy; 2026 Attent &middot; Gemaakt met liefde door Studio BLEACH</p></div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- FOOTER V3: Minimal -->
+  <div class="variant" data-variant="3">
+    <footer class="footer-section footer-v3">
+      <div class="container">
+        <svg class="footer-logo-svg" viewBox="0 0 394.9 135.11"><g fill="#FFF8EE"><path d="M9.38,94.14c0-10.94,9.83-25.34,39.46-25.34h.97c7.61-18.69,19.38-45.55,36.97-45.55,5.4,0,9.14.83,13.57,1.94l-6.23,43.61h13.15l-1.52,11.21h-13.15l-.83,5.4c-1.52,10.11,1.52,15.09,8.31,15.09,8.44,0,14.81-6.78,20.63-17.86l9.14,4.43c-6.51,13.15-17.31,24.78-32.4,24.64-12.74,0-22.01-8.45-19.11-26.31l.83-5.4h-20.21l-.28.55c-8.86,21.32-18.14,31.29-31.7,31.29-8.44,0-17.58-5.81-17.58-17.72ZM27.93,100.78c6.51,0,11.35-7.75,17.17-20.63-14.95.83-23.54,7.2-23.54,14.26,0,4.15,2.77,6.37,6.37,6.37ZM80.95,68.8l5.26-33.64h-.69c-6.92,0-15.09,17.17-22.01,33.64h17.44Z"/><path d="M119.85,87.08l3.46-21.18h-9.55l1.66-11.35h9.69l3.05-18.97h13.01l-3.05,18.97h17.03l-1.52,11.35h-17.44l-3.32,20.77c-1.66,9.41,1.66,13.84,9.55,13.84,7.2,0,15.78-6.37,21.32-17.86l9.14,4.43c-7.48,15.78-19.24,24.64-33.37,24.64-9,0-22.98-4.15-19.66-24.64Z"/><path d="M162.91,87.08l3.46-21.18h-9.55l1.66-11.35h9.69l3.05-18.97h13.01l-3.05,18.97h17.03l-1.52,11.35h-17.44l-3.32,20.77c-1.66,9.41,1.66,13.84,9.55,13.84,7.2,0,15.78-6.37,21.32-17.86l9.14,4.43c-7.48,15.78-19.24,24.64-33.37,24.64-9,0-22.98-4.15-19.66-24.64Z"/><path d="M234.07,53.16c11.91,0,18,7.48,18.14,15.23,0,9.83-9.55,20.49-32.12,23.54,2.91,5.81,9.28,9.14,17.86,9.14,9.97,0,20.08-5.12,26.58-18.41l9.14,4.43c-7.89,16.34-20.77,24.78-37.24,24.78-18.97,0-31.15-10.11-31.01-27.14,0-15.51,10.24-31.57,28.66-31.57ZM239.88,69.08c0-3.05-2.22-5.26-5.95-5.4-8.58,0-15.23,9.14-15.64,19.24,14.68-1.11,21.6-8.17,21.6-13.84Z"/><path d="M268.26,54.54h12.46l-1.8,12.74c5.4-7.2,14.12-13.98,24.23-14.12,10.52,0,16.61,6.78,16.75,16.34,0,8.03-4.02,17.44-4.02,23.95,0,4.71,2.91,7.06,7.2,7.06,5.81,0,12.18-5.95,18.28-17.86l9.14,4.43c-6.78,13.71-17.58,24.64-30.32,24.64-8.86,0-16.61-5.12-16.61-15.92,0-7.89,3.18-15.64,3.32-22.98,0-4.98-2.63-8.86-8.03-9-11.49,0-20.77,18-23.81,33.09l-.42,3.05-1.38,10.52h-13.01l8.03-55.93Z"/><path d="M340.53,87.08l3.32-21.18h-9.41l1.52-11.21h9.69l3.05-18.97h13.15l-3.05,18.97h17.03l-1.52,11.21h-17.44l-3.32,20.77c-1.52,9.14,1.66,14.4,8.31,14.4,5.81,0,10.94-5.12,15.78-12.04l7.89,6.09c-5.81,8.31-14.68,16.75-25.75,16.75-8.58,0-22.57-4.29-19.24-24.78Z"/></g></svg>
+        <p style="font-size:13px;color:var(--text-muted)">&copy; 2026 Attent</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- FOOTER V4: With Social -->
+  <div class="variant" data-variant="4">
+    <footer class="footer-section footer-v4">
+      <div class="container">
+        <div class="footer-wide">
+          <div><svg class="footer-logo-svg" viewBox="0 0 394.9 135.11"><g fill="#FFF8EE"><path d="M9.38,94.14c0-10.94,9.83-25.34,39.46-25.34h.97c7.61-18.69,19.38-45.55,36.97-45.55,5.4,0,9.14.83,13.57,1.94l-6.23,43.61h13.15l-1.52,11.21h-13.15l-.83,5.4c-1.52,10.11,1.52,15.09,8.31,15.09,8.44,0,14.81-6.78,20.63-17.86l9.14,4.43c-6.51,13.15-17.31,24.78-32.4,24.64-12.74,0-22.01-8.45-19.11-26.31l.83-5.4h-20.21l-.28.55c-8.86,21.32-18.14,31.29-31.7,31.29-8.44,0-17.58-5.81-17.58-17.72ZM27.93,100.78c6.51,0,11.35-7.75,17.17-20.63-14.95.83-23.54,7.2-23.54,14.26,0,4.15,2.77,6.37,6.37,6.37ZM80.95,68.8l5.26-33.64h-.69c-6.92,0-15.09,17.17-22.01,33.64h17.44Z"/><path d="M119.85,87.08l3.46-21.18h-9.55l1.66-11.35h9.69l3.05-18.97h13.01l-3.05,18.97h17.03l-1.52,11.35h-17.44l-3.32,20.77c-1.66,9.41,1.66,13.84,9.55,13.84,7.2,0,15.78-6.37,21.32-17.86l9.14,4.43c-7.48,15.78-19.24,24.64-33.37,24.64-9,0-22.98-4.15-19.66-24.64Z"/><path d="M162.91,87.08l3.46-21.18h-9.55l1.66-11.35h9.69l3.05-18.97h13.01l-3.05,18.97h17.03l-1.52,11.35h-17.44l-3.32,20.77c-1.66,9.41,1.66,13.84,9.55,13.84,7.2,0,15.78-6.37,21.32-17.86l9.14,4.43c-7.48,15.78-19.24,24.64-33.37,24.64-9,0-22.98-4.15-19.66-24.64Z"/><path d="M234.07,53.16c11.91,0,18,7.48,18.14,15.23,0,9.83-9.55,20.49-32.12,23.54,2.91,5.81,9.28,9.14,17.86,9.14,9.97,0,20.08-5.12,26.58-18.41l9.14,4.43c-7.89,16.34-20.77,24.78-37.24,24.78-18.97,0-31.15-10.11-31.01-27.14,0-15.51,10.24-31.57,28.66-31.57ZM239.88,69.08c0-3.05-2.22-5.26-5.95-5.4-8.58,0-15.23,9.14-15.64,19.24,14.68-1.11,21.6-8.17,21.6-13.84Z"/><path d="M268.26,54.54h12.46l-1.8,12.74c5.4-7.2,14.12-13.98,24.23-14.12,10.52,0,16.61,6.78,16.75,16.34,0,8.03-4.02,17.44-4.02,23.95,0,4.71,2.91,7.06,7.2,7.06,5.81,0,12.18-5.95,18.28-17.86l9.14,4.43c-6.78,13.71-17.58,24.64-30.32,24.64-8.86,0-16.61-5.12-16.61-15.92,0-7.89,3.18-15.64,3.32-22.98,0-4.98-2.63-8.86-8.03-9-11.49,0-20.77,18-23.81,33.09l-.42,3.05-1.38,10.52h-13.01l8.03-55.93Z"/><path d="M340.53,87.08l3.32-21.18h-9.41l1.52-11.21h9.69l3.05-18.97h13.15l-3.05,18.97h17.03l-1.52,11.21h-17.44l-3.32,20.77c-1.52,9.14,1.66,14.4,8.31,14.4,5.81,0,10.94-5.12,15.78-12.04l7.89,6.09c-5.81,8.31-14.68,16.75-25.75,16.75-8.58,0-22.57-4.29-19.24-24.78Z"/></g></svg></div>
+          <div class="social-icons">
+            <a href="#" class="social-icon" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+            <a href="#" class="social-icon" aria-label="Twitter"><svg viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg></a>
+            <a href="#" class="social-icon" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+          </div>
+        </div>
+        <div class="footer-bottom"><p>&copy; 2026 Attent &middot; Gemaakt met liefde door Studio BLEACH</p></div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- FOOTER V5: With Email -->
+  <div class="variant" data-variant="5">
+    <footer class="footer-section footer-v5" style="text-align:center">
+      <div class="container">
+        <svg class="footer-logo-svg" style="margin:0 auto 12px" viewBox="0 0 394.9 135.11"><g fill="#FFF8EE"><path d="M9.38,94.14c0-10.94,9.83-25.34,39.46-25.34h.97c7.61-18.69,19.38-45.55,36.97-45.55,5.4,0,9.14.83,13.57,1.94l-6.23,43.61h13.15l-1.52,11.21h-13.15l-.83,5.4c-1.52,10.11,1.52,15.09,8.31,15.09,8.44,0,14.81-6.78,20.63-17.86l9.14,4.43c-6.51,13.15-17.31,24.78-32.4,24.64-12.74,0-22.01-8.45-19.11-26.31l.83-5.4h-20.21l-.28.55c-8.86,21.32-18.14,31.29-31.7,31.29-8.44,0-17.58-5.81-17.58-17.72ZM27.93,100.78c6.51,0,11.35-7.75,17.17-20.63-14.95.83-23.54,7.2-23.54,14.26,0,4.15,2.77,6.37,6.37,6.37ZM80.95,68.8l5.26-33.64h-.69c-6.92,0-15.09,17.17-22.01,33.64h17.44Z"/><path d="M119.85,87.08l3.46-21.18h-9.55l1.66-11.35h9.69l3.05-18.97h13.01l-3.05,18.97h17.03l-1.52,11.35h-17.44l-3.32,20.77c-1.66,9.41,1.66,13.84,9.55,13.84,7.2,0,15.78-6.37,21.32-17.86l9.14,4.43c-7.48,15.78-19.24,24.64-33.37,24.64-9,0-22.98-4.15-19.66-24.64Z"/><path d="M162.91,87.08l3.46-21.18h-9.55l1.66-11.35h9.69l3.05-18.97h13.01l-3.05,18.97h17.03l-1.52,11.35h-17.44l-3.32,20.77c-1.66,9.41,1.66,13.84,9.55,13.84,7.2,0,15.78-6.37,21.32-17.86l9.14,4.43c-7.48,15.78-19.24,24.64-33.37,24.64-9,0-22.98-4.15-19.66-24.64Z"/><path d="M234.07,53.16c11.91,0,18,7.48,18.14,15.23,0,9.83-9.55,20.49-32.12,23.54,2.91,5.81,9.28,9.14,17.86,9.14,9.97,0,20.08-5.12,26.58-18.41l9.14,4.43c-7.89,16.34-20.77,24.78-37.24,24.78-18.97,0-31.15-10.11-31.01-27.14,0-15.51,10.24-31.57,28.66-31.57ZM239.88,69.08c0-3.05-2.22-5.26-5.95-5.4-8.58,0-15.23,9.14-15.64,19.24,14.68-1.11,21.6-8.17,21.6-13.84Z"/><path d="M268.26,54.54h12.46l-1.8,12.74c5.4-7.2,14.12-13.98,24.23-14.12,10.52,0,16.61,6.78,16.75,16.34,0,8.03-4.02,17.44-4.02,23.95,0,4.71,2.91,7.06,7.2,7.06,5.81,0,12.18-5.95,18.28-17.86l9.14,4.43c-6.78,13.71-17.58,24.64-30.32,24.64-8.86,0-16.61-5.12-16.61-15.92,0-7.89,3.18-15.64,3.32-22.98,0-4.98-2.63-8.86-8.03-9-11.49,0-20.77,18-23.81,33.09l-.42,3.05-1.38,10.52h-13.01l8.03-55.93Z"/><path d="M340.53,87.08l3.32-21.18h-9.41l1.52-11.21h9.69l3.05-18.97h13.15l-3.05,18.97h17.03l-1.52,11.21h-17.44l-3.32,20.77c-1.52,9.14,1.66,14.4,8.31,14.4,5.81,0,10.94-5.12,15.78-12.04l7.89,6.09c-5.81,8.31-14.68,16.75-25.75,16.75-8.58,0-22.57-4.29-19.24-24.78Z"/></g></svg>
+        <p class="footer-tagline" style="margin-bottom:8px">De attentheidsapp.</p>
+        <div class="signup-row">
+          <input class="signup-input" type="email" placeholder="Je e-mailadres">
+          <button class="signup-btn">Aanmelden</button>
+        </div>
+        <div class="footer-bottom" style="border-top:none"><p>&copy; 2026 Attent &middot; Gemaakt met liefde door Studio BLEACH</p></div>
+      </div>
+    </footer>
+  </div>
+
+</div>
+
+</main>
+
+<!-- ================================================================
+   SIDEBAR
+   ================================================================ -->
+<aside class="sidebar">
+  <div class="sidebar-title">Attent Builder</div>
+
+  <div class="sidebar-section" data-target="hero">
+    <div class="sidebar-label" onclick="scrollToSection('hero')">Hero</div>
+    <div class="sidebar-buttons">
+      <button class="active" data-variant="1" onclick="switchVariant('hero',1,this)">1</button>
+      <button data-variant="2" onclick="switchVariant('hero',2,this)">2</button>
+      <button data-variant="3" onclick="switchVariant('hero',3,this)">3</button>
+      <button data-variant="4" onclick="switchVariant('hero',4,this)">4</button>
+      <button data-variant="5" onclick="switchVariant('hero',5,this)">5</button>
+    </div>
+  </div>
+
+  <div class="sidebar-section" data-target="strip">
+    <div class="sidebar-label" onclick="scrollToSection('strip')">Fotostrip</div>
+    <div class="sidebar-buttons">
+      <button class="active" data-variant="1" onclick="switchVariant('strip',1,this)">1</button>
+      <button data-variant="2" onclick="switchVariant('strip',2,this)">2</button>
+      <button data-variant="3" onclick="switchVariant('strip',3,this)">3</button>
+      <button data-variant="4" onclick="switchVariant('strip',4,this)">4</button>
+      <button data-variant="5" onclick="switchVariant('strip',5,this)">5</button>
+    </div>
+  </div>
+
+  <div class="sidebar-section" data-target="problem">
+    <div class="sidebar-label" onclick="scrollToSection('problem')">Probleem</div>
+    <div class="sidebar-buttons">
+      <button class="active" data-variant="1" onclick="switchVariant('problem',1,this)">1</button>
+      <button data-variant="2" onclick="switchVariant('problem',2,this)">2</button>
+      <button data-variant="3" onclick="switchVariant('problem',3,this)">3</button>
+      <button data-variant="4" onclick="switchVariant('problem',4,this)">4</button>
+      <button data-variant="5" onclick="switchVariant('problem',5,this)">5</button>
+    </div>
+  </div>
+
+  <div class="sidebar-section" data-target="pivot">
+    <div class="sidebar-label" onclick="scrollToSection('pivot')">Pivot</div>
+    <div class="sidebar-buttons">
+      <button class="active" data-variant="1" onclick="switchVariant('pivot',1,this)">1</button>
+      <button data-variant="2" onclick="switchVariant('pivot',2,this)">2</button>
+      <button data-variant="3" onclick="switchVariant('pivot',3,this)">3</button>
+      <button data-variant="4" onclick="switchVariant('pivot',4,this)">4</button>
+      <button data-variant="5" onclick="switchVariant('pivot',5,this)">5</button>
+    </div>
+  </div>
+
+  <div class="sidebar-section" data-target="how">
+    <div class="sidebar-label" onclick="scrollToSection('how')">Hoe het werkt</div>
+    <div class="sidebar-buttons">
+      <button class="active" data-variant="1" onclick="switchVariant('how',1,this)">1</button>
+      <button data-variant="2" onclick="switchVariant('how',2,this)">2</button>
+      <button data-variant="3" onclick="switchVariant('how',3,this)">3</button>
+      <button data-variant="4" onclick="switchVariant('how',4,this)">4</button>
+      <button data-variant="5" onclick="switchVariant('how',5,this)">5</button>
+    </div>
+  </div>
+
+  <div class="sidebar-section" data-target="stories">
+    <div class="sidebar-label" onclick="scrollToSection('stories')">Verhalen</div>
+    <div class="sidebar-buttons">
+      <button class="active" data-variant="1" onclick="switchVariant('stories',1,this)">1</button>
+      <button data-variant="2" onclick="switchVariant('stories',2,this)">2</button>
+      <button data-variant="3" onclick="switchVariant('stories',3,this)">3</button>
+      <button data-variant="4" onclick="switchVariant('stories',4,this)">4</button>
+      <button data-variant="5" onclick="switchVariant('stories',5,this)">5</button>
+    </div>
+  </div>
+
+  <div class="sidebar-section" data-target="proof">
+    <div class="sidebar-label" onclick="scrollToSection('proof')">Social Proof</div>
+    <div class="sidebar-buttons">
+      <button class="active" data-variant="1" onclick="switchVariant('proof',1,this)">1</button>
+      <button data-variant="2" onclick="switchVariant('proof',2,this)">2</button>
+      <button data-variant="3" onclick="switchVariant('proof',3,this)">3</button>
+      <button data-variant="4" onclick="switchVariant('proof',4,this)">4</button>
+      <button data-variant="5" onclick="switchVariant('proof',5,this)">5</button>
+    </div>
+  </div>
+
+  <div class="sidebar-section" data-target="reminders">
+    <div class="sidebar-label" onclick="scrollToSection('reminders')">Herinneringen</div>
+    <div class="sidebar-buttons">
+      <button class="active" data-variant="1" onclick="switchVariant('reminders',1,this)">1</button>
+      <button data-variant="2" onclick="switchVariant('reminders',2,this)">2</button>
+      <button data-variant="3" onclick="switchVariant('reminders',3,this)">3</button>
+      <button data-variant="4" onclick="switchVariant('reminders',4,this)">4</button>
+      <button data-variant="5" onclick="switchVariant('reminders',5,this)">5</button>
+    </div>
+  </div>
+
+  <div class="sidebar-section" data-target="cta">
+    <div class="sidebar-label" onclick="scrollToSection('cta')">CTA</div>
+    <div class="sidebar-buttons">
+      <button class="active" data-variant="1" onclick="switchVariant('cta',1,this)">1</button>
+      <button data-variant="2" onclick="switchVariant('cta',2,this)">2</button>
+      <button data-variant="3" onclick="switchVariant('cta',3,this)">3</button>
+      <button data-variant="4" onclick="switchVariant('cta',4,this)">4</button>
+      <button data-variant="5" onclick="switchVariant('cta',5,this)">5</button>
+    </div>
+  </div>
+
+  <div class="sidebar-section" data-target="footer">
+    <div class="sidebar-label" onclick="scrollToSection('footer')">Footer</div>
+    <div class="sidebar-buttons">
+      <button class="active" data-variant="1" onclick="switchVariant('footer',1,this)">1</button>
+      <button data-variant="2" onclick="switchVariant('footer',2,this)">2</button>
+      <button data-variant="3" onclick="switchVariant('footer',3,this)">3</button>
+      <button data-variant="4" onclick="switchVariant('footer',4,this)">4</button>
+      <button data-variant="5" onclick="switchVariant('footer',5,this)">5</button>
+    </div>
+  </div>
+
+  <button class="export-btn" onclick="exportConfig()">Export Config</button>
+</aside>
+
+</div>
+
+<!-- ================================================================
+   JAVASCRIPT
+   ================================================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // ========== VARIANT SWITCHING ==========
+  window.switchVariant = function(section, variantNum, btn) {
+    var group = document.querySelector('.section-group[data-section="' + section + '"]');
+    if (!group) return;
+
+    var variants = group.querySelectorAll('.variant');
+    variants.forEach(function(v) { v.classList.remove('active'); });
+    var target = group.querySelector('.variant[data-variant="' + variantNum + '"]');
+    if (target) target.classList.add('active');
+
+    var sidebarSection = document.querySelector('.sidebar-section[data-target="' + section + '"]');
+    if (sidebarSection) {
+      sidebarSection.querySelectorAll('.sidebar-buttons button').forEach(function(b) {
+        b.classList.remove('active');
+      });
+    }
+    if (btn) btn.classList.add('active');
+
+    // Re-init text cycles for newly visible variants
+    setTimeout(function() { measureTextCycles(); }, 50);
+  };
+
+  // ========== SCROLL TO SECTION ==========
+  window.scrollToSection = function(section) {
+    var el = document.getElementById('section-' + section);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  // ========== TEXT CYCLE ==========
+  function measureTextCycles() {
+    document.querySelectorAll('.text-cycle').forEach(function(cycle) {
+      var active = cycle.querySelector('.text-cycle-word.active');
+      if (active) {
+        cycle.style.width = active.scrollWidth + 'px';
+      }
+    });
+  }
+
+  function initTextCycles() {
+    document.querySelectorAll('.text-cycle').forEach(function(cycle) {
+      var words = cycle.querySelectorAll('.text-cycle-word');
+      if (words.length < 2) return;
+      var idx = 0;
+
+      function setWidth() {
+        cycle.style.width = words[idx].scrollWidth + 'px';
+      }
+
+      setTimeout(setWidth, 100);
+      window.addEventListener('resize', setWidth);
+
+      setInterval(function() {
+        var variant = cycle.closest('.variant');
+        if (variant && !variant.classList.contains('active')) return;
+
+        var prev = idx;
+        idx = (idx + 1) % words.length;
+
+        words[prev].classList.remove('active');
+        words[prev].classList.add('exit');
+
+        words[idx].classList.add('active');
+        setWidth();
+
+        setTimeout(function() {
+          words[prev].classList.remove('exit');
+        }, 400);
+      }, 3000);
+    });
+  }
+
+  // ========== GRADIENT BG — Original 21st.dev breathing pattern ==========
+  function initGradientBg(el) {
+    var width = 125, dir = 1, speed = 0.02, range = 5;
+    var gradColors = ['#0C0C22','#0C0C22','#6D2EFF','#FFA2FF','#7DFFFF','#E8FF3C','#6D2EFF'];
+    var stops = [35, 50, 60, 70, 80, 90, 100];
+
+    function animate() {
+      if (width >= 125 + range) dir = -1;
+      if (width <= 125 - range) dir = 1;
+      width += dir * speed;
+
+      var s = stops.map(function(p, i) { return gradColors[i] + ' ' + p + '%'; }).join(',');
+      el.style.background = 'radial-gradient(' + width + '% ' + width + '% at 50% 20%, ' + s + ')';
+      requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
+
+    el.style.opacity = '0';
+    el.style.transform = 'scale(1.5)';
+    el.style.transition = 'opacity 2s cubic-bezier(0.25,0.1,0.25,1), transform 2s cubic-bezier(0.25,0.1,0.25,1)';
+    setTimeout(function() {
+      el.style.opacity = '1';
+      el.style.transform = 'scale(1)';
+    }, 50);
+  }
+
+  function initGradientBgs() {
+    document.querySelectorAll('.hero-gradient-bg, .cta-gradient-bg').forEach(function(el) {
+      initGradientBg(el);
+    });
+  }
+
+  // ========== STEP ACCORDION ==========
+  window.switchStep = function(btn) {
+    var col = btn.closest('.how-steps-col');
+    if (!col) col = btn.parentElement;
+    var buttons = col.querySelectorAll('.how-step-btn');
+    buttons.forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+
+    var phoneId = col.getAttribute('data-phone-target');
+    if (phoneId) {
+      var phone = document.getElementById(phoneId);
+      if (phone) {
+        var screens = phone.querySelectorAll('.phone-screen-view');
+        screens.forEach(function(s) { s.classList.remove('active'); });
+        var stepNum = btn.getAttribute('data-step');
+        var targetScreen = phone.querySelector('.phone-screen-view[data-screen="' + stepNum + '"]');
+        if (targetScreen) targetScreen.classList.add('active');
+      }
+    }
+  };
+
+  // ========== CAROUSEL NAVIGATION ==========
+  var carouselState = {};
+  window.navigateCarousel = function(id, dir) {
+    var container = document.querySelector('[data-carousel="' + id + '"]');
+    if (!container) return;
+    var steps = container.querySelectorAll('[data-cstep]');
+    if (!steps.length) return;
+
+    if (!(id in carouselState)) carouselState[id] = 0;
+    steps[carouselState[id]].classList.remove('active');
+    carouselState[id] = (carouselState[id] + dir + steps.length) % steps.length;
+    steps[carouselState[id]].classList.add('active');
+
+    var dotsContainer = document.querySelector('[data-dots="' + id + '"]');
+    if (dotsContainer) {
+      var dots = dotsContainer.querySelectorAll('.carousel-dot');
+      dots.forEach(function(d, i) {
+        d.classList.toggle('active', i === carouselState[id]);
+      });
+    }
+  };
+
+  // ========== CARD STACK AUTO-CYCLE ==========
+  function initCardStacks() {
+    var stacks = document.querySelectorAll('[data-stack]');
+    stacks.forEach(function(stack) {
+      var cards = stack.querySelectorAll('.stack-card-el');
+      if (cards.length < 2) return;
+      var total = cards.length;
+
+      setInterval(function() {
+        var variant = stack.closest('.variant');
+        if (variant && !variant.classList.contains('active')) return;
+
+        cards.forEach(function(card) {
+          var pos = parseInt(card.getAttribute('data-pos'));
+          var newPos = (pos - 1 + total) % total;
+          card.setAttribute('data-pos', newPos);
+        });
+      }, 4000);
+    });
+  }
+
+  // ========== ROTATING QUOTES (Proof V2) ==========
+  function initRotatingQuotes() {
+    var containers = document.querySelectorAll('[data-rotate]');
+    containers.forEach(function(container) {
+      var items = container.querySelectorAll('.rq-item');
+      if (items.length < 2) return;
+      var idx = 0;
+      var rotateId = container.getAttribute('data-rotate');
+
+      setInterval(function() {
+        var variant = container.closest('.variant');
+        if (variant && !variant.classList.contains('active')) return;
+
+        items[idx].classList.remove('active');
+        idx = (idx + 1) % items.length;
+        items[idx].classList.add('active');
+
+        // Update dots if present
+        var dotsContainer = document.querySelector('[data-dots="' + rotateId + '"]');
+        if (dotsContainer) {
+          var dots = dotsContainer.querySelectorAll('.carousel-dot');
+          dots.forEach(function(d, i) {
+            d.classList.toggle('active', i === idx);
+          });
+        }
+      }, 5000);
+    });
+  }
+
+  // ========== SPOTLIGHT (Reminders V4) ==========
+  function initSpotlights() {
+    var containers = document.querySelectorAll('[data-spotlight]');
+    containers.forEach(function(container) {
+      var cards = container.querySelectorAll('.spotlight-card');
+      if (cards.length < 2) return;
+      var idx = 0;
+      var spotId = container.getAttribute('data-spotlight');
+
+      setInterval(function() {
+        var variant = container.closest('.variant');
+        if (variant && !variant.classList.contains('active')) return;
+
+        cards[idx].classList.remove('active');
+        idx = (idx + 1) % cards.length;
+        cards[idx].classList.add('active');
+
+        var dotsContainer = document.querySelector('[data-dots="' + spotId + '"]');
+        if (dotsContainer) {
+          var dots = dotsContainer.querySelectorAll('.carousel-dot');
+          dots.forEach(function(d, i) {
+            d.classList.toggle('active', i === idx);
+          });
+        }
+      }, 4000);
+    });
+  }
+
+  // ========== CTA V5 PARALLAX ==========
+  function initParallax() {
+    var ctaV5 = document.querySelector('[data-parallax="cta-v5"]');
+    if (!ctaV5) return;
+
+    window.addEventListener('scroll', function() {
+      var variant = ctaV5.closest('.variant');
+      if (variant && !variant.classList.contains('active')) return;
+
+      var rect = ctaV5.getBoundingClientRect();
+      var windowHeight = window.innerHeight;
+
+      if (rect.top < windowHeight && rect.bottom > 0) {
+        var progress = (windowHeight - rect.top) / (windowHeight + rect.height);
+        var offset = (progress - 0.5) * 40;
+        var bg = ctaV5.querySelector('.cta-bg img');
+        if (bg) bg.style.transform = 'translateY(' + offset + 'px)';
+      }
+    }, { passive: true });
+  }
+
+  // ========== SCROLL REVEAL ==========
+  function initScrollReveal() {
+    var els = document.querySelectorAll('.rv');
+    if (!els.length) return;
+
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    els.forEach(function(el) { observer.observe(el); });
+  }
+
+  // ========== STORIES V5 AUTO-ADVANCE ==========
+  function initStoryCarousel() {
+    setInterval(function() {
+      var container = document.querySelector('[data-carousel="stories-v5"]');
+      if (!container) return;
+      var variant = container.closest('.variant');
+      if (variant && !variant.classList.contains('active')) return;
+      navigateCarousel('stories-v5', 1);
+    }, 6000);
+  }
+
+  // ========== EXPORT CONFIG ==========
+  window.exportConfig = function() {
+    var config = {};
+    var groups = document.querySelectorAll('.section-group');
+    groups.forEach(function(g) {
+      var section = g.getAttribute('data-section');
+      var active = g.querySelector('.variant.active');
+      config[section] = active ? parseInt(active.getAttribute('data-variant')) : 1;
+    });
+    var json = JSON.stringify(config, null, 2);
+    alert('Huidige configuratie:\n\n' + json);
+    console.log('Attent Section Builder Config:', config);
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(json).then(function() {
+        console.log('Config gekopieerd naar klembord');
+      });
+    }
+  };
+
+  // ========== INIT ==========
+  document.addEventListener('DOMContentLoaded', function() {
+    initTextCycles();
+    initGradientBgs();
+    initCardStacks();
+    initRotatingQuotes();
+    initSpotlights();
+    initParallax();
+    initScrollReveal();
+    initStoryCarousel();
+  });
+
+})();
+</script>
+
+</body>
+</html>

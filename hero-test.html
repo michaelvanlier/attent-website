@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attent — Section Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0C0C22;
+  --bg-raised: rgba(255,248,238,0.04);
+  --text-h: rgba(255,248,238,0.95);
+  --text-p: rgba(255,248,238,0.6);
+  --text-muted: rgba(255,248,238,0.3);
+  --border: rgba(255,248,238,0.08);
+  --border-md: rgba(255,248,238,0.14);
+  --purple: #6D2EFF;
+  --pink: #FFA2FF;
+  --cream: #FFF8EE;
+  --cyan: #7DFFFF;
+  --yellow: #E8FF3C;
+  --green: #00FF80;
+  --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --font-h: 'Sora', sans-serif;
+  --font-b: 'DM Sans', sans-serif;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text-p); font-family: var(--font-b); font-size: 17px; line-height: 1.75; overflow-x: hidden; }
+button { font-family: inherit; border: none; background: none; cursor: pointer; }
+a { color: inherit; text-decoration: none; cursor: pointer; }
+img { display: block; max-width: 100%; height: auto; }
+:focus-visible { outline: 2px solid var(--purple); outline-offset: 3px; }
+
+/* Grain */
+body::after { content:''; position:fixed; inset:0; pointer-events:none; z-index:9999; opacity:0.03; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); mix-blend-mode:overlay; }
+
+.main { }
+.container { max-width: 1100px; margin: 0 auto; padding: 0 48px; }
+
+/* ============================================================
+   HERO — Left-aligned text, floating cards right
+   ============================================================ */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+.hero-gradient-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.hero-layout {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 48px;
+}
+.hero-text { max-width: 560px; }
+.hero-text h1 {
+  font-family: var(--font-h);
+  font-weight: 600;
+  font-size: clamp(40px, 5.5vw, 68px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-h);
+}
+.hero-sub {
+  font-size: 18px;
+  color: var(--text-p);
+  max-width: 440px;
+  margin-top: 24px;
+  line-height: 1.7;
+}
+.hero-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+
+/* Buttons */
+.btn-primary { display:inline-flex; align-items:center; gap:8px; padding:16px 32px; font-family:var(--font-h); font-size:15px; font-weight:600; color:var(--cream); background:var(--purple); border-radius:999px; transition:transform 160ms var(--ease-out), box-shadow 300ms var(--ease-out); }
+.btn-primary:hover { box-shadow:0 4px 32px rgba(109,46,255,0.35); }
+.btn-primary:active { transform:scale(0.97); }
+.btn-ghost { display:inline-flex; align-items:center; gap:6px; padding:16px 24px; font-family:var(--font-h); font-size:15px; font-weight:500; color:var(--text-p); border:1px solid var(--border); border-radius:999px; transition:color 200ms var(--ease-out), border-color 200ms var(--ease-out); }
+.btn-ghost:hover { color:var(--text-h); border-color:rgba(255,248,238,0.2); }
+.btn-ghost:active { transform:scale(0.97); }
+
+/* Floating cards — right side */
+.hero-cards {
+  position: relative;
+  height: 500px;
+}
+.float-card {
+  position: absolute;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  transform: rotate(var(--r,0deg)) translateY(var(--py,0px));
+  will-change: transform;
+  transition: transform 300ms var(--ease-out);
+  white-space: nowrap;
+}
+.float-card:hover { transform: rotate(var(--r,0deg)) translateY(calc(var(--py,0px) - 6px)); }
+.float-card-emoji { font-size: 28px; flex-shrink: 0; }
+.float-card-text strong { display:block; font-family:var(--font-h); font-size:14px; font-weight:600; color:var(--text-h); }
+.float-card-text span { font-size:13px; color:var(--text-muted); }
+
+/* Card positions — scattered on right side */
+.fc-1 { top: 8%; left: 10%; --r:-3deg; animation: fc-in 0.8s var(--ease-expo) 0.4s both; }
+.fc-2 { top: 30%; right: 0%; --r:2deg; animation: fc-in 0.8s var(--ease-expo) 0.6s both; }
+.fc-3 { top: 55%; left: 5%; --r:-1.5deg; animation: fc-in 0.8s var(--ease-expo) 0.8s both; }
+.fc-4 { top: 75%; right: 8%; --r:2.5deg; animation: fc-in 0.8s var(--ease-expo) 1.0s both; }
+
+@keyframes fc-in {
+  from { opacity:0; transform:rotate(var(--r,0deg)) translateY(30px); }
+  to { opacity:1; transform:rotate(var(--r,0deg)) translateY(0); }
+}
+
+/* Scroll indicator */
+.scroll-line { position:absolute; bottom:32px; left:50%; transform:translateX(-50%); width:1px; height:48px; background:linear-gradient(to bottom, var(--text-muted), transparent); opacity:0.4; z-index:1; }
+
+/* ============================================================
+   TEXT CYCLE
+   ============================================================ */
+.text-cycle { display:inline-block; position:relative; overflow:hidden; height:1.2em; vertical-align:bottom; min-width:4ch; transition:width 500ms var(--ease-out); }
+.text-cycle-word { position:absolute; left:0; top:0; white-space:nowrap; background:linear-gradient(135deg, var(--pink), var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; opacity:0; transform:translateY(0.4em); filter:blur(6px); transition:opacity 350ms var(--ease-out), transform 350ms var(--ease-out), filter 350ms var(--ease-out); pointer-events:none; }
+.text-cycle-word.active { opacity:1; transform:translateY(0); filter:blur(0px); pointer-events:auto; }
+.text-cycle-word.exit { opacity:0 !important; transform:translateY(-0.4em); filter:blur(6px); visibility:hidden; transition:opacity 250ms var(--ease-out), transform 250ms var(--ease-out), filter 250ms var(--ease-out), visibility 0ms 250ms; }
+
+/* ============================================================
+   PROBLEM SECTION — 5 variants
+   ============================================================ */
+.problem-section { padding: 120px 0 140px; position: relative; }
+.section-label { font-family:var(--font-h); font-size:11px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--purple); margin-bottom:16px; }
+.section-title { font-family:var(--font-h); font-weight:500; font-size:clamp(28px,4vw,48px); line-height:1.15; letter-spacing:-0.02em; color:var(--text-h); margin-bottom:48px; max-width:600px; }
+
+/* Card base */
+.p-card { background:var(--bg-raised); border:1px solid var(--border); border-radius:20px; padding:32px; position:relative; overflow:hidden; transition:border-color 300ms var(--ease-out), transform 300ms var(--ease-out), box-shadow 300ms var(--ease-out); }
+.p-card::before { content:''; position:absolute; inset:0; border-radius:inherit; background:linear-gradient(135deg, rgba(109,46,255,0.08), rgba(255,162,255,0.04) 50%, rgba(125,255,255,0.02)); opacity:0; transition:opacity 500ms var(--ease-out); pointer-events:none; }
+@media (hover:hover) {
+  .p-card:hover { border-color:var(--border-md); transform:translateY(-2px); box-shadow:0 8px 32px rgba(0,0,0,0.3); }
+  .p-card:hover::before { opacity:1; }
+}
+.p-card .stat { font-family:var(--font-h); font-size:48px; font-weight:700; color:var(--text-h); opacity:0.8; line-height:1; margin-bottom:12px; }
+.p-card .stat-label { font-size:16px; color:var(--text-p); line-height:1.6; }
+.p-card .stat-sub { font-size:14px; color:var(--text-muted); margin-top:8px; font-style:italic; }
+
+/* Photo inside card */
+.p-card-img { width:100%; height:180px; object-fit:cover; border-radius:12px; margin-bottom:20px; }
+
+/* V1: Three statement cards in a row */
+.problem-v1 .p-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+
+/* V2: Photo + text split */
+.problem-v2-layout { display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; }
+.problem-v2-photo { border-radius:20px; overflow:hidden; height:480px; }
+.problem-v2-photo img { width:100%; height:100%; object-fit:cover; }
+.problem-v2-text .problem-item { padding:24px 0; border-bottom:1px solid var(--border); }
+.problem-v2-text .problem-item:last-child { border-bottom:none; }
+.problem-v2-text .problem-item strong { display:block; font-family:var(--font-h); font-size:16px; font-weight:600; color:var(--text-h); margin-bottom:4px; }
+
+/* V3: Single big statement + stat row */
+.problem-v3-statement { font-family:var(--font-h); font-weight:500; font-size:clamp(24px,3.5vw,40px); line-height:1.3; color:var(--text-h); max-width:800px; margin-bottom:64px; }
+.stat-row { display:flex; gap:0; }
+.stat-row-item { flex:1; text-align:center; padding:32px 24px; }
+.stat-row-item + .stat-row-item { border-left:1px solid var(--border); }
+.stat-row-item .stat-num { font-family:var(--font-h); font-size:40px; font-weight:700; color:var(--text-h); line-height:1; margin-bottom:8px; }
+.stat-row-item .stat-desc { font-size:14px; color:var(--text-muted); }
+
+/* V4: Numbered vertical cards */
+.problem-v4-list { display:flex; flex-direction:column; gap:0; }
+.problem-v4-item { display:flex; gap:32px; padding:40px 0; border-top:1px solid var(--border); align-items:flex-start; }
+.problem-v4-item:first-child { border-top:none; }
+.problem-v4-num { font-family:var(--font-h); font-size:56px; font-weight:700; color:var(--text-h); opacity:0.06; line-height:1; flex-shrink:0; min-width:80px; }
+.problem-v4-content strong { display:block; font-family:var(--font-h); font-size:20px; font-weight:600; color:var(--text-h); margin-bottom:8px; }
+
+/* V5: Dark bento grid */
+.problem-v5-grid { display:grid; grid-template-columns:1.2fr 1fr; grid-template-rows:auto auto; gap:24px; }
+.problem-v5-tall { grid-row:1/3; }
+.problem-v5-tall img { width:100%; height:240px; object-fit:cover; border-radius:12px; margin-bottom:20px; }
+.problem-v5-accent-pink { border-left:3px solid var(--pink); }
+.problem-v5-accent-purple { border-left:3px solid var(--purple); }
+
+/* All variants visible (stacked for comparison) */
+.section-group .variant { display:block; }
+.section-group .variant + .variant { border-top: 1px solid var(--border); }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:900px) {
+  .main { }
+  .hero-layout { grid-template-columns:1fr; }
+  .hero-cards { height:auto; display:flex; flex-wrap:wrap; gap:12px; justify-content:center; padding:40px 0; }
+  .float-card { position:relative; top:auto; left:auto; right:auto; bottom:auto; }
+  .fc-1,.fc-2,.fc-3,.fc-4 { top:auto; left:auto; right:auto; }
+  .problem-v1 .p-grid { grid-template-columns:1fr; }
+  .problem-v2-layout { grid-template-columns:1fr; }
+  .problem-v5-grid { grid-template-columns:1fr; }
+  .problem-v5-tall { grid-row:auto; }
+  .stat-row { flex-direction:column; }
+  .stat-row-item + .stat-row-item { border-left:none; border-top:1px solid var(--border); }
+  .container { padding:0 24px; }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  *,*::before,*::after { animation-duration:0.01ms !important; transition-duration:0.01ms !important; }
+  .text-cycle-word { filter:none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="main">
+
+<!-- ====== HERO (locked to V1) ====== -->
+<section class="hero">
+  <div class="hero-gradient-bg" id="gradBg"></div>
+  <div class="hero-layout">
+    <div class="hero-text">
+      <h1>Mis nooit meer een <span class="text-cycle"><span class="text-cycle-word active">verjaardag</span><span class="text-cycle-word">jubileum</span><span class="text-cycle-word">moment</span><span class="text-cycle-word">mijlpaal</span><span class="text-cycle-word">kans</span></span></h1>
+      <p class="hero-sub">Attent helpt je om er te zijn op de momenten die ertoe doen.</p>
+      <div class="hero-actions">
+        <a href="#" class="btn-primary">Download gratis</a>
+        <a href="#" class="btn-ghost">Bekijk hoe het werkt &rarr;</a>
+      </div>
+    </div>
+    <div class="hero-cards">
+      <div class="float-card fc-1"><div class="float-card-emoji">🎂</div><div class="float-card-text"><strong>Mama's verjaardag</strong><span>Over 19 dagen</span></div></div>
+      <div class="float-card fc-2"><div class="float-card-emoji">💍</div><div class="float-card-text"><strong>Trouwdag met Emma</strong><span>Over 45 dagen</span></div></div>
+      <div class="float-card fc-3"><div class="float-card-emoji">🎉</div><div class="float-card-text"><strong>Jaap's nieuwe baan</strong><span>Vandaag</span></div></div>
+      <div class="float-card fc-4"><div class="float-card-emoji">👶</div><div class="float-card-text"><strong>David werd vader</strong><span>Vorige week</span></div></div>
+    </div>
+  </div>
+  <div class="scroll-line"></div>
+</section>
+
+<!-- ====== PROBLEM (5 variants) ====== -->
+<div class="section-group" data-section="problem">
+
+  <!-- V1: Three statement cards -->
+  <div class="variant active" data-v="1">
+    <section class="problem-section problem-v1">
+      <div class="container">
+        <div class="section-label">De harde waarheid</div>
+        <div class="section-title">Iedereen wil attent zijn.<br>Bijna niemand is het.</div>
+        <div class="p-grid">
+          <div class="p-card">
+            <div class="stat">92%</div>
+            <div class="stat-label">wil attenter zijn voor hun dierbaren</div>
+            <div class="stat-sub">Het willen is niet het probleem.</div>
+          </div>
+          <div class="p-card">
+            <div class="stat">5+</div>
+            <div class="stat-label">apps waar je verjaardagen, adressen en data bewaart</div>
+            <div class="stat-sub">Mama's ringmaat? Ergens in een appje.</div>
+          </div>
+          <div class="p-card">
+            <div class="stat" style="color:var(--pink)">0</div>
+            <div class="stat-label">dagen aanlooptijd bij de meeste herinnering-apps</div>
+            <div class="stat-sub">Een herinnering op de dag zelf is een herinnering om je schuldig te voelen.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- V2: Photo + text split -->
+  <div class="variant" data-v="2">
+    <section class="problem-section">
+      <div class="container">
+        <div class="section-label">De harde waarheid</div>
+        <div class="section-title">Iedereen wil attent zijn.<br>Bijna niemand is het.</div>
+        <div class="problem-v2-layout">
+          <div class="problem-v2-photo">
+            <img src="assets/images/heart-hands.jpg" alt="Hart met handen" loading="lazy">
+          </div>
+          <div class="problem-v2-text">
+            <div class="problem-item"><strong>Je wilt het wel</strong>92% van de mensen wil attenter zijn. Het lukt alleen niet.</div>
+            <div class="problem-item"><strong>Je data is overal</strong>Mama's verjaardag in je telefoon. Haar adres in een appje. Haar ringmaat... ergens.</div>
+            <div class="problem-item"><strong>Te laat is te laat</strong>Een herinnering op de dag zelf is een herinnering om je schuldig te voelen.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- V3: Big statement + stat row -->
+  <div class="variant" data-v="3">
+    <section class="problem-section">
+      <div class="container">
+        <div class="section-label">De harde waarheid</div>
+        <p class="problem-v3-statement">Je weet dat mama jarig is. Je weet alleen niet precies wanneer. Of wat haar ringmaat is. Of waar je dat cadeautje naartoe moet sturen.</p>
+        <div class="stat-row">
+          <div class="stat-row-item"><div class="stat-num">92%</div><div class="stat-desc">wil attenter zijn</div></div>
+          <div class="stat-row-item"><div class="stat-num">5+</div><div class="stat-desc">apps met je data verspreid</div></div>
+          <div class="stat-row-item"><div class="stat-num">0 dgn</div><div class="stat-desc">aanlooptijd bij je herinnering</div></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- V4: Numbered vertical cards -->
+  <div class="variant" data-v="4">
+    <section class="problem-section">
+      <div class="container">
+        <div class="section-label">De harde waarheid</div>
+        <div class="section-title">Iedereen wil attent zijn.<br>Bijna niemand is het.</div>
+        <div class="problem-v4-list">
+          <div class="problem-v4-item"><div class="problem-v4-num">01</div><div class="problem-v4-content"><strong>Het willen is er wel</strong><p>92% van de mensen wil attenter zijn voor hun dierbaren. Het lukt alleen niet om het ook daadwerkelijk te doen.</p></div></div>
+          <div class="problem-v4-item"><div class="problem-v4-num">02</div><div class="problem-v4-content"><strong>Je data is overal verspreid</strong><p>Mama's verjaardag in je telefoon. Haar adres in een appje. Haar ringmaat... ergens in een oud bericht.</p></div></div>
+          <div class="problem-v4-item"><div class="problem-v4-num">03</div><div class="problem-v4-content"><strong>Te laat is te laat</strong><p>Een herinnering op de dag zelf is een herinnering om je schuldig te voelen. Niet om iets leuks te regelen.</p></div></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- V5: Dark bento grid -->
+  <div class="variant" data-v="5">
+    <section class="problem-section">
+      <div class="container">
+        <div class="section-label">De harde waarheid</div>
+        <div class="section-title">Iedereen wil attent zijn.<br>Bijna niemand is het.</div>
+        <div class="problem-v5-grid">
+          <div class="p-card problem-v5-tall">
+            <img src="assets/images/heart-hands.jpg" alt="" class="p-card-img" loading="lazy">
+            <div class="stat">92%</div>
+            <div class="stat-label">wil attenter zijn voor hun dierbaren</div>
+            <div class="stat-sub">Het willen is niet het probleem.</div>
+          </div>
+          <div class="p-card problem-v5-accent-pink">
+            <div class="stat">5+</div>
+            <div class="stat-label">apps waar je data verspreid zit</div>
+            <div class="stat-sub">Mama's ringmaat? Ergens in een oud appje.</div>
+          </div>
+          <div class="p-card problem-v5-accent-purple">
+            <div class="stat" style="color:var(--pink)">0</div>
+            <div class="stat-label">dagen aanlooptijd</div>
+            <div class="stat-sub">Een herinnering op de dag zelf is een herinnering om je schuldig te voelen.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</div>
+
+</div><!-- /main -->
+
+<script>
+(function(){
+  'use strict';
+
+  /* Text cycle */
+  function initTextCycles() {
+    document.querySelectorAll('.text-cycle').forEach(function(cycle) {
+      var words = cycle.querySelectorAll('.text-cycle-word');
+      if (words.length < 2) return;
+      var idx = 0;
+      var measurer = document.createElement('span');
+      measurer.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;pointer-events:none;font:inherit';
+      cycle.parentNode.appendChild(measurer);
+      function setW() { measurer.textContent = words[idx].textContent; cycle.style.width = measurer.offsetWidth + 'px'; }
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(setW);
+      setTimeout(setW, 100);
+      setTimeout(setW, 500);
+      window.addEventListener('resize', setW);
+      setInterval(function() {
+        var v = cycle.closest('.variant, .hero');
+        if (v && !v.classList.contains('active') && !v.classList.contains('hero')) return;
+        var prev = idx;
+        idx = (idx + 1) % words.length;
+        words[prev].classList.remove('active');
+        words[prev].classList.add('exit');
+        words[idx].classList.add('active');
+        setW();
+        setTimeout(function(){ words[prev].classList.remove('exit'); }, 450);
+      }, 3000);
+    });
+  }
+
+  /* Gradient bg — 21st.dev faithful port */
+  function initGradientBg(el) {
+    if (!el) return;
+    var w = 125, dir = 1, sp = 0.02, rng = 5;
+    var cols = ['#0C0C22','#6D2EFF','#FFA2FF','#7DFFFF','#E8FF3C'];
+    var stops = [35,50,60,80,100];
+    function anim() {
+      if (w >= 125+rng) dir=-1; if (w <= 125-rng) dir=1; w += dir*sp;
+      var s = stops.map(function(p,i){return cols[i]+' '+p+'%'}).join(',');
+      el.style.background = 'radial-gradient('+w+'% '+w+'% at 50% 20%, '+s+')';
+      requestAnimationFrame(anim);
+    }
+    requestAnimationFrame(anim);
+    el.style.opacity='0'; el.style.transform='scale(1.5)';
+    el.style.transition='opacity 2s cubic-bezier(0.25,0.1,0.25,1), transform 2s cubic-bezier(0.25,0.1,0.25,1)';
+    setTimeout(function(){ el.style.opacity='1'; el.style.transform='scale(1)'; },50);
+  }
+
+  /* Parallax on float cards */
+  function initParallax() {
+    var cards = document.querySelectorAll('.hero-cards .float-card');
+    if (!cards.length) return;
+    var speeds = [0.12, -0.08, 0.15, -0.1];
+    var ticking = false;
+    window.addEventListener('scroll', function() {
+      if (!ticking) { requestAnimationFrame(function() {
+        var y = window.scrollY;
+        cards.forEach(function(c,i){ c.style.setProperty('--py', (y*speeds[i%speeds.length])+'px'); });
+        ticking = false;
+      }); ticking = true; }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    initTextCycles();
+    initGradientBg(document.getElementById('gradBg'));
+    initParallax();
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+/* ========================================
+   ATTENT — Design Tokens
+   Extracted from brandbook.html
+   ======================================== */
+
+:root {
+  /* Brand Colors */
+  --cream: #FFF8EE;
+  --ink: #0C0C22;
+  --pink: #FFA2FF;
+  --purple: #6D2EFF;
+  --yellow: #E8FF3C;
+  --cyan: #7DFFFF;
+  --green: #00FF80;
+  --magenta: #FF69FF;
+  --teal: #2D9B9B;
+
+  /* Surfaces */
+  --surface: #FFF4E2;
+  --raised: #FFFFFF;
+
+  /* Text — Light sections */
+  --text-primary: #0C0C22;
+  --text-body: #5A5468;
+  --text-muted: #9A9198;
+
+  /* Text — Dark sections */
+  --dark-text-primary: rgba(255, 248, 238, 0.9);
+  --dark-text-secondary: rgba(255, 248, 238, 0.45);
+  --dark-text-muted: rgba(255, 248, 238, 0.25);
+
+  /* Borders */
+  --border: rgba(12, 12, 34, 0.06);
+  --border-md: rgba(12, 12, 34, 0.10);
+  --border-dark: rgba(255, 248, 238, 0.08);
+  --border-dark-md: rgba(255, 248, 238, 0.12);
+
+  /* Easing */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  /* Radius */
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 28px;
+  --radius-xl: 40px;
+  --radius-full: 999px;
+
+  /* Shadows — multi-layer */
+  --shadow-xs: 0 1px 2px rgba(12, 12, 34, 0.04);
+  --shadow-sm: 0 1px 3px rgba(12, 12, 34, 0.06), 0 1px 2px rgba(12, 12, 34, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(12, 12, 34, 0.06), 0 2px 4px -2px rgba(12, 12, 34, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(12, 12, 34, 0.06), 0 4px 6px -4px rgba(12, 12, 34, 0.04), 0 0 0 1px rgba(12, 12, 34, 0.02);
+  --shadow-xl: 0 20px 25px -5px rgba(12, 12, 34, 0.08), 0 8px 10px -6px rgba(12, 12, 34, 0.04), 0 0 0 1px rgba(12, 12, 34, 0.02);
+  --shadow-float: 0 12px 40px -8px rgba(12, 12, 34, 0.12), 0 4px 12px -2px rgba(12, 12, 34, 0.06);
+  --shadow-glow-purple: 0 0 40px rgba(109, 46, 255, 0.25), 0 0 80px rgba(109, 46, 255, 0.1);
+  --shadow-glow-pink: 0 0 40px rgba(255, 162, 255, 0.25), 0 0 80px rgba(255, 162, 255, 0.1);
+
+  /* Gradients */
+  --grad-hero: linear-gradient(160deg, rgba(109, 46, 255, 0.06) 0%, transparent 40%, rgba(255, 162, 255, 0.04) 70%, transparent 100%);
+  --grad-brand: linear-gradient(135deg, var(--pink), var(--purple));
+  --grad-brand-wide: linear-gradient(143deg, #FFA2FF 0%, #6D2EFF 40%, #7DFFFF 75%, #E8FF3C 100%);
+  --grad-dark-atmo: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(109, 46, 255, 0.12), transparent 60%),
+                    radial-gradient(ellipse 60% 60% at 80% 100%, rgba(255, 162, 255, 0.08), transparent 60%);
+
+  /* Spacing */
+  --section-gap: 140px;
+  --max-width: 1200px;
+  --page-padding: 32px;
+  --page-padding-mobile: 20px;
+}

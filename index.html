@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attent — De attentheidsapp</title>
+<meta name="description" content="Attent helpt je om er te zijn op de momenten die ertoe doen. Download gratis.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+
+<!-- ====== NAV ====== -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-brand" aria-label="Attent home">
+      <svg class="nav-logo" viewBox="0 0 394.9 135.11" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <g fill="var(--ink)">
+          <path d="M9.38,94.14c0-10.94,9.83-25.34,39.46-25.34h.97c7.61-18.69,19.38-45.55,36.97-45.55,5.4,0,9.14.83,13.57,1.94l-6.23,43.61h13.15l-1.52,11.21h-13.15l-.83,5.4c-1.52,10.11,1.52,15.09,8.31,15.09,8.44,0,14.81-6.78,20.63-17.86l9.14,4.43c-6.51,13.15-17.31,24.78-32.4,24.64-12.74,0-22.01-8.45-19.11-26.31l.83-5.4h-20.21l-.28.55c-8.86,21.32-18.14,31.29-31.7,31.29-8.44,0-17.58-5.81-17.58-17.72ZM27.93,100.78c6.51,0,11.35-7.75,17.17-20.63-14.95.83-23.54,7.2-23.54,14.26,0,4.15,2.77,6.37,6.37,6.37ZM80.95,68.8l5.26-33.64h-.69c-6.92,0-15.09,17.17-22.01,33.64h17.44Z"/>
+          <path d="M119.85,87.08l3.46-21.18h-9.55l1.66-11.35h9.69l3.05-18.97h13.01l-3.05,18.97h17.03l-1.52,11.35h-17.44l-3.32,20.77c-1.66,9.41,1.66,13.84,9.55,13.84,7.2,0,15.78-6.37,21.32-17.86l9.14,4.43c-7.48,15.78-19.24,24.64-33.37,24.64-9,0-22.98-4.15-19.66-24.64Z"/>
+          <path d="M162.91,87.08l3.46-21.18h-9.55l1.66-11.35h9.69l3.05-18.97h13.01l-3.05,18.97h17.03l-1.52,11.35h-17.44l-3.32,20.77c-1.66,9.41,1.66,13.84,9.55,13.84,7.2,0,15.78-6.37,21.32-17.86l9.14,4.43c-7.48,15.78-19.24,24.64-33.37,24.64-9,0-22.98-4.15-19.66-24.64Z"/>
+          <path d="M234.07,53.16c11.91,0,18,7.48,18.14,15.23,0,9.83-9.55,20.49-32.12,23.54,2.91,5.81,9.28,9.14,17.86,9.14,9.97,0,20.08-5.12,26.58-18.41l9.14,4.43c-7.89,16.34-20.77,24.78-37.24,24.78-18.97,0-31.15-10.11-31.01-27.14,0-15.51,10.24-31.57,28.66-31.57ZM239.88,69.08c0-3.05-2.22-5.26-5.95-5.4-8.58,0-15.23,9.14-15.64,19.24,14.68-1.11,21.6-8.17,21.6-13.84Z"/>
+          <path d="M268.26,54.54h12.46l-1.8,12.74c5.4-7.2,14.12-13.98,24.23-14.12,10.52,0,16.61,6.78,16.75,16.34,0,8.03-4.02,17.44-4.02,23.95,0,4.71,2.91,7.06,7.2,7.06,5.81,0,12.18-5.95,18.28-17.86l9.14,4.43c-6.78,13.71-17.58,24.64-30.32,24.64-8.86,0-16.61-5.12-16.61-15.92,0-7.89,3.18-15.64,3.32-22.98,0-4.98-2.63-8.86-8.03-9-11.49,0-20.77,18-23.81,33.09l-.42,3.05-1.38,10.52h-13.01l8.03-55.93Z"/>
+          <path d="M340.53,87.08l3.32-21.18h-9.41l1.52-11.21h9.69l3.05-18.97h13.15l-3.05,18.97h17.03l-1.52,11.21h-17.44l-3.32,20.77c-1.52,9.14,1.66,14.4,8.31,14.4,5.81,0,10.94-5.12,15.78-12.04l7.89,6.09c-5.81,8.31-14.68,16.75-25.75,16.75-8.58,0-22.57-4.29-19.24-24.78Z"/>
+        </g>
+      </svg>
+    </a>
+
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#stories" data-i18n="nav.features">Features</a></li>
+      <li><a href="#how" data-i18n="nav.how">Hoe het werkt</a></li>
+      <li class="nav-lang">
+        <button class="lang-btn active" data-lang="nl">NL</button>
+        <span class="lang-sep">|</span>
+        <button class="lang-btn" data-lang="en">EN</button>
+      </li>
+    </ul>
+
+    <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ====== HERO ====== -->
+<section class="hero" id="hero">
+  <!-- Animated gradient background -->
+  <div class="hero-gradient" id="heroGradient"></div>
+
+  <div class="container hero-grid">
+    <div class="hero-text rv">
+      <h1>
+        <span data-i18n="hero.line1">Mis nooit meer een</span>
+        <span class="text-cycle" id="textCycle">
+          <span class="text-cycle-word active">verjaardag</span>
+          <span class="text-cycle-word">jubileum</span>
+          <span class="text-cycle-word">moment</span>
+          <span class="text-cycle-word">mijlpaal</span>
+          <span class="text-cycle-word">kans</span>
+        </span>
+      </h1>
+      <p class="hero-sub" data-i18n="hero.sub">Attent helpt je om er te zijn op de momenten die ertoe doen.</p>
+      <div class="hero-actions">
+        <a href="#cta" class="btn btn-neon" data-i18n="hero.cta1">Download gratis</a>
+        <a href="#how" class="btn-text" data-i18n="hero.cta2">Bekijk hoe het werkt <span class="arrow">&rarr;</span></a>
+      </div>
+    </div>
+    <div class="hero-photo rv" style="--delay: 0.15s">
+      <img src="assets/images/hero-couple.jpg" alt="Stel dat samen naar een telefoon kijkt" width="560" height="640" loading="eager">
+    </div>
+  </div>
+</section>
+
+<!-- ====== PHOTO STRIP ====== -->
+<section class="photo-strip" aria-hidden="true">
+  <div class="marquee-row marquee-right">
+    <div class="marquee-track">
+      <img src="assets/images/selfie-woman.jpg" alt="" width="140" height="180">
+      <img src="assets/images/phone-lying.jpg" alt="" width="140" height="180">
+      <img src="assets/images/friends-piggyback.jpg" alt="" width="140" height="180">
+      <img src="assets/images/van-woman.jpg" alt="" width="140" height="180">
+      <img src="assets/images/headphones-smile.jpg" alt="" width="140" height="180">
+      <!-- dupe 2 -->
+      <img src="assets/images/selfie-woman.jpg" alt="" width="140" height="180">
+      <img src="assets/images/phone-lying.jpg" alt="" width="140" height="180">
+      <img src="assets/images/friends-piggyback.jpg" alt="" width="140" height="180">
+      <img src="assets/images/van-woman.jpg" alt="" width="140" height="180">
+      <img src="assets/images/headphones-smile.jpg" alt="" width="140" height="180">
+      <!-- dupe 3 -->
+      <img src="assets/images/selfie-woman.jpg" alt="" width="140" height="180">
+      <img src="assets/images/phone-lying.jpg" alt="" width="140" height="180">
+      <img src="assets/images/friends-piggyback.jpg" alt="" width="140" height="180">
+      <img src="assets/images/van-woman.jpg" alt="" width="140" height="180">
+      <img src="assets/images/headphones-smile.jpg" alt="" width="140" height="180">
+    </div>
+  </div>
+  <div class="marquee-row marquee-left">
+    <div class="marquee-track">
+      <img src="assets/images/heart-hands.jpg" alt="" width="140" height="180">
+      <img src="assets/images/beach-laugh.jpg" alt="" width="140" height="180">
+      <img src="assets/images/spinning-joy.jpg" alt="" width="140" height="180">
+      <img src="assets/images/friends-phones.jpg" alt="" width="140" height="180">
+      <img src="assets/images/hero-couple.jpg" alt="" width="140" height="180">
+      <!-- dupe 2 -->
+      <img src="assets/images/heart-hands.jpg" alt="" width="140" height="180">
+      <img src="assets/images/beach-laugh.jpg" alt="" width="140" height="180">
+      <img src="assets/images/spinning-joy.jpg" alt="" width="140" height="180">
+      <img src="assets/images/friends-phones.jpg" alt="" width="140" height="180">
+      <img src="assets/images/hero-couple.jpg" alt="" width="140" height="180">
+      <!-- dupe 3 -->
+      <img src="assets/images/heart-hands.jpg" alt="" width="140" height="180">
+      <img src="assets/images/beach-laugh.jpg" alt="" width="140" height="180">
+      <img src="assets/images/spinning-joy.jpg" alt="" width="140" height="180">
+      <img src="assets/images/friends-phones.jpg" alt="" width="140" height="180">
+      <img src="assets/images/hero-couple.jpg" alt="" width="140" height="180">
+    </div>
+  </div>
+</section>
+
+<!-- ====== PROBLEM ====== -->
+<section class="problem" id="problem">
+  <div class="container">
+    <span class="badge rv" data-i18n="problem.label">DE HARDE WAARHEID</span>
+    <h2 class="section-title rv" data-i18n="problem.title">Iedereen wil attent zijn.<br>Bijna niemand is het.</h2>
+
+    <div class="problem-grid">
+      <div class="problem-card problem-card--photo rv">
+        <img src="assets/images/heart-hands.jpg" alt="Hartgebaar vanuit autoraam" width="400" height="240" loading="lazy">
+        <p data-i18n="problem.card1">92% wil attenter zijn voor hun dierbaren. Het willen is niet het probleem.</p>
+      </div>
+      <div class="problem-card rv" style="--delay: 0.1s">
+        <p data-i18n="problem.card2">Je weet dat mama jarig is. Maar je weet niet precies wanneer. Of wat haar ringmaat is. Of waar je dat cadeautje naartoe moet sturen.</p>
+      </div>
+      <div class="problem-card problem-card--wide rv" style="--delay: 0.2s">
+        <div class="problem-card-inner">
+          <p data-i18n="problem.card3">Een herinnering op de dag zelf is een herinnering om je schuldig te voelen.</p>
+          <div class="problem-stat">
+            <span class="stat-number">0</span>
+            <span class="stat-label" data-i18n="problem.stat">dagen van tevoren</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== PIVOT ====== -->
+<section class="pivot" id="pivot">
+  <div class="container pivot-grid">
+    <div class="pivot-photo rv">
+      <img src="assets/images/spinning-joy.jpg" alt="Vrouw die draait van vreugde" width="520" height="620" loading="lazy">
+    </div>
+    <div class="pivot-text rv" style="--delay: 0.15s">
+      <h2 class="shimmer-text" data-i18n="pivot.text">Stel je voor dat je nooit meer een moment mist.</h2>
+    </div>
+  </div>
+</section>
+
+<!-- ====== HOW IT WORKS ====== -->
+<section class="how" id="how">
+  <div class="container">
+    <span class="badge rv" data-i18n="how.label">HOE HET WERKT</span>
+    <h2 class="section-title rv" data-i18n="how.title">Drie stappen om nooit meer te vergeten</h2>
+
+    <div class="how-grid">
+      <div class="how-steps">
+        <button class="step active rv" data-step="1" aria-expanded="true">
+          <span class="step-num">01</span>
+          <div class="step-content">
+            <h3 data-i18n="how.step1.title">Voeg je mensen toe</h3>
+            <p data-i18n="how.step1.desc">Importeer contacten of voeg ze handmatig toe. Stel verjaardagen, jubilea en alles wat ertoe doet in.</p>
+          </div>
+        </button>
+        <button class="step rv" data-step="2" style="--delay:0.08s" aria-expanded="false">
+          <span class="step-num">02</span>
+          <div class="step-content">
+            <h3 data-i18n="how.step2.title">Krijg slimme herinneringen</h3>
+            <p data-i18n="how.step2.desc">Attent vertelt het je vroeg genoeg om iets te doen. Niet op de dag zelf als je alleen nog een paniektekstje kunt sturen.</p>
+          </div>
+        </button>
+        <button class="step rv" data-step="3" style="--delay:0.16s" aria-expanded="false">
+          <span class="step-num">03</span>
+          <div class="step-content">
+            <h3 data-i18n="how.step3.title">Laat zien dat je er bent</h3>
+            <p data-i18n="how.step3.desc">Stuur een cadeautje, schrijf een berichtje, of check gewoon even in. Elke actie bouwt aan je streak.</p>
+          </div>
+        </button>
+      </div>
+
+      <div class="phone-mockup rv" style="--delay:0.2s">
+        <div class="phone-frame">
+          <div class="phone-notch"></div>
+          <div class="phone-screens">
+            <!-- Screen 1: Contacts -->
+            <div class="phone-screen active" data-screen="1">
+              <div class="screen-header">
+                <span class="screen-title" data-i18n="phone.contacts">Mijn mensen</span>
+                <span class="screen-count">12</span>
+              </div>
+              <div class="contact-item">
+                <div class="avatar" style="background: var(--pink);">S</div>
+                <div class="contact-info">
+                  <span class="contact-name">Sarah de Vries</span>
+                  <span class="contact-detail" data-i18n="phone.birthday">Verjaardag: 14 april</span>
+                </div>
+              </div>
+              <div class="contact-item">
+                <div class="avatar" style="background: var(--purple); color: #fff;">M</div>
+                <div class="contact-info">
+                  <span class="contact-name">Mama</span>
+                  <span class="contact-detail" data-i18n="phone.birthday2">Verjaardag: 8 juni</span>
+                </div>
+              </div>
+              <div class="contact-item">
+                <div class="avatar" style="background: var(--cyan);">T</div>
+                <div class="contact-info">
+                  <span class="contact-name">Thomas</span>
+                  <span class="contact-detail" data-i18n="phone.anniv">Jubileum: 22 mei</span>
+                </div>
+              </div>
+              <div class="contact-item">
+                <div class="avatar" style="background: var(--yellow); color: var(--ink);">L</div>
+                <div class="contact-info">
+                  <span class="contact-name">Lisa</span>
+                  <span class="contact-detail" data-i18n="phone.birthday3">Verjaardag: 3 dec</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Screen 2: Reminders -->
+            <div class="phone-screen" data-screen="2">
+              <div class="screen-header">
+                <span class="screen-title" data-i18n="phone.reminders">Herinneringen</span>
+              </div>
+              <div class="reminder-card reminder-urgent">
+                <div class="reminder-time" data-i18n="phone.in3weeks">Over 3 weken</div>
+                <div class="reminder-title" data-i18n="phone.sarah30">Sarah wordt 30!</div>
+                <div class="reminder-hint" data-i18n="phone.sarahHint">Tijd om een cadeau te regelen</div>
+              </div>
+              <div class="reminder-card">
+                <div class="reminder-time" data-i18n="phone.in6weeks">Over 6 weken</div>
+                <div class="reminder-title" data-i18n="phone.mama">Mama&rsquo;s verjaardag</div>
+                <div class="reminder-hint" data-i18n="phone.mamaHint">Ze wilde dat boek van Kluun</div>
+              </div>
+              <div class="reminder-card">
+                <div class="reminder-time" data-i18n="phone.in2months">Over 2 maanden</div>
+                <div class="reminder-title" data-i18n="phone.thomas">Jubileum Thomas &amp; Eva</div>
+                <div class="reminder-hint" data-i18n="phone.thomasHint">Dinertje boeken?</div>
+              </div>
+            </div>
+
+            <!-- Screen 3: Streaks -->
+            <div class="phone-screen" data-screen="3">
+              <div class="screen-header">
+                <span class="screen-title" data-i18n="phone.activity">Activiteit</span>
+              </div>
+              <div class="streak-display">
+                <div class="streak-flame">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--pink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 3 2.5 3.5 3.5 4.5A5 5 0 0 1 17 10c0 3.5-2 5-5 7.5C9 15 7 13.5 7 10a5 5 0 0 1 1.5-3.5C9.5 5.5 11 5 12 2z"/></svg>
+                </div>
+                <span class="streak-count">7</span>
+                <span class="streak-label" data-i18n="phone.streak">dagen op rij</span>
+              </div>
+              <div class="activity-item done">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="phone.sent">Cadeau verstuurd naar Sarah</span>
+              </div>
+              <div class="activity-item done">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="phone.checked">Ingecheckt bij Thomas</span>
+              </div>
+              <div class="activity-item done">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="phone.wrote">Berichtje gestuurd naar Lisa</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== STORY CARDS ====== -->
+<section class="stories" id="stories">
+  <div class="container">
+    <div class="story-card rv">
+      <div class="story-photo">
+        <img src="assets/images/friends-phones.jpg" alt="Twee vriendinnen lachend met telefoons" width="480" height="360" loading="lazy">
+      </div>
+      <div class="story-text">
+        <p data-i18n="stories.card1">Sarah wordt 30 over 3 weken. Attent vertelde het je op tijd. Je hebt een cadeau geregeld. Je bent de held.</p>
+        <span class="story-tag" data-i18n="stories.card1.tag">Slimme herinneringen</span>
+      </div>
+    </div>
+
+    <div class="story-card story-card--reverse rv">
+      <div class="story-photo">
+        <img src="assets/images/headphones-smile.jpg" alt="Vrouw met koptelefoon lacht" width="480" height="360" loading="lazy">
+      </div>
+      <div class="story-text">
+        <p data-i18n="stories.card2">Je weet nog dat je klant van sushi houdt. Dat je collega vorige maand vader is geworden. Kleine details, groot verschil.</p>
+        <span class="story-tag" data-i18n="stories.card2.tag">Alles op één plek</span>
+      </div>
+    </div>
+
+    <div class="story-card rv">
+      <div class="story-photo">
+        <img src="assets/images/beach-laugh.jpg" alt="Vrouw op strand lacht met telefoon" width="480" height="360" loading="lazy">
+      </div>
+      <div class="story-text">
+        <p data-i18n="stories.card3">7 dagen op rij attent geweest. Je streak groeit. Je wordt er een beetje competitief van.</p>
+        <span class="story-tag" data-i18n="stories.card3.tag">Streaks die het leuk maken</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== SOCIAL PROOF ====== -->
+<section class="proof" id="proof">
+  <div class="container">
+    <h2 class="section-title rv" data-i18n="proof.title">Een probleem dat universeel werd herkend.</h2>
+
+    <div class="proof-grid">
+      <div class="proof-card proof-card--pink rv">
+        <blockquote>
+          <p data-i18n="proof.quote1">&ldquo;Een oplossing die voelt alsof het er altijd al had moeten zijn.&rdquo;</p>
+          <footer data-i18n="proof.attr1">Founder, pitchsessie</footer>
+        </blockquote>
+      </div>
+      <div class="proof-card proof-card--purple rv" style="--delay:0.1s">
+        <blockquote>
+          <p data-i18n="proof.quote2">&ldquo;Ik was vorige maand letterlijk de verjaardag van mijn beste vriend vergeten. Take my money.&rdquo;</p>
+          <footer data-i18n="proof.attr2">Developer, pitchsessie</footer>
+        </blockquote>
+      </div>
+      <div class="proof-card proof-card--cyan rv" style="--delay:0.2s">
+        <blockquote>
+          <p data-i18n="proof.quote3">&ldquo;Het streak-ding is geniaal. Ik zou met mijn broers en zussen strijden over wie attenter is.&rdquo;</p>
+          <footer data-i18n="proof.attr3">Creative, pitchsessie</footer>
+        </blockquote>
+      </div>
+    </div>
+
+    <div class="proof-rating rv">
+      <div class="stars">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--yellow)" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--yellow)" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--yellow)" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--yellow)" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--yellow)" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+      <span data-i18n="proof.rating">4.9 uit pitchsessies</span>
+    </div>
+  </div>
+</section>
+
+<!-- ====== REMINDER CARDS STACK ====== -->
+<section class="card-stack-section" id="reminders">
+  <div class="container" style="text-align:center">
+    <div class="section-label rv" data-i18n="cards.label">WAT JE ONTVANGT</div>
+    <h2 class="section-title rv" data-i18n="cards.title">Herinneringen die er echt toe doen</h2>
+    <p class="section-sub rv" data-i18n="cards.sub">Geen saaie notificaties. Persoonlijke, tijdige nudges die je helpen er te zijn.</p>
+  </div>
+  <div class="card-stack" id="cardStack">
+    <div class="stack-card active" data-card="0">
+      <div class="stack-card-inner">
+        <div class="stack-card-emoji">🎂</div>
+        <div class="stack-card-content">
+          <strong>Mama's verjaardag</strong>
+          <span>Over 19 dagen — 12 april</span>
+          <small>Tip: ze wilde een nieuwe Sancerre proberen</small>
+        </div>
+        <div class="stack-card-action" style="background:rgba(109,46,255,0.08);color:var(--purple)">Plan cadeau</div>
+      </div>
+    </div>
+    <div class="stack-card" data-card="1">
+      <div class="stack-card-inner">
+        <div class="stack-card-emoji">💍</div>
+        <div class="stack-card-content">
+          <strong>Trouwdag met Emma</strong>
+          <span>Over 45 dagen — 8 mei</span>
+          <small>Vorig jaar: diner bij Jules. Overtref jezelf.</small>
+        </div>
+        <div class="stack-card-action" style="background:rgba(255,162,255,0.08);color:var(--pink)">Verras haar</div>
+      </div>
+    </div>
+    <div class="stack-card" data-card="2">
+      <div class="stack-card-inner">
+        <div class="stack-card-emoji">🎉</div>
+        <div class="stack-card-content">
+          <strong>Jaap's nieuwe baan</strong>
+          <span>Vandaag</span>
+          <small>Een felicitatiebericht doet wonderen.</small>
+        </div>
+        <div class="stack-card-action" style="background:rgba(0,255,128,0.08);color:#00994d">Stuur bericht</div>
+      </div>
+    </div>
+    <div class="stack-card" data-card="3">
+      <div class="stack-card-inner">
+        <div class="stack-card-emoji">👶</div>
+        <div class="stack-card-content">
+          <strong>David werd vader</strong>
+          <span>Vorige week</span>
+          <small>Een kaartje sturen? Of een klein cadeautje?</small>
+        </div>
+        <div class="stack-card-action" style="background:rgba(125,255,255,0.08);color:var(--teal)">Kies cadeau</div>
+      </div>
+    </div>
+    <div class="stack-card" data-card="4">
+      <div class="stack-card-inner">
+        <div class="stack-card-emoji">🏆</div>
+        <div class="stack-card-content">
+          <strong>7-dag streak bereikt</strong>
+          <span>Je bent on fire</span>
+          <small>Nog 3 dagen tot Blaze-status.</small>
+        </div>
+        <div class="stack-card-action" style="background:rgba(232,255,60,0.08);color:#7a8500">Ga zo door</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== FINAL CTA ====== -->
+<section class="cta" id="cta">
+  <canvas id="confetti" aria-hidden="true"></canvas>
+  <div class="container">
+    <div class="cta-photo rv">
+      <img src="assets/images/friends-phones.jpg" alt="Vrienden lachen samen" width="1100" height="500" loading="lazy">
+    </div>
+    <h2 class="rv" data-i18n="cta.title">Je mensen verdienen iemand die het onthoudt.</h2>
+    <p class="cta-sub rv" data-i18n="cta.sub">Wees diegene.</p>
+    <a href="#" class="btn btn-gradient rv" id="ctaBtn" data-i18n="cta.btn">Download Attent gratis</a>
+    <div class="store-badges rv">
+      <a href="#" class="store-badge" aria-label="Download on the App Store">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--cream)"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        <div><small>Download on the</small><strong>App Store</strong></div>
+      </a>
+      <a href="#" class="store-badge" aria-label="Get it on Google Play">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--cream)"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.302 1.31a1.004 1.004 0 0 1 0 1.764l-2.302 1.31-2.536-2.536 2.536-2.536zM5.864 2.658L16.8 8.99l-2.302 2.302-8.635-8.635z"/></svg>
+        <div><small>Get it on</small><strong>Google Play</strong></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ====== FOOTER ====== -->
+<footer class="footer" id="footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <svg class="footer-logo" viewBox="0 0 394.9 135.11" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <g fill="var(--ink)">
+          <path d="M9.38,94.14c0-10.94,9.83-25.34,39.46-25.34h.97c7.61-18.69,19.38-45.55,36.97-45.55,5.4,0,9.14.83,13.57,1.94l-6.23,43.61h13.15l-1.52,11.21h-13.15l-.83,5.4c-1.52,10.11,1.52,15.09,8.31,15.09,8.44,0,14.81-6.78,20.63-17.86l9.14,4.43c-6.51,13.15-17.31,24.78-32.4,24.64-12.74,0-22.01-8.45-19.11-26.31l.83-5.4h-20.21l-.28.55c-8.86,21.32-18.14,31.29-31.7,31.29-8.44,0-17.58-5.81-17.58-17.72ZM27.93,100.78c6.51,0,11.35-7.75,17.17-20.63-14.95.83-23.54,7.2-23.54,14.26,0,4.15,2.77,6.37,6.37,6.37ZM80.95,68.8l5.26-33.64h-.69c-6.92,0-15.09,17.17-22.01,33.64h17.44Z"/>
+          <path d="M119.85,87.08l3.46-21.18h-9.55l1.66-11.35h9.69l3.05-18.97h13.01l-3.05,18.97h17.03l-1.52,11.35h-17.44l-3.32,20.77c-1.66,9.41,1.66,13.84,9.55,13.84,7.2,0,15.78-6.37,21.32-17.86l9.14,4.43c-7.48,15.78-19.24,24.64-33.37,24.64-9,0-22.98-4.15-19.66-24.64Z"/>
+          <path d="M162.91,87.08l3.46-21.18h-9.55l1.66-11.35h9.69l3.05-18.97h13.01l-3.05,18.97h17.03l-1.52,11.35h-17.44l-3.32,20.77c-1.66,9.41,1.66,13.84,9.55,13.84,7.2,0,15.78-6.37,21.32-17.86l9.14,4.43c-7.48,15.78-19.24,24.64-33.37,24.64-9,0-22.98-4.15-19.66-24.64Z"/>
+          <path d="M234.07,53.16c11.91,0,18,7.48,18.14,15.23,0,9.83-9.55,20.49-32.12,23.54,2.91,5.81,9.28,9.14,17.86,9.14,9.97,0,20.08-5.12,26.58-18.41l9.14,4.43c-7.89,16.34-20.77,24.78-37.24,24.78-18.97,0-31.15-10.11-31.01-27.14,0-15.51,10.24-31.57,28.66-31.57ZM239.88,69.08c0-3.05-2.22-5.26-5.95-5.4-8.58,0-15.23,9.14-15.64,19.24,14.68-1.11,21.6-8.17,21.6-13.84Z"/>
+          <path d="M268.26,54.54h12.46l-1.8,12.74c5.4-7.2,14.12-13.98,24.23-14.12,10.52,0,16.61,6.78,16.75,16.34,0,8.03-4.02,17.44-4.02,23.95,0,4.71,2.91,7.06,7.2,7.06,5.81,0,12.18-5.95,18.28-17.86l9.14,4.43c-6.78,13.71-17.58,24.64-30.32,24.64-8.86,0-16.61-5.12-16.61-15.92,0-7.89,3.18-15.64,3.32-22.98,0-4.98-2.63-8.86-8.03-9-11.49,0-20.77,18-23.81,33.09l-.42,3.05-1.38,10.52h-13.01l8.03-55.93Z"/>
+          <path d="M340.53,87.08l3.32-21.18h-9.41l1.52-11.21h9.69l3.05-18.97h13.15l-3.05,18.97h17.03l-1.52,11.21h-17.44l-3.32,20.77c-1.52,9.14,1.66,14.4,8.31,14.4,5.81,0,10.94-5.12,15.78-12.04l7.89,6.09c-5.81,8.31-14.68,16.75-25.75,16.75-8.58,0-22.57-4.29-19.24-24.78Z"/>
+        </g>
+      </svg>
+      <p class="footer-tagline" data-i18n="footer.tagline">De attentheidsapp.</p>
+    </div>
+    <div class="footer-col">
+      <h4 data-i18n="footer.product">Product</h4>
+      <ul>
+        <li><a href="#stories" data-i18n="footer.link.features">Features</a></li>
+        <li><a href="#how" data-i18n="footer.link.how">Hoe het werkt</a></li>
+        <li><a href="#cta" data-i18n="footer.link.download">Download</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4 data-i18n="footer.company">Bedrijf</h4>
+      <ul>
+        <li><a href="#" data-i18n="footer.link.about">Over ons</a></li>
+        <li><a href="#" data-i18n="footer.link.blog">Blog</a></li>
+        <li><a href="#" data-i18n="footer.link.contact">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4 data-i18n="footer.legal">Juridisch</h4>
+      <ul>
+        <li><a href="#" data-i18n="footer.link.privacy">Privacy</a></li>
+        <li><a href="#" data-i18n="footer.link.terms">Voorwaarden</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <p>&copy; 2026 Attent &middot; <span data-i18n="footer.credit">Gemaakt met liefde door Studio BLEACH</span></p>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,292 @@
+/* ========================================
+   ATTENT — Animations
+   Emil Kowalski rules: custom ease-out,
+   never ease-in, respect reduced-motion
+   ======================================== */
+
+/* ---- Scroll Reveal ---- */
+.rv {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 700ms var(--ease-out), transform 700ms var(--ease-out);
+  transition-delay: var(--delay, 0s);
+}
+
+.rv.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---- Marquee ---- */
+@keyframes marquee-right {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-152px * 5)); }
+}
+
+@keyframes marquee-left {
+  0% { transform: translateX(calc(-152px * 5)); }
+  100% { transform: translateX(0); }
+}
+
+.marquee-right .marquee-track {
+  animation: marquee-right 30s linear infinite;
+}
+
+.marquee-left .marquee-track {
+  animation: marquee-left 30s linear infinite;
+}
+
+/* ---- Shimmer Text ---- */
+.shimmer-text {
+  background: linear-gradient(
+    110deg,
+    var(--dark-text-primary) 0%,
+    var(--dark-text-primary) 40%,
+    rgba(255, 162, 255, 0.7) 50%,
+    var(--dark-text-primary) 60%,
+    var(--dark-text-primary) 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 4s var(--ease-in-out) infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 150% center; }
+  100% { background-position: -50% center; }
+}
+
+/* ---- Confetti particle (JS-driven canvas, but fallback keyframe for CSS-only sparkle) ---- */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* ---- Button hover glow pulse ---- */
+.btn-gradient {
+  position: relative;
+}
+
+.btn-gradient::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: var(--radius-full);
+  background: var(--grad-brand);
+  z-index: -1;
+  opacity: 0;
+  filter: blur(16px);
+  transition: opacity 300ms var(--ease-out);
+}
+
+.btn-gradient:hover::after {
+  opacity: 0.4;
+}
+
+/* ---- Phone screen transitions ---- */
+.phone-screen {
+  transition: opacity 400ms var(--ease-out), transform 400ms var(--ease-out);
+  transform: scale(0.98);
+}
+
+.phone-screen.active {
+  transform: scale(1);
+}
+
+/* ---- Step expand animation ---- */
+.step {
+  transition: border-color 200ms var(--ease-out),
+              box-shadow 200ms var(--ease-out),
+              background 200ms var(--ease-out);
+}
+
+.step.active {
+  background: var(--raised);
+}
+
+/* ---- Card hover lift ---- */
+.story-card,
+.problem-card,
+.proof-card {
+  transition: transform 300ms var(--ease-out), box-shadow 300ms var(--ease-out);
+}
+
+/* ---- Nav transition ---- */
+.nav {
+  transition: background 300ms var(--ease-out),
+              border-color 300ms var(--ease-out),
+              box-shadow 300ms var(--ease-out);
+}
+
+/* ---- Link underline animation ---- */
+.nav-links a {
+  position: relative;
+}
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1.5px;
+  background: var(--purple);
+  transition: width 300ms var(--ease-out);
+}
+
+.nav-links a:hover::after {
+  width: 100%;
+}
+
+/* ---- Text Cycle (animated word swap) ---- */
+.text-cycle {
+  display: inline-block;
+  position: relative;
+  vertical-align: bottom;
+  overflow: hidden;
+  height: 1.2em;
+  min-width: 3ch;
+}
+
+.text-cycle-word {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: max-content;
+  font-weight: 800;
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: 0;
+  transform: translateY(-100%);
+  filter: blur(8px);
+  transition: opacity 400ms var(--ease-out), transform 400ms var(--ease-out), filter 400ms var(--ease-out);
+}
+
+.text-cycle-word.active {
+  position: relative;
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+.text-cycle-word.exit {
+  opacity: 0;
+  transform: translateY(100%);
+  filter: blur(8px);
+}
+
+/* ---- Hero Gradient Background ---- */
+.hero-gradient {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(1.3);
+  transition: opacity 2s cubic-bezier(0.25, 0.1, 0.25, 1), transform 2s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.hero-gradient.active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ---- Neon Button Glow ---- */
+.btn-neon {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-neon::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--purple), transparent);
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+
+.btn-neon::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--purple), transparent);
+  opacity: 0.3;
+  transition: opacity 500ms ease;
+}
+
+.btn-neon:hover::before {
+  opacity: 1;
+}
+
+.btn-neon:hover::after {
+  opacity: 0.6;
+}
+
+/* ---- Stacked Card Animation ---- */
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px) scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(var(--y)) scale(var(--s));
+  }
+}
+
+@keyframes card-exit {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(var(--y)) scale(var(--s));
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(300px) scale(1);
+  }
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .rv {
+    opacity: 1;
+    transform: none;
+  }
+
+  .shimmer-text {
+    animation: none;
+    background: none;
+    -webkit-text-fill-color: var(--dark-text-primary);
+  }
+
+  .marquee-right .marquee-track,
+  .marquee-left .marquee-track {
+    animation: none;
+  }
+}
