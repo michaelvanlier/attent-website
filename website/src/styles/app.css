@@ -397,14 +397,14 @@ img, svg { display: block; max-width: 100%; }
 
 .phone-mockup-left {
   z-index: 2;
-  transform: translateX(-200px) rotate(-6deg) scale(0.92);
-  bottom: -20px;
+  bottom: 0;
+  will-change: transform;
 }
 
 .phone-mockup-right {
   z-index: 2;
-  transform: translateX(200px) rotate(6deg) scale(0.92);
-  bottom: -20px;
+  bottom: 0;
+  will-change: transform;
 }
 
 .phone-screen {
@@ -1899,8 +1899,8 @@ img, svg { display: block; max-width: 100%; }
   .hero-buttons .btn { width: 100%; justify-content: center; }
   .hero-phones { height: 300px; }
   .phone-mockup { width: 180px; height: 360px; border-radius: 24px; }
-  .phone-mockup-left { transform: translateX(-120px) rotate(-6deg) scale(0.88); }
-  .phone-mockup-right { transform: translateX(120px) rotate(6deg) scale(0.88); }
+  .phone-mockup-left, .phone-mockup-right { /* JS handles transforms */ }
+
   .section { padding: 100px 20px; }
   .statement-section { padding: 60px 20px; }
   .statement-text { font-size: 24px; }

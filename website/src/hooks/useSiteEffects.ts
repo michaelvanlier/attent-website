@@ -105,6 +105,51 @@ export function useSiteEffects() {
       if (cycleResizeHandler) window.removeEventListener('resize', cycleResizeHandler)
     })
 
+    // --- Hero phones fan-out on scroll (progressive) ---
+    const heroPhones = document.querySelector('.hero-phones') as HTMLElement | null
+    const phoneLeft = document.querySelector('.phone-mockup-left') as HTMLElement | null
+    const phoneRight = document.querySelector('.phone-mockup-right') as HTMLElement | null
+    if (heroPhones && phoneLeft && phoneRight) {
+      let ticking = false
+      const isMobile = window.innerWidth <= 768
+      const maxX = isMobile ? 120 : 200
+      const maxRotate = 6
+      const maxScale = isMobile ? 0.88 : 0.92
+      const maxBottom = 20
+
+      const updatePhones = () => {
+        const rect = heroPhones.getBoundingClientRect()
+        const viewH = window.innerHeight
+        // Progress: 0 when phones enter viewport, 1 when top of phones hits ~40% of viewport
+        const start = viewH * 0.8
+        const end = viewH * 0.2
+        const progress = Math.max(0, Math.min(1, (start - rect.top) / (start - end)))
+
+        const x = progress * maxX
+        const rotate = progress * maxRotate
+        const scale = 1 - progress * (1 - maxScale)
+        const bottom = progress * maxBottom
+
+        phoneLeft.style.transform = `translateX(${-x}px) rotate(${-rotate}deg) scale(${scale})`
+        phoneLeft.style.bottom = `${-bottom}px`
+        phoneRight.style.transform = `translateX(${x}px) rotate(${rotate}deg) scale(${scale})`
+        phoneRight.style.bottom = `${-bottom}px`
+        ticking = false
+      }
+
+      const onPhoneScroll = () => {
+        if (!ticking) {
+          requestAnimationFrame(updatePhones)
+          ticking = true
+        }
+      }
+
+      // Set initial state
+      updatePhones()
+      window.addEventListener('scroll', onPhoneScroll, { passive: true })
+      cleanups.push(() => window.removeEventListener('scroll', onPhoneScroll))
+    }
+
     // --- Statement text fill (scroll-based word coloring) ---
     const stWords = document.querySelectorAll('.statement-text .stword')
     let stObserver: IntersectionObserver | undefined
